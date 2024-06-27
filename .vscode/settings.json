@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "vector": "cpp"
+    }
+}
+
+{
+    "editor.formatOnSave": true
+}

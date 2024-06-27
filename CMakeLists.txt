@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_N YesRTOS)
-project(${PROJECT_N} VERSION 1.0)
+set(PROJECT_NAME YesRTOS)
+project(${PROJECT_NAME} VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+set(CMAKE_CXX_FLAGS "-g -O0")
 
-file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+# Find all C++ source files in the src directory.
+file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/*.S)
 
-# a macro that gets all of the header containing directories. 
+# A macro that gets all of the header containing directories.
 MACRO(header_directories return_list includes_base_folder extention )
     FILE(GLOB_RECURSE new_list ${includes_base_folder}/*.${extention})
     SET(dir_list "")
@@ -21,7 +24,7 @@ MACRO(header_directories return_list includes_base_folder extention )
     SET(${return_list} ${dir_list})
 ENDMACRO()
 
-# using said macro.
+# Find all header files in the include directory.
 header_directories(INCLUDES ${PROJECT_SOURCE_DIR}/include/ hpp)
 
 message("src files:")
@@ -33,6 +36,8 @@ message("include directories:")
 foreach(dir ${INCLUDES})
         message(STATUS ${dir})
 endforeach()
-add_executable(${PROJECT_N} ${SRCS})
 
-target_include_directories(${PROJECT_N} PUBLIC include)
+# Create the executable.
+SET(EXECUTABLE_NAME RunIt)
+add_executable(${EXECUTABLE_NAME} ${SRCS})
+target_include_directories(${EXECUTABLE_NAME} PUBLIC include)
