@@ -7,7 +7,7 @@ add_library(stm32cubemx INTERFACE)
 enable_language(C ASM)
 
 target_compile_definitions(stm32cubemx INTERFACE 
-	USE_HAL_DRIVER 
+	USE_HAL_DRIVER
 	STM32F767xx
     $<$<CONFIG:Debug>:DEBUG>
 )
@@ -58,5 +58,13 @@ target_link_libraries(stm32cubemx INTERFACE
 if(CMAKE_C_STANDARD LESS 11)
     message(ERROR "Generated code requires C11 or higher")
 endif()
+
+# Flash command.
+add_custom_target(flash
+    COMMAND openocd
+            -f interface/stlink-v2-1.cfg
+            -f target/stm32f7x.cfg
+            -c 'program /Users/lhan/Projects/YesRTOS/Armv7-M/build/Armv7-M.elf verify reset exit'
+)
 
 
