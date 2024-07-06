@@ -13,7 +13,7 @@ Thread::Thread(thread_info_t cfg) {
 Thread::~Thread() {
   this->thread_info.routine_ptr = nullptr;
   this->thread_info.state = COMPLETE;
-};
+}
 
 /// @brief Get thread state.
 /// @return thread state reference.

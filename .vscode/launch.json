@@ -1,17 +1,19 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "configurations": [
       {
-        "name": "(lldb) Launch debug session",
-        "type": "lldb",
-        "request": "launch",
-        "program": "${workspaceRoot}/RunIt",
-        "args": [],
-        "stopAtEntry": true,
-        "cwd": "${workspaceRoot}",
-        "environment": [],
-        "externalConsole": false,
-        "MIMode": "lldb"
-      },
-    ]
-  }
+          "name": "Cortex Debug (STM32F767 ST-Link)",   // Required VSCode extension: "Cortex-Debug"
+          "cwd": "${workspaceRoot}",
+          "executable": "${workspaceRoot}/build/src/armv7m/YesRTOSMachineLayer.elf",
+          "request": "launch",
+          "type": "cortex-debug",
+          "servertype": "openocd",
+          "configFiles": [
+              "interface/stlink.cfg",
+              "target/stm32f7x.cfg",
+          ],
+          "openOCDLaunchCommands": ["init", "reset init"],
+          "runToEntryPoint": "main",    // Debug symbol to place first breakpoint on.
+          "svdFile": "${workspaceRoot}/armv7m/STM32F767.svd"
+      }
+  ]
+}

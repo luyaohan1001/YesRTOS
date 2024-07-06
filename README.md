@@ -5,15 +5,22 @@
 [AI art generated with Magic Studio](https://magicstudio.com/ai-art-generator/)
 
 ## Goal of the Project
-* Lightweight, efficient, and cross-platform real-time operating system.
-* Implemented with modern C++ and assembly.
+* Lightweight, efficient, and low coupling real time operating system.
 
-## Platform
-* ARM64
-  
+## Language
+* Modern C++, C11, and ARM assembly.
+
+## Build System
+* CMake
+
+## Tool Chain
+* VSCode + GNU GCC Cross Compiler, Analysis Tools, etc.
+* OpenOCD
+* GDB
+
 ## Design Phase of YesRTOS
 #### Phase 0
-* Round-Robin Scheduler 
+* Round-Robin Scheduler
 * Cooperative Thread (no preemption)
 * Context Switch
 
@@ -26,7 +33,7 @@
 #### Phase 2
 * Profiling Interface
 * Software Architecture Layout
-   
+
 #### Phase 3
 * Spinlock
 * Mutex
@@ -42,14 +49,23 @@
 * Other advanced topics
 
 ## Intended Application in Future
-* ⌚️ IoT Devices 
+* ⌚️ IoT Devices
 * 🚇 Automotive Systems
 * 👨‍🏭 Industrial Automation
 * 🏥 Medical Devices
-* 🎮 Consumer Electronics: 
+* 🎮 Consumer Electronics
 
+#### Compilation
 
-## Apple Silicon (ARM64) Assembly Programming
-  * https://github.com/below/HelloSilicon
-  * https://courses.cs.washington.edu/courses/cse469/19wi/arm64.pdf
-  * https://developer.arm.com/documentation/den0024/a/An-Introduction-to-the-ARMv8-Instruction-Sets/The-ARMv8-instruction-sets
+  Follow these steps to compile this project.
+  ```bash
+  1. mkdir build
+  2. cd build
+  3. cmake ..
+  4. make -j8
+  ```
+
+  To flash to platform using OpenOCD, use the following command:
+  ```bash
+  make flash
+  ```

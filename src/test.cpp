@@ -15,7 +15,7 @@ void(thread1_routine)(Thread& thread_handle) {
   }
 }
 
-int main(int argc, char const* argv[]) {
+int main() {
   // main function --> actual entry.
   Thread thread0(thread_info_t{.id = 0, .routine_ptr = thread0_routine});
   RoundRobinScheduler::add_thread(thread0);

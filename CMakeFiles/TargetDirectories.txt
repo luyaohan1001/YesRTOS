@@ -1,3 +1,0 @@
-/Users/lhan/Projects/YesRTOS/CMakeFiles/RunIt.dir
-/Users/lhan/Projects/YesRTOS/CMakeFiles/edit_cache.dir
-/Users/lhan/Projects/YesRTOS/CMakeFiles/rebuild_cache.dir
