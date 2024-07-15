@@ -1,22 +1,30 @@
 # YesRTOS - A Real-Time Operating System
 
-![alt text](/docs/images/github_profile.jpg)
+![alt text](/docs/diagrams/github_profile.jpg)
 
 [AI art generated with Magic Studio](https://magicstudio.com/ai-art-generator/)
 
 ## Goal of the Project
-* Lightweight, efficient, and low coupling real time operating system.
+* Lightweight and portable real time operating system.
 
 ## Language
-* Modern C++, C11, and ARM assembly.
+* Modern C++, C11, and GNU ARM assembly.
 
 ## Build System
-* CMake
+* CMake, Make
 
-## Tool Chain
-* VSCode + GNU GCC Cross Compiler, Analysis Tools, etc.
+## Environment / Tool Chain
+* VSCode
+* Clangd
 * OpenOCD
-* GDB
+* GNU ARM Toolchain
+* PlantUML
+* Doxygen
+* Cppcheck
+* QEMU
+
+## YesRTOS Architecture Diagram
+![alt text](/docs/diagrams/architecture.png)
 
 ## Design Phase of YesRTOS
 #### Phase 0
@@ -54,6 +62,12 @@
 * 👨‍🏭 Industrial Automation
 * 🏥 Medical Devices
 * 🎮 Consumer Electronics
+
+
+## Phase 0 Demo
+
+![alt text](/docs/demo/CooperativeMultitaskingDemo.gif)
+CooperativeMultitaskingDemo.mp4
 
 #### Compilation
 

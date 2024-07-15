@@ -1,0 +1,41 @@
+' Demo: Cooperative multitasking
+@startuml
+
+skinparam monochrome reverse
+skinparam DefaultFontSize 10
+skinparam ArrowFontSize 9
+
+' Color scheme
+title Cooperative Multitasking Demo
+
+' Clean
+hide empty description
+
+' Fonts
+skinparam DefaultFontSize 10
+skinparam ArrowFontSize 9
+
+' State with descriptions
+main: initialize roundrobin scheduler, adding several threads
+thread0: run routine, wake up thread1 and yield
+thread1: run routine, on its first entry only, wake up thread0 and yield
+
+' Begin
+[*] --> main
+main --> scheduler
+scheduler -d-> scheduler : iterate thread queue
+
+scheduler --> save_sched_context : run()
+save_sched_context --> thread0
+save_sched_context --> thread1
+
+thread0 -r-> load_sched_context : yield()
+load_sched_context--> scheduler : b $LR
+
+thread1 -l-> load_sched_context : yield()
+load_sched_context--> scheduler : b $LR
+
+
+center footer Luyao Han 2024
+
+@enduml

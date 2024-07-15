@@ -1,0 +1,58 @@
+' Component UML diagram script for YesRTOS
+@startuml
+
+skinparam monochrome reverse
+skinparam DefaultFontSize 10
+skinparam ArrowFontSize 9
+
+title YesRTOS Software Architecture
+
+component c0[
+  Library Interface
+  {{
+    [Configuration]
+    [Kernel API]
+  }}
+]
+
+component c1[
+  Middle Ware
+  {{
+    frame Scheduling {
+      [Timeslice]
+      [Cooperative]
+      [Preemptive]
+    }
+
+    frame Synchronization {
+      [Semaphore]
+      [Spinlock]
+      [Mutex]
+      [Message Queue]
+    }
+    frame Resource {
+      [Dynamic Memory]
+      [Network Interface]
+    }
+  }}
+]
+
+
+component c2 [
+  Machine Layer
+  {{
+    frame "ASM" {
+      [Boot]
+      [Context Switch]
+    }
+    frame "ARM" #line.dashed {
+      [CMSIS] #line.dashed
+    }
+  }}
+]
+
+c0 -- c1
+c1 -- c2
+center footer Luyao Han 2024
+
+@enduml

@@ -1,0 +1,35 @@
+' State diagram for YesRTOS Threads
+@startuml
+
+'color scheme
+skinparam monochrome reverse
+skinparam DefaultFontSize 10
+skinparam ArrowFontSize 9
+
+'title
+title YesRTOS Thread State Diagram
+
+'states
+ACTIVE : thread created & runnable
+RUNNING: routine execution
+BLOCKED: thread blocked
+SLEEP: thread halted
+COMPLETE: routine finished
+
+'arrows / texts
+[*] --> ACTIVE
+ACTIVE -d-> RUNNING : run()
+
+RUNNING --> SLEEP : to_sleep()
+RUNNING --> BLOCKED : wait()
+RUNNING --> COMPLETE : set_complete() / routine finished
+
+SLEEP --> ACTIVE : wake_up()
+BLOCKED --> ACTIVE : //Event//
+
+COMPLETE -d-> [*]
+
+'footer
+center footer Luyao Han 2024
+
+@enduml

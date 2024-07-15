@@ -1,29 +1,45 @@
+/**
+ * @file scheduler.cpp
+ * @author Luyao Han (luyaohan1001@gmail.com)
+ * @brief YesRTOS scheduler implementation.
+ * @version 1.0
+ * @date 2024-07-12
+ * @copyright Copyright (c) 2024
+ */
+
+#include <iostream>
 #include <scheduler.hpp>
 
 using namespace YesRTOS;
 
-// Static Class Member Initialization
-/// @brief Thread queue definition.
-/// @details static (as storage modifier) to maintain single per class, and to be accessed by kernal interrupt which is static method.
-/// @details other static keyword usage (as linkage modifier) does not apply here.
-std::vector<YesRTOS::Thread> RoundRobinScheduler::thread_q;
+/**
+ * @brief Pointer to scheduler context-saving stack.
+ */
+volatile uint32_t *sched_stk_ptr;
 
-/// @brief Tick counter.
-long RoundRobinScheduler::tick = 0;
-
-/// @brief Constructor.
+/**
+ * @brief Constructor.
+ */
 RoundRobinScheduler::RoundRobinScheduler() {
+  // save to global symbol
+  sched_stk_ptr = this->sched_context_stack;
 }
 
-/// @brief Destructor.
+/**
+ * @brief Destructor.
+ */
 RoundRobinScheduler::~RoundRobinScheduler() {
-  thread_q.clear();
 }
 
-/// @brief Invoke scheduler.
+/**
+ * @brief Pick the next thread and run.
+ */
 void RoundRobinScheduler::schedule() {
   while (true) {
-    for (auto thread_ptr = RoundRobinScheduler::thread_q.begin(); thread_ptr != RoundRobinScheduler::thread_q.end(); thread_ptr++) {
+    // Save scheduler context so when switching back the next task will be selected.
+    save_sched_context();
+    for (auto q_idx = 0; q_idx < THREAD_QUEUE_DEPTH; ++q_idx) {
+      Thread *thread_ptr = thread_q[q_idx];
       switch (thread_ptr->get_state()) {
         case ACTIVE:
           thread_ptr->run();
@@ -36,18 +52,19 @@ void RoundRobinScheduler::schedule() {
           break;
 
         case SLEEP:
-          thread_ptr->resume();
           break;
 
         case COMPLETE:
+          // TODO: Implement task deletion from thread queue.
           break;
       }
     }
   }
 }
 
-/// @brief Add thread to scheduler queue.
-/// @param t
-void RoundRobinScheduler::add_thread(Thread t) {
-  RoundRobinScheduler::thread_q.push_back(t);
+/**
+ * @brief Add thread to scheduler queue.
+ */
+void RoundRobinScheduler::add_thread(Thread *t) {
+  this->thread_q[q_top_cnt++] = t;
 }

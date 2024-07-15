@@ -1,10 +1,18 @@
-#pragma once
-#include <unistd.h>
+/**
+ * @file scheduler.hpp
+ * @author Luyao Han (luyaohan1001@gmail.com)
+ * @brief YesRTOS scheduler header.
+ * @version 1.0
+ * @date 2024-07-12
+ * @copyright Copyright (c) 2024
+ */
 
-#include <csignal>
-#include <iostream>
+#pragma once
+#include <armv7m.h>
+
 #include <thread.hpp>
-#include <vector>
+
+#define THREAD_QUEUE_DEPTH 8
 
 namespace YesRTOS {
 class RoundRobinScheduler {
@@ -12,13 +20,12 @@ class RoundRobinScheduler {
   RoundRobinScheduler();
   ~RoundRobinScheduler();
 
-  static void start();
-  static void add_thread(Thread thread);
-  static void kernel_interrupt();
-  static void schedule();
+  void add_thread(Thread* thread);
+  void schedule();
 
  private:
-  static long tick;
-  static std::vector<YesRTOS::Thread> thread_q;
+  uint8_t q_top_cnt = 0;
+  uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
+  Thread* thread_q[THREAD_QUEUE_DEPTH];
 };
 }  // namespace YesRTOS
