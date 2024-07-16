@@ -58,12 +58,14 @@ void(thread1_routine)(Thread* thread_handle) {
       yield_thread(thread_handle->thread_stack_ptr);
     }
   }
+  thread0_ptr->wake_up();
 }
 
 /**
  * @brief YesRTOS Cooperative style scheduling demo between two threads.
  */
 int main() {
+  systick_clk_init();
   RoundRobinScheduler sched0;
 
   Thread thread0(0, thread0_routine);

@@ -53,6 +53,7 @@ void Thread::set_rountine(void (*routine_ptr)(Thread* thread_handle)) {
 void Thread::run() {
   this->thread_info.state = RUNNING;
   (*this->thread_info.routine_ptr)(this);
+  this->thread_info.state = COMPLETE;
 }
 
 /**

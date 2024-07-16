@@ -12,7 +12,7 @@
 
 #include <thread.hpp>
 
-#define THREAD_QUEUE_DEPTH 8
+#define THREAD_QUEUE_DEPTH 2
 
 namespace YesRTOS {
 class RoundRobinScheduler {

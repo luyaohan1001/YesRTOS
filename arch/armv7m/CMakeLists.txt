@@ -28,6 +28,7 @@ target_include_directories(LibBareMetal INTERFACE
 target_sources(LibBareMetal INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/context.s
     ${CMAKE_CURRENT_LIST_DIR}/trace.c
+    ${CMAKE_CURRENT_LIST_DIR}/clock.c
     # ${CMAKE_CURRENT_LIST_DIR}/Core/Src/stm32f7xx_it.c
     # ${CMAKE_CURRENT_LIST_DIR}/Core/Src/stm32f7xx_hal_msp.c
     # ${CMAKE_CURRENT_LIST_DIR}/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c

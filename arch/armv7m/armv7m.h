@@ -27,3 +27,11 @@ extern "C" {
 extern "C" {
   extern void itm_trace(const char* ptr);
 }
+
+/**
+ * @brief Interfaces implemented in clock.c
+ *
+ */
+extern "C" {
+  extern void systick_clk_init(void);
+}
