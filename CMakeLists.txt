@@ -59,3 +59,12 @@ COMMAND openocd
             -f target/stm32f7x.cfg
             -c 'program ${CMAKE_SOURCE_DIR}/build/${PROJECT_NAME}.elf verify reset exit'
 )
+
+# Launch QEMU with the YesRTOS image
+add_custom_target(qemu
+COMMAND qemu-system-arm
+        -machine stm32vldiscovery
+        -gdb tcp::3333
+        -nographic
+        -kernel ${CMAKE_SOURCE_DIR}/build/${PROJECT_NAME}.elf
+)

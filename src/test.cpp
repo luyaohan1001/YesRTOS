@@ -8,9 +8,8 @@
  */
 
 #include <armv7m.h>
-
-#include <iostream>
 #include <scheduler.hpp>
+#include <iostream>
 
 #define DBG
 

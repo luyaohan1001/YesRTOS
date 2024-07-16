@@ -13,9 +13,17 @@
 #include <cstdint>
 
 /**
- * @brief Interfaces implemented in assembly.
+ * @brief Interfaces implemented in context.s.
  */
 extern "C" {
   extern void yield_thread(void *thread_handle);
   extern void save_sched_context();
+}
+
+/**
+ * @brief Interfaces implemented in trace.c
+ *
+ */
+extern "C" {
+  extern void itm_trace(const char* ptr);
 }

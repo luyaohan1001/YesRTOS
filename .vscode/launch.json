@@ -1,6 +1,7 @@
 {
   "configurations": [
       {
+          // Attributes: https://github.com/Marus/cortex-debug/blob/master/debug_attributes.md
           "name": "Cortex Debug (STM32F767 ST-Link)",   // Required VSCode extension: "Cortex-Debug"
           "cwd": "${workspaceRoot}",
           "executable": "${workspaceRoot}/build/YesRTOS.elf",
@@ -11,9 +12,18 @@
               "interface/stlink.cfg",
               "target/stm32f7x.cfg",
           ],
-          "openOCDLaunchCommands": ["init", "reset init"],
-          "runToEntryPoint": "main",    // Debug symbol to place first breakpoint on.
-          "svdFile": "${workspaceRoot}/armv7m/STM32F767.svd"
-      }
+          "runToEntryPoint": "main",
+          "svdFile": "${workspaceRoot}/armv7m/STM32F767.svd",
+          "openOCDLaunchCommands": [
+            "init",
+            "reset init",
+          ],
+          "postLaunchCommands": [
+             // Enable TPIU to receive instrumentation trace, log to tpiu.dump, set default CPU freq 16MHz.
+            "monitor tpiu config internal tpiu.dump uart off 16000000",
+             // Monitor instruciton trace macrocell.
+            "monitor itm ports on"
+          ],
+      },
   ]
 }
