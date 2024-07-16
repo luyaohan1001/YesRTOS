@@ -23,6 +23,9 @@
 * Cppcheck
 * QEMU
 
+## Tracing
+* ARM ITM/TPIU
+
 ## YesRTOS Architecture Diagram
 ![alt text](/docs/diagrams/architecture.png)
 
