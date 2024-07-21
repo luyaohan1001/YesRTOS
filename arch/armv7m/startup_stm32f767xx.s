@@ -31,10 +31,10 @@
 .global  g_pfnVectors
 .global  Default_Handler
 
-/* start address for the initialization values of the .data section. 
+/* start address for the initialization values of the .data section.
 defined in linker script */
 .word  _sidata
-/* start address for the .data section. defined in linker script */  
+/* start address for the .data section. defined in linker script */
 .word  _sdata
 /* end address for the .data section. defined in linker script */
 .word  _edata
@@ -44,11 +44,16 @@ defined in linker script */
 .word  _ebss
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
+/* start address of heap */
+.word _ld_start_heap
+/* end  address of heap */
+.word _ld_end_heap
+
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
  *          necessary set is performed, after which the application
- *          supplied main() routine is called. 
+ *          supplied main() routine is called.
  * @param  None
  * @retval : None
 */

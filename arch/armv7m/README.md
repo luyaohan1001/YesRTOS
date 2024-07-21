@@ -2,9 +2,9 @@
 
 This directory contains the machine layer for ARMv7-M.
 
-The CMSIS / Core / Drivers and linker scripts are provided by STMicroelectronics through CubeMX code generator.
+YesRTOS middleware interacts with this layer to complete the important kernel functionalities such as critical section protection and context switching.
 
-YesRTOS scheduling layer interacts with ARM CMSIS (Common Microcontroller Software Interface Standard) to complete the important kernel functionalities such as critical section protection and context switching.
+The linker scripts and startup scripts are provided by STMicroelectronics through CubeMX code generator.
 
 ## ARM Cortex M7
 * In-order super-scalar processor - instruction level parallelism on dual issued instruction

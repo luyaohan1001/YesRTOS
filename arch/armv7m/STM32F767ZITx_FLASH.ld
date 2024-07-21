@@ -1,11 +1,8 @@
 /*
 ******************************************************************************
 **
-
 **  File        : LinkerScript.ld
-**
 **  Author		: STM32CubeMX
-**
 **  Abstract    : Linker script for STM32F767ZITx series
 **                2048Kbytes FLASH and 512Kbytes RAM
 **
@@ -18,6 +15,9 @@
 **
 **  Distribution: The file is distributed “as is,” without any warranty
 **                of any kind.
+**
+**  Modied by: Luyao Han (luyaohan1001@gmail.com)
+**  Modification is done including stack and heap configurations to provide foundation of dynamic memory management.
 **
 *****************************************************************************
 ** @attention
@@ -53,10 +53,10 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
+_estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM, bottom of the stack pointer */
 /* Generate a link error if heap and stack don't fit into RAM */
-_Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+_alloc_heap_size = 0x2800;      /* required amount of heap  */
+_alloc_stack_size = 0x400;     /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
@@ -168,8 +168,10 @@ SECTIONS
     . = ALIGN(8);
     PROVIDE ( end = . );
     PROVIDE ( _end = . );
-    . = . + _Min_Heap_Size;
-    . = . + _Min_Stack_Size;
+    _ld_start_heap = .;         /* start of heap */
+    . = . + _alloc_heap_size;
+    _ld_end_heap = .;
+    . = . + _alloc_stack_size;  /* end of heap */
     . = ALIGN(8);
   } >RAM
 
