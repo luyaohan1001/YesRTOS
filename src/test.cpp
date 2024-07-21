@@ -7,77 +7,64 @@
  * @copyright Copyright (c) 2024
  */
 
-#include <armv7m.h>
-
+#include <baremetal_api.h>
 #include <iostream>
 #include <scheduler.hpp>
 
-#define DBG
-
 using namespace YesRTOS;
 
-// Initialize thread on DATA for testing references.
-#ifdef DBG
-Thread *thread0_ptr, *thread1_ptr;
-#endif
-
 /**
- * @brief Custom routine for Thread0: some random operations followed with yield call..
+ * @brief Thread0 routine.
  */
-void(thread0_routine)(Thread* thread_handle) {
+void(thread0_routine)() {
   for (auto i = 0; i < 5; ++i) {
     std::cout << "️♥ Thread 0 ♥️" << std::endl;
     int a = 15;
     int b = 13;
     int c = 14;
     int d = 11;
-    // wake up thread 1
-    thread1_ptr->wake_up();
-    // set current to sleep and yield current thread
-    thread0_ptr->to_sleep();
-    yield_thread(thread_handle->thread_stack_ptr);
     a = a + i;
     a *= (a + b + c + d);
+    while (1);
   }
 }
 
 /**
- * @brief Custom routine for Thread1: yield to thread 0 on first time entry.
+ * @brief Thread1 routine.
  */
-void(thread1_routine)(Thread* thread_handle) {
-  for (auto i = 0; i < 5; ++i) {
+void(thread1_routine)() {
+  while (1) {
     std::cout << "️♥ Thread 1 ♥️" << std::endl;
-    // Use flag to make thread1 yeild to thread0 on first entry.
-    static bool first_entry = false;
-    if (first_entry == false) {
-      first_entry = true;
-      // wake up thread0
-      thread0_ptr->wake_up();
-      // set current to sleep and yield
-      thread1_ptr->to_sleep();
-      yield_thread(thread_handle->thread_stack_ptr);
-    }
   }
-  thread0_ptr->wake_up();
+}
+
+/**
+ * @brief Thread1 routine.
+ */
+void(thread2_routine)() {
+  while (1) {
+    std::cout << "️♥ Thread 2 ♥️" << std::endl;
+  }
 }
 
 /**
  * @brief YesRTOS Cooperative style scheduling demo between two threads.
  */
 int main() {
-  systick_clk_init();
-  RoundRobinScheduler sched0;
+  // Get schedueler instance.
+  extern YesRTOS::PreemptiveScheduler sched;
 
+  // Add threads.
   Thread thread0(0, thread0_routine);
-  sched0.add_thread(&thread0);
+  sched.add_thread(&thread0);
 
   Thread thread1(1, thread1_routine);
-  sched0.add_thread(&thread1);
+  sched.add_thread(&thread1);
 
-#ifdef DBG
-  thread0_ptr = &thread0;
-  thread1_ptr = &thread1;
-#endif
-  sched0.schedule();
+  Thread thread2(2, thread2_routine);
+  sched.add_thread(&thread2);
+
+  sched.start();
+  while (1);
   return 0;
 }

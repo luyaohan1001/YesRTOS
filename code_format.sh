@@ -2,4 +2,5 @@
 #   clang-format -style=google -dump-config > clang-format.cfg
 clang-format -style=file:clang-format.cfg -i ./src/*.cpp
 clang-format -style=file:clang-format.cfg -i ./include/*.hpp
+clang-format -style=file:clang-format.cfg -i ./arch/armv7m/*.cpp
 

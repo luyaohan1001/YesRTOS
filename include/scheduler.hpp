@@ -8,24 +8,43 @@
  */
 
 #pragma once
-#include <armv7m.h>
-
 #include <thread.hpp>
 
-#define THREAD_QUEUE_DEPTH 2
+#define THREAD_QUEUE_DEPTH 8
 
 namespace YesRTOS {
-class RoundRobinScheduler {
- public:
-  RoundRobinScheduler();
-  ~RoundRobinScheduler();
+
+class Scheduler {
+  public:
+  Scheduler() = default;
+  ~Scheduler() = default;
 
   void add_thread(Thread* thread);
-  void schedule();
-
- private:
-  uint8_t q_top_cnt = 0;
-  uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
   Thread* thread_q[THREAD_QUEUE_DEPTH];
+
+  protected:
+  uint32_t q_size;
+  uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
 };
+
+class PreemptiveScheduler : public Scheduler {
+  public:
+  PreemptiveScheduler();
+  ~PreemptiveScheduler();
+
+  void schedule_next();
+  void start();
+
+  /**
+   * @brief Double pointer to stack of thread currently being executed.
+   * @note This is a double pointer.
+   *       *pp_active_thread_stk ==> the stack pointer, SP. Allocate space by (*pp_active_thread_stk)--, vise versa.
+   *       **pp_active_thread_stk ==> content of the entry pointed by SP. We could write to that stack entry by (**pp_active_thread_stk)=value.
+   */
+  uint32_t** pp_active_thread_stk;
+
+  private:
+  uint32_t curr_thread_cnt;
+};
+
 }  // namespace YesRTOS

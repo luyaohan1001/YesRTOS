@@ -9,62 +9,56 @@
 
 #include <iostream>
 #include <scheduler.hpp>
+#include <baremetal_api.h>
 
 using namespace YesRTOS;
 
 /**
- * @brief Pointer to scheduler context-saving stack.
- */
-volatile uint32_t *sched_stk_ptr;
-
-/**
- * @brief Constructor.
- */
-RoundRobinScheduler::RoundRobinScheduler() {
-  // save to global symbol
-  sched_stk_ptr = this->sched_context_stack;
-}
-
-/**
- * @brief Destructor.
- */
-RoundRobinScheduler::~RoundRobinScheduler() {
-}
-
-/**
- * @brief Pick the next thread and run.
- */
-void RoundRobinScheduler::schedule() {
-  while (true) {
-    // Save scheduler context so when switching back the next task will be selected.
-    save_sched_context();
-    for (auto q_idx = 0; q_idx < THREAD_QUEUE_DEPTH; ++q_idx) {
-      Thread *thread_ptr = thread_q[q_idx];
-      switch (thread_ptr->get_state()) {
-        case ACTIVE:
-          thread_ptr->run();
-          break;
-
-        case RUNNING:
-          break;
-
-        case BLOCKED:
-          break;
-
-        case SLEEP:
-          break;
-
-        case COMPLETE:
-          // TODO: Implement task deletion from thread queue.
-          break;
-      }
-    }
-  }
-}
-
-/**
  * @brief Add thread to scheduler queue.
  */
-void RoundRobinScheduler::add_thread(Thread *t) {
-  this->thread_q[q_top_cnt++] = t;
+void Scheduler::add_thread(Thread *t) {
+  this->thread_q[q_size++] = t;
+}
+
+/**
+ * @brief Constructor
+ */
+PreemptiveScheduler::PreemptiveScheduler() {
+  this->q_size = 0;
+  this->pp_active_thread_stk = nullptr;
+}
+
+/**
+ * @brief Destructor
+ */
+PreemptiveScheduler::~PreemptiveScheduler() {
+  return;
+}
+
+/**
+ * @brief Destructor
+ */
+void PreemptiveScheduler::start() {
+  if (q_size == 0) {
+    return;
+  }
+
+  this->curr_thread_cnt = 0;
+  this->pp_active_thread_stk = &thread_q[this->curr_thread_cnt]->stkptr;
+  systick_clk_init();
+  start_first_task();
+}
+
+/**
+ * @brief Return the next thread to run.
+ */
+void PreemptiveScheduler::schedule_next() {
+  // RoundRobin Scheduling.
+  // TODO: Add logic for thread priority based scheduling.
+  this->curr_thread_cnt += 1;
+  this->curr_thread_cnt %= this->q_size;
+  Thread *thread_ptr = this->thread_q[this->curr_thread_cnt];
+  if (thread_ptr->get_state() == ACTIVE) {
+    this->pp_active_thread_stk = &thread_ptr->stkptr;
+  }
 }

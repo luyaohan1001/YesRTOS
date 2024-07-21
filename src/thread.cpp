@@ -8,18 +8,25 @@
  */
 
 #include <thread.hpp>
+#include <baremetal_api.h>
 
 using namespace YesRTOS;
 
 /**
- * @brief Construct a new Thread:: Thread object
+ * @brief Construct a new Thread object
  * @param id Unique ID for the thread, defined by the user.
  * @param routine_ptr Function pointer to the execution routine.
  */
-Thread::Thread(uint32_t id, void (*routine_ptr)(Thread* self)) {
+Thread::Thread(uint32_t id, void (*routine_ptr)(void)) {
   this->thread_info.id = id;
   this->thread_info.state = ACTIVE;
-  this->set_rountine(routine_ptr);
+  this->set_routine(routine_ptr);
+
+  uint32_t* contxt_stk_bottom = (uint32_t*)(&this->allocated_stack[0] + STACK_ALLOCATION_SIZE);
+  this->stkptr = contxt_stk_bottom;
+
+  // Initialize stack context for the thread to run for the first time.
+  this->init_stack();
 }
 
 /**
@@ -31,9 +38,13 @@ Thread::~Thread() {
 }
 
 /**
- * @brief Get current thread lifecycle state.
- * @return const thread_state_t&
+ * @brief Initialize thread stack for necessary context.
+ * @note  This function is a wrapper call for any architecture dependent thread stack initialization.
  */
+void Thread::init_stack() {
+  init_stack_armv7m(&this->stkptr, (uint32_t*)(uintptr_t)this->thread_info.routine_ptr);
+}
+
 const thread_state_t& Thread::get_state() const {
   return this->thread_info.state;
 }
@@ -42,7 +53,7 @@ const thread_state_t& Thread::get_state() const {
  * @brief Set the thread rountine.
  * @param routine_ptr
  */
-void Thread::set_rountine(void (*routine_ptr)(Thread* thread_handle)) {
+void Thread::set_routine(void (*routine_ptr)(void)) {
   this->thread_info.routine_ptr = routine_ptr;
   this->thread_info.state = ACTIVE;
 }
@@ -52,16 +63,8 @@ void Thread::set_rountine(void (*routine_ptr)(Thread* thread_handle)) {
  */
 void Thread::run() {
   this->thread_info.state = RUNNING;
-  (*this->thread_info.routine_ptr)(this);
+  (*this->thread_info.routine_ptr)();
   this->thread_info.state = COMPLETE;
-}
-
-/**
- * @brief Get the stack pointer storing current thread's context.
- * @return uint32_t*
- */
-uint32_t* Thread::get_thread_stack_ptr() {
-  return this->thread_stack_ptr;
 }
 
 /**

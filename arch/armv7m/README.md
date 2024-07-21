@@ -83,3 +83,6 @@ YesRTOS scheduling layer interacts with ARM CMSIS (Common Microcontroller Softwa
 
     then the address of a will be loaded into $r0 according to to ARM Procedure Call Standard.
 
+  4. Why "extern C" key word is necessary, regarding C++ name mangling
+      https://web.mit.edu/tibbetts/Public/inside-c/www/mangling.html
+

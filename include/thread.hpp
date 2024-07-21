@@ -10,6 +10,7 @@
 #pragma once
 
 #include <armv7m.h>
+#include <baremetal_api.h>
 
 namespace YesRTOS {
 
@@ -21,33 +22,33 @@ typedef enum thread_state {
   COMPLETE
 } thread_state_t;
 
-// Forward declaration.
-class Thread;
-
 typedef struct thread_info {
   uint32_t id;
   thread_state_t state;
-  void (*routine_ptr)(Thread* self);
+  void (*routine_ptr)(void);
 } thread_info_t;
 
 class Thread {
- public:
-  Thread(uint32_t id, void (*routine_ptr)(Thread* self));
+  public:
+  Thread(uint32_t id, void (*routine_ptr)(void));
   ~Thread();
 
- public:
+  public:
+  void init_stack();
   const thread_state_t& get_state() const;
-  void set_rountine(void (*routine_ptr)(Thread* thread_handle));
+  void set_routine(void (*routine_ptr)(void));
   void set_state(thread_state_t cfg);
   void wake_up();
   void to_sleep();
-  uint32_t* get_thread_stack_ptr();
   void run();
 
- public:
-  uint32_t thread_stack_ptr[CONTEXT_SAVE_STACK_SIZE];
+  public:
+  // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
+  uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
+  // Stack pointer pointing to top of the stack.
+  uint32_t* stkptr;
 
- private:
+  private:
   thread_info_t thread_info;
 };
 }  // namespace YesRTOS
