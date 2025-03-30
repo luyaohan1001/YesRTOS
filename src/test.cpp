@@ -17,15 +17,13 @@ using namespace YesRTOS;
  * @brief Thread0 routine.
  */
 void(thread0_routine)() {
-  for (auto i = 0; i < 5; ++i) {
-    std::cout << "️♥ Thread 0 ♥️" << std::endl;
+  while (1) {
+    // std::cout << "️♥ Thread 0 ♥️" << std::endl;
+    // itm_trace("Thread 0\n");
     int a = 15;
     int b = 13;
     int c = 14;
     int d = 11;
-    a = a + i;
-    a *= (a + b + c + d);
-    while (1);
   }
 }
 
@@ -34,7 +32,9 @@ void(thread0_routine)() {
  */
 void(thread1_routine)() {
   while (1) {
-    std::cout << "️♥ Thread 1 ♥️" << std::endl;
+    // itm_trace("Thread 1\n");
+    int a = 10;
+    // std::cout << "️♥ Thread 1 ♥️" << std::endl;
   }
 }
 
@@ -61,8 +61,8 @@ int main() {
   Thread thread1(1, thread1_routine);
   sched.add_thread(&thread1);
 
-  Thread thread2(2, thread2_routine);
-  sched.add_thread(&thread2);
+  // Thread thread2(2, thread2_routine);
+  // sched.add_thread(&thread2);
 
   sched.start();
   while (1);

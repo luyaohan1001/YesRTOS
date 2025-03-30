@@ -10,4 +10,4 @@
  */
 
 #define CPU_CLK_FREQ_HZ         (16000000UL)    // Core frequency.
-#define TIMESLICE_FREQ_HZ       (100UL)         // Timeslice frequency.
+#define TIMESLICE_FREQ_HZ       (1UL)         // Timeslice frequency.

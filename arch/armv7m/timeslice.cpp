@@ -67,7 +67,7 @@ void SysTick_Handler() {
   // schduler updates pp_active_thread_stk to next thread.
   sched.schedule_next();
 
-  // Restoreig context of next thread.
+  // Restore context of next thread.
   // $r0 = sched.pp_active_thread_stk
   __asm volatile("mov r0, %0" : : "r"(sched.pp_active_thread_stk) : "memory");
   // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp

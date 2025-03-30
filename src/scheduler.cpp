@@ -58,7 +58,5 @@ void PreemptiveScheduler::schedule_next() {
   this->curr_thread_cnt += 1;
   this->curr_thread_cnt %= this->q_size;
   Thread *thread_ptr = this->thread_q[this->curr_thread_cnt];
-  if (thread_ptr->get_state() == ACTIVE) {
-    this->pp_active_thread_stk = &thread_ptr->stkptr;
-  }
+  this->pp_active_thread_stk = &thread_ptr->stkptr;
 }

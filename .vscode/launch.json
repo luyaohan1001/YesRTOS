@@ -8,22 +8,34 @@
           "request": "launch",
           "type": "cortex-debug",
           "servertype": "openocd",
+          // "debugServerPath": "/path/to/openocd",
           "configFiles": [
-              "interface/stlink.cfg",
+              "interface/stlink-v2-1.cfg",
               "target/stm32f7x.cfg",
           ],
+          // "preLaunchCommands": ["make -j8", "make flash"],
           "runToEntryPoint": "main",
           "svdFile": "${workspaceRoot}/armv7m/STM32F767.svd",
           "openOCDLaunchCommands": [
             "init",
             "reset init",
           ],
-          "postLaunchCommands": [
-             // Enable TPIU to receive instrumentation trace, log to tpiu.dump, set default CPU freq 16MHz.
-            "monitor tpiu config internal tpiu.dump uart off 16000000",
-             // Monitor instruciton trace macrocell.
-            "monitor itm ports on"
-          ],
+          "swoConfig": {
+              "enabled": true,
+              "cpuFrequency": 16000000,
+              "swoFrequency":  2000000,
+              "source": "probe",
+              "decoders": [
+                  {
+                      "type": "console",
+                      "port": 0,
+                      "label": "hdm",
+                      "logfile": "${workspaceRoot}/swo_trace.txt",
+                      "showOnStartup": true,
+                      "timestamp": false
+                  }
+              ],
+          }
       },
   ]
 }

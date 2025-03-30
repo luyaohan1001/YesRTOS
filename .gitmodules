@@ -1,0 +1,3 @@
+[submodule "tools/OpenOCD"]
+	path = tools/OpenOCD
+	url = git@github.com:STMicroelectronics/OpenOCD.git

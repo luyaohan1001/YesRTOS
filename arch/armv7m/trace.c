@@ -39,8 +39,8 @@ void itm_write_char(char ch) {
 
 /**
  * @brief Trace string.
- *
  * @param ptr Pointer to first character.
+ * @todo Add lock to function for thread safety.
  */
 void itm_trace(const char* ptr) {
   itm_initialize();

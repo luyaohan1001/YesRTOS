@@ -15,6 +15,7 @@
 
 ## Environment / Tool Chain
 * VSCode
+* Cortex-Debug Extension
 * Clangd
 * OpenOCD
 * GNU ARM Toolchain
@@ -24,7 +25,7 @@
 * QEMU
 
 ## Tracing
-* ARM ITM/TPIU
+* ARM ITM/SWO
 
 ## YesRTOS Architecture Diagram
 ![alt text](/docs/diagrams/architecture.png)
