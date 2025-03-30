@@ -29,6 +29,7 @@ add_library(LibYesRTOSTopLayer INTERFACE)
 target_sources(LibYesRTOSTopLayer INTERFACE
     ${CMAKE_SOURCE_DIR}/src/scheduler.cpp
     ${CMAKE_SOURCE_DIR}/src/thread.cpp
+    ${CMAKE_SOURCE_DIR}/src/mempool.cpp
     ${CMAKE_SOURCE_DIR}/src/test.cpp
 )
 
