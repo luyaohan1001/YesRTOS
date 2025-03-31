@@ -33,7 +33,8 @@ class mempool {
   static void free(uint32_t* p_mem);
   static void init();
 
-  // constructor and destructor CANNOT be static.
+  private:
+  // hide constructor and destructor to avoid external instantiation of this class.
   mempool();
   ~mempool() = delete;
 
