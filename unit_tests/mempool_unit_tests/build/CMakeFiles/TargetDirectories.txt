@@ -1,0 +1,4 @@
+/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/CMakeFiles/mempool_unit_test.dir
+/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/CMakeFiles/test.dir
+/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/CMakeFiles/edit_cache.dir
+/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/CMakeFiles/rebuild_cache.dir

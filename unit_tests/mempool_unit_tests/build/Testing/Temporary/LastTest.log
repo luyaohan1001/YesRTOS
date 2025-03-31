@@ -1,0 +1,18 @@
+Start testing: Mar 30 20:43 PDT
+----------------------------------------------------------
+1/1 Testing: alloc_size_variation
+1/1 Test: alloc_size_variation
+Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test"
+Directory: /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build
+"alloc_size_variation" start time: Mar 30 20:43 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"alloc_size_variation" end time: Mar 30 20:43 PDT
+"alloc_size_variation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Mar 30 20:43 PDT

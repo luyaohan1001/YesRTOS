@@ -7,8 +7,9 @@
  * @copyright Copyright (c) 2024
  */
 
-#include <thread.hpp>
 #include <baremetal_api.h>
+
+#include <thread.hpp>
 
 using namespace YesRTOS;
 

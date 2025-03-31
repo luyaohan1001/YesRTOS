@@ -13,6 +13,7 @@
 
 #include <baremetal_api.h>
 #include <config.h>
+
 #include <scheduler.hpp>
 #include <thread.hpp>
 

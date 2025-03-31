@@ -35,7 +35,20 @@
                       "timestamp": false
                   }
               ],
-          }
+          },
       },
+
+      {
+        "name": "Debug C++",
+        "type": "cppdbg", // requires "C/C++" extension on VSCode
+        "request": "launch",
+        "program": "${workspaceFolder}/unit_tests/build/mempool_unit_test",
+        "args": [],
+        "stopAtEntry": true,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "lldb"
+    }
   ]
 }

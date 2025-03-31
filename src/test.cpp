@@ -8,6 +8,7 @@
  */
 
 #include <baremetal_api.h>
+
 #include <iostream>
 #include <scheduler.hpp>
 

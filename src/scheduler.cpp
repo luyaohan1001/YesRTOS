@@ -7,9 +7,10 @@
  * @copyright Copyright (c) 2024
  */
 
+#include <baremetal_api.h>
+
 #include <iostream>
 #include <scheduler.hpp>
-#include <baremetal_api.h>
 
 using namespace YesRTOS;
 
