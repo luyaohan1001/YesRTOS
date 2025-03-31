@@ -17,26 +17,17 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]   # Multi-platform
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
 
-    # ✅ Install dependencies based on OS
-    - name: Install dependencies (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt update
-        sudo apt install -y gcc-arm-none-eabi
-
+    # ✅ Install dependencies.
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
         brew update
-        brew install arm-none-eabi-gcc
+        brew install arm-none-eabi-gcc newlib
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
