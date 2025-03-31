@@ -1,7 +1,6 @@
 CMakeFiles/mempool_unit_test.dir/Users/lhan/Projects/YesRTOS/src/mempool.cpp.o: \
   /Users/lhan/Projects/YesRTOS/src/mempool.cpp \
   /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/../../include/mempool.hpp \
-  /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/../../include/bitops.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/stdint.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__config \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__config_site \
@@ -26,6 +25,7 @@ CMakeFiles/mempool_unit_test.dir/Users/lhan/Projects/YesRTOS/src/mempool.cpp.o: 
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_uintptr_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/_types/_intmax_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/_types/_uintmax_t.h \
+  /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/../../include/bitops.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__assert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__assertion_handler \

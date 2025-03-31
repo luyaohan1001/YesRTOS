@@ -38,11 +38,14 @@
           },
       },
 
+
+
+      // Native testing environment on HOST MACHINE (MacOS) for offline unit testing.
       {
         "name": "Debug C++",
-        "type": "cppdbg", // requires "C/C++" extension on VSCode
+        "type": "cppdbg", // dependency: "C/C++" extension on VSCode
         "request": "launch",
-        "program": "${workspaceFolder}/unit_tests/build/mempool_unit_test",
+        "program": "${workspaceFolder}/unit_tests/mempool_unit_tests/build/mempool_unit_test",
         "args": [],
         "stopAtEntry": true,
         "cwd": "${workspaceFolder}",
@@ -50,5 +53,6 @@
         "externalConsole": false,
         "MIMode": "lldb"
     }
+
   ]
 }

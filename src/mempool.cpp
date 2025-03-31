@@ -15,6 +15,7 @@ uint32_t mempool::total_capacity_byte;
 /**
  * @brief Initialize static variables of memory pool class.
  * @param None.
+ * @note It should be called only once in the system initialization.
  */
 void mempool::init() {
   mempool::heap_start = _ld_start_heap;
@@ -56,7 +57,7 @@ mempool::size_group_t mempool::match_size_grp(const uint32_t& req_size) {
  */
 mempool::alloc_t mempool::malloc(const uint32_t& req_size) {
   size_group_t sz_grp = match_size_grp(req_size);
-  alloc_t ret = {ALLOC_FAIL, reinterpret_cast<uint32_t*>(-1)};
+  alloc_t ret = {ALLOC_FAIL, nullptr};
   if (sz_grp == SIZE_GRP_NOT_FOUND) return ret;
   if (alloc_bitmaps[sz_grp] == BITMAP_FULL_MASK) return ret;
 

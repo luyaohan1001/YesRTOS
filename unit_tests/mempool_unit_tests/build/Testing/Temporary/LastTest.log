@@ -1,18 +1,63 @@
-Start testing: Mar 30 20:43 PDT
+Start testing: Mar 30 22:03 PDT
 ----------------------------------------------------------
-1/1 Testing: alloc_size_variation
-1/1 Test: alloc_size_variation
-Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test"
+1/4 Testing: mempool_unit_test0
+1/4 Test: mempool_unit_test0
+Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test" "alloc size < 32"
 Directory: /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build
-"alloc_size_variation" start time: Mar 30 20:43 PDT
+"mempool_unit_test0" start time: Mar 30 22:03 PDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.17 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"alloc_size_variation" end time: Mar 30 20:43 PDT
-"alloc_size_variation" time elapsed: 00:00:00
+"mempool_unit_test0" end time: Mar 30 22:03 PDT
+"mempool_unit_test0" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Mar 30 20:43 PDT
+2/4 Testing: mempool_unit_test1
+2/4 Test: mempool_unit_test1
+Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test" "alloc and free size < 32"
+Directory: /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build
+"mempool_unit_test1" start time: Mar 30 22:03 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"mempool_unit_test1" end time: Mar 30 22:03 PDT
+"mempool_unit_test1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/4 Testing: mempool_unit_test2
+3/4 Test: mempool_unit_test2
+Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test" "alloc size 128"
+Directory: /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build
+"mempool_unit_test2" start time: Mar 30 22:03 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"mempool_unit_test2" end time: Mar 30 22:03 PDT
+"mempool_unit_test2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/4 Testing: mempool_unit_test3
+4/4 Test: mempool_unit_test3
+Command: "/Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build/mempool_unit_test" "invalid size"
+Directory: /Users/lhan/Projects/YesRTOS/unit_tests/mempool_unit_tests/build
+"mempool_unit_test3" start time: Mar 30 22:03 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"mempool_unit_test3" end time: Mar 30 22:03 PDT
+"mempool_unit_test3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Mar 30 22:03 PDT
