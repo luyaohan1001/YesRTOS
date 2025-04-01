@@ -48,14 +48,14 @@ class mempool {
   static uint32_t min_alloc_size, max_alloc_size;
   static uint32_t total_capacity_byte;
 
-  constexpr static uint32_t MAX_CNT_PER_SIZE_GRP = 32;      // MAX 32 instance of each allocation size.
+  constexpr static uint32_t MAX_CNT_PER_SIZE_GRP = 32;  // MAX 32 instance of each allocation size.
 
   private:
   // "static" allocates memory at compile-time; "constexpr" forces initialization at compile-time, which compiler does constant folding.
   // below has declaration and and constexpr allows internal instantiation (memory allocated here).
-  constexpr static uint32_t ALLOC_SIZE_GROUPS = 5;            // corresponding to 32 / 64 / 128 / 256 / 512 byte defined in size_group_t
-  constexpr static uint32_t MIN_ALLOC_SIZE_SHAMT = 5;         // 1 << 5 = 32
-  constexpr static uint32_t MAX_ALLOC_SIZE_SHAMT = 9;         // 1 << 9 = 512
+  constexpr static uint32_t ALLOC_SIZE_GROUPS = 5;     // corresponding to 32 / 64 / 128 / 256 / 512 byte defined in size_group_t
+  constexpr static uint32_t MIN_ALLOC_SIZE_SHAMT = 5;  // 1 << 5 = 32
+  constexpr static uint32_t MAX_ALLOC_SIZE_SHAMT = 9;  // 1 << 9 = 512
   constexpr static uint32_t BITMAP_FULL_MASK = 0xFFFFFFFF;
 
   // below are only declared, required external instantiation later.

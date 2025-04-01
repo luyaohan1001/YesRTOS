@@ -44,7 +44,7 @@ void(thread1_routine)() {
  */
 void(thread2_routine)() {
   while (1) {
-    std::cout << "️♥ Thread 2 ♥️" << std::endl;
+    // std::cout << "️♥ Thread 2 ♥️" << std::endl;
   }
 }
 
@@ -52,20 +52,17 @@ void(thread2_routine)() {
  * @brief YesRTOS Cooperative style scheduling demo between two threads.
  */
 int main() {
-  // Get schedueler instance.
-  extern YesRTOS::PreemptiveScheduler sched;
-
   // Add threads.
   Thread thread0(0, thread0_routine);
-  sched.add_thread(&thread0);
+  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread0);
 
   Thread thread1(1, thread1_routine);
-  sched.add_thread(&thread1);
+  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread1);
 
-  // Thread thread2(2, thread2_routine);
-  // sched.add_thread(&thread2);
+  Thread thread2(2, thread2_routine);
+  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread2);
 
-  sched.start();
+  RoundRobinScheduler<TASK_QUEUE_DEPTH>::start();
   while (1);
   return 0;
 }

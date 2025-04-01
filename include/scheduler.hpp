@@ -10,30 +10,24 @@
 #pragma once
 #include <thread.hpp>
 
-#define THREAD_QUEUE_DEPTH 8
+#include "config.h"
 
 namespace YesRTOS {
 
-class Scheduler {
+/*
+@note
+  With Templates: When templates are used, the compiler only knows the types when it instantiates the class with specific types.
+  Because of this, the compiler needs explicit instructions to access members from the base class.
+  Thus 'this->' is required to explicitly access members inherited from a templated base class.
+*/
+template <uint32_t DEPTH>
+class RoundRobinScheduler {
   public:
-  Scheduler() = default;
-  ~Scheduler() = default;
+  static void schedule_next();
+  static void start();
 
-  void add_thread(Thread* thread);
-  Thread* thread_q[THREAD_QUEUE_DEPTH];
-
-  protected:
-  uint32_t q_size;
-  uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
-};
-
-class PreemptiveScheduler : public Scheduler {
-  public:
-  PreemptiveScheduler();
-  ~PreemptiveScheduler();
-
-  void schedule_next();
-  void start();
+  static void add_thread(Thread* thread);
+  static Thread* thread_q[DEPTH];
 
   /**
    * @brief Double pointer to stack of thread currently being executed.
@@ -41,10 +35,20 @@ class PreemptiveScheduler : public Scheduler {
    *       *pp_active_thread_stk ==> the stack pointer, SP. Allocate space by (*pp_active_thread_stk)--, vise versa.
    *       **pp_active_thread_stk ==> content of the entry pointed by SP. We could write to that stack entry by (**pp_active_thread_stk)=value.
    */
-  uint32_t** pp_active_thread_stk;
+  static uint32_t** pp_active_thread_stk;
 
   private:
-  uint32_t curr_thread_cnt;
+  static uint32_t curr_thread_cnt;
+  /**
+   * @note Hide constructor / destructor to avoid instantiation.
+   */
+  RoundRobinScheduler();
+  ~RoundRobinScheduler();
+
+  protected:
+  static uint32_t q_size;
+  static uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
 };
 
+template class RoundRobinScheduler<TASK_QUEUE_DEPTH>;
 }  // namespace YesRTOS

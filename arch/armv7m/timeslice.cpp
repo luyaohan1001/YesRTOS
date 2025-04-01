@@ -32,9 +32,6 @@
 #define ICSR (*((volatile uint32_t *)0xe000ed04))  // Interrupt control and status register
 #define PENDSVSET_BIT (1UL << 28UL)                // sets the PendSV exception as pending.
 
-// Declare scheduler instance. This is a global instance.
-YesRTOS::PreemptiveScheduler sched;
-
 /**
  * @brief Start systick timer.
  */
@@ -61,16 +58,16 @@ void SysTick_Handler() {
   // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
   __asm volatile("stmdb r1!, {r4-r11, r14}");
   // $r0 = sched.pp_active_thread_stk
-  __asm volatile("mov r0, %0" : : "r"(sched.pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
   // *$r0 = r1 ==> *sched.pp_active_thread_stk = $r1 = psp (storing psp back to thread context)
   __asm volatile("str r1, [r0]");
 
-  // schduler updates pp_active_thread_stk to next thread.
-  sched.schedule_next();
+  // scheduler updates pp_active_thread_stk to next thread.
+  YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::schedule_next();
 
   // Restore context of next thread.
   // $r0 = sched.pp_active_thread_stk
-  __asm volatile("mov r0, %0" : : "r"(sched.pp_active_thread_stk) : "memory");
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");
   // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp
   __asm volatile("ldr r0, [r0]");
   // load multiple, increment after. (r4=*psp;psp+=4; r5=*psp;psp+=4; r6=*psp;psp+=4;... r14=*psp;psp+=4;)
@@ -128,7 +125,7 @@ void start_first_task(void) {
  */
 extern "C" {
 void SVC_Handler(void) {
-  __asm volatile("mov r0, %0" : : "r"(sched.pp_active_thread_stk) : "memory");
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");
   __asm volatile("ldr r0, [r0]");
   __asm volatile("ldmia r0!, {r4-r11, r14}");
   __asm volatile("msr psp, r0");  // Point process stack pointer to top of the stack after popping.

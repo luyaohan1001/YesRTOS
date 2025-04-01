@@ -5,10 +5,10 @@
 [AI art generated with Magic Studio](https://magicstudio.com/ai-art-generator/)
 
 ## Goal of the Project
-* Lightweight and portable real time operating system.
+* Lightweight real time operating system for ARM-Cortex M.
 
 ## Language
-* Modern C++, C11, and GNU ARM assembly.
+* C++17, C11, and GNU ARM assembly.
 
 ## Build System
 * CMake, Make
@@ -16,13 +16,11 @@
 ## Environment / Tool Chain
 * VSCode
 * Cortex-Debug Extension
-* Clangd
 * OpenOCD
 * GNU ARM Toolchain
 * PlantUML
 * Doxygen
 * Cppcheck
-* QEMU
 
 ## Tracing
 * ARM ITM/SWO
@@ -39,16 +37,17 @@
 #### Phase 1
 * Timeslice
 * Memory Management
-* Preemptive Thread
-* Priority Scheduler
+* Mutex
+
 
 #### Phase 2
+* Priority Scheduler
+* Preemptive Thread
 * Profiling Interface
 * Software Architecture Layout
 
 #### Phase 3
 * Spinlock
-* Mutex
 * Semaphore
 
 #### Phase 4

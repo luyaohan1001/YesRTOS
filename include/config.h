@@ -11,3 +11,5 @@
 
 #define CPU_CLK_FREQ_HZ         (16000000UL)    // Core frequency.
 #define TIMESLICE_FREQ_HZ       (1UL)         // Timeslice frequency.
+
+#define TASK_QUEUE_DEPTH        (32)
