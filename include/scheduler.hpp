@@ -50,5 +50,4 @@ class RoundRobinScheduler {
   static uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
 };
 
-template class RoundRobinScheduler<TASK_QUEUE_DEPTH>;
 }  // namespace YesRTOS

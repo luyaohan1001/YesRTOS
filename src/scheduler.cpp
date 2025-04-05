@@ -65,3 +65,5 @@ void RoundRobinScheduler<DEPTH>::schedule_next() {
   Thread* thread_ptr = RoundRobinScheduler<DEPTH>::thread_q[RoundRobinScheduler<DEPTH>::curr_thread_cnt];
   RoundRobinScheduler<DEPTH>::pp_active_thread_stk = &thread_ptr->stkptr;
 }
+
+template class YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>;

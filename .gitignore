@@ -4,3 +4,5 @@ arch/armv7m/Core
 arch/armv7m/Drivers
 arch/armv7m/STM32F7xx_HAL_Driver
 arch/armv7m/cubemx_templete.c
+unit_tests/*/build
+swo_trace.txt
