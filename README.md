@@ -1,3 +1,5 @@
+![CI WORKFLOW STATUS BADGE](https://github.com/luyaohan1001/YesRTOS/actions/workflows/main.yml/badge.svg?branch=main)
+
 # YesRTOS - A Real-Time Operating System
 
 ![alt text](/docs/diagrams/github_profile.jpg)
