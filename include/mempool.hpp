@@ -1,3 +1,14 @@
+/**
+ * @file mempool.hpp
+ * @author Luyao Han (luyaohan1001@gmail.com)
+ * @brief O(1) Memory management library that supports dynamic memory allocation / deallocation on pre-allocated heap.
+ * @version 0.1
+ * @date 2025-04-04
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #pragma once
 
 #include <cstddef>
@@ -5,11 +16,15 @@
 
 #include "bitops.hpp"
 
+/**
+ * @brief Linker symbol to be defined for preallocated heap region, typically from a linker script.
+ */
 extern size_t _ld_start_heap;
 extern size_t _ld_end_heap;
 
 class mempool {
   public:
+
   typedef enum {
     ALLOC_SUCCESS,
     ALLOC_FAIL

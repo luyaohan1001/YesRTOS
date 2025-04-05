@@ -24,7 +24,7 @@ int main() {
   list0.insert_front(2);
   list0.trace_list();
 
-  list_node_t<size_t>* node = list0.lookup(2);
+  list_node_t<size_t>* node = list0.lookup(133);
   list0.delete_node(node);
   // list0.insert_front(50);
   list0.trace_list();

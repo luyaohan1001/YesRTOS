@@ -8,11 +8,11 @@
 #define HEAP_SIZE 0x10000
 
 // allow OS to allocate a region for heap testing
-static uint32_t heap[HEAP_SIZE];
+static size_t heap[HEAP_SIZE];
 
 // generate heap symbol that is supposed to be defined in linker script
-uint32_t _ld_start_heap = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&heap[0]));
-uint32_t _ld_end_heap = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&heap[HEAP_SIZE]));
+size_t _ld_start_heap = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&heap[0]));
+size_t _ld_end_heap = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&heap[HEAP_SIZE]));
 
 // Testing allocation size < 32
 void test_alloc_size_lt_32() {

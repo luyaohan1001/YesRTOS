@@ -22,9 +22,7 @@ bool linkedlist<T>::is_empty() const {
 template <typename T>
 list_node_t<T>* linkedlist<T>::insert_front(T&& data) {
   mempool::alloc_t alloc_res = mempool::malloc(sizeof(list_node_t<T>));
-  std::cout << "size of list_node_t<T>: " << sizeof(list_node_t<T>) << std::endl;
   if (alloc_res.status == mempool::ALLOC_FAIL) {
-    std::cout << "linkedlist:: ALLOC_FAIL" << std::endl;
     return nullptr;
   }
   list_node_t<T>* p_new_node = reinterpret_cast<list_node_t<T>*>(alloc_res.addr);
@@ -97,7 +95,7 @@ void linkedlist<T>::trace_list() const {
     std::cout << p_node_itr->data << " -> ";
     p_node_itr = p_node_itr->next;
   }
-  std::cout << " nullptr" << std::endl;
+  std::cout << "[NULL]" << std::endl;
 }
 
 // explicit instantiation
