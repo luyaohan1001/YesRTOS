@@ -1,4 +1,4 @@
-![CI WORKFLOW STATUS BADGE](https://github.com/luyaohan1001/YesRTOS/actions/workflows/main.yml/badge.svg?branch=main)
+![CI WORKFLOW STATUS BADGE](https://github.com/luyaohan1001/YesRTOS/actions/workflows/cmake-single-platform.yml/badge.svg?branch=main)
 
 # YesRTOS - A Real-Time Operating System
 
