@@ -1,5 +1,7 @@
 #include "linkedlist.hpp"
 
+#include "thread.hpp"
+
 template <typename T>
 linkedlist<T>::~linkedlist() {
   list_node_t<T>* p_node_itr = this->head;
@@ -17,6 +19,11 @@ linkedlist<T>::~linkedlist() {
 template <typename T>
 bool linkedlist<T>::is_empty() const {
   return this->head == nullptr;
+}
+
+template <typename T>
+list_node_t<T>* linkedlist<T>::insert_front(T& data) {
+  return insert_front(std::move(data));
 }
 
 template <typename T>
@@ -53,32 +60,43 @@ void linkedlist<T>::delete_node(list_node_t<T>* p_del_target) {
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::lookup(T&& data) const {
-  list_node_t<T>* p_node_itr = this->head;
-  while (p_node_itr) {
-    if (p_node_itr->data == data) {
-      return p_node_itr;
-    }
-    p_node_itr = p_node_itr->next;
-  }
-  return nullptr;
+  // list_node_t<T>* p_node_itr = this->head;
+  // while (p_node_itr) {
+  //   if (p_node_itr->data == data) {
+  //     return p_node_itr;
+  //   }
+  //   p_node_itr = p_node_itr->next;
+  // }
+  // return nullptr;
 }
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::lookup(list_node_t<T>* p_target_node) const {
-  list_node_t<T>* p_node_itr = this->head;
-  while (p_node_itr) {
-    if (p_node_itr->data == p_target_node->data) {
-      return p_node_itr;
-    }
-    p_node_itr = p_node_itr->next;
-  }
-  return nullptr;
+  // list_node_t<T>* p_node_itr = this->head;
+  // while (p_node_itr) {
+  //   if (p_node_itr->data == p_target_node->data) {
+  //     return p_node_itr;
+  //   }
+  //   p_node_itr = p_node_itr->next;
+  // }
+  // return nullptr;
 }
 
 template <typename T>
-list_node_t<T>* linkedlist<T>::operator[](T& index) const {
+list_node<T>* linkedlist<T>::get_next_node_circular(list_node_t<T>* p_curr_node) const {
+  if (!p_curr_node)
+    return nullptr;
+  else if (!p_curr_node->next) {
+    return this->head;
+  } else {
+    return p_curr_node->next;
+  }
+}
+
+template <typename T>
+list_node_t<T>* linkedlist<T>::operator[](size_t& index) const {
   list_node_t<T>* p_node_itr = this->head;
-  T cnt = 0;
+  size_t cnt = 0;
   while (p_node_itr) {
     if (cnt++ == index) {
       return p_node_itr;
@@ -92,12 +110,15 @@ template <typename T>
 void linkedlist<T>::trace_list() const {
   list_node_t<T>* p_node_itr = this->head;
   while (p_node_itr) {
-    std::cout << p_node_itr->data << " -> ";
+    // std::cout << p_node_itr->data << " -> ";
     p_node_itr = p_node_itr->next;
   }
-  std::cout << "[NULL]" << std::endl;
+  // std::cout << "[NULL]" << std::endl;
 }
 
 // explicit instantiation
 template class linkedlist<size_t>;
 template struct list_node<size_t>;
+
+template class linkedlist<YesRTOS::Thread>;
+template struct list_node<YesRTOS::Thread>;

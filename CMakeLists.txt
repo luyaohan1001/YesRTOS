@@ -27,8 +27,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 add_library(LibYesRTOSTopLayer INTERFACE)
 
 target_sources(LibYesRTOSTopLayer INTERFACE
-    ${CMAKE_SOURCE_DIR}/src/scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/src/rr_scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/src/preempt_fifo_scheduler.cpp
     ${CMAKE_SOURCE_DIR}/src/thread.cpp
+    ${CMAKE_SOURCE_DIR}/src/bitops.cpp
     ${CMAKE_SOURCE_DIR}/src/mempool.cpp
     ${CMAKE_SOURCE_DIR}/src/linkedlist.cpp
     ${CMAKE_SOURCE_DIR}/src/test.cpp

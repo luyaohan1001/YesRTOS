@@ -24,7 +24,6 @@ extern size_t _ld_end_heap;
 
 class mempool {
   public:
-
   typedef enum {
     ALLOC_SUCCESS,
     ALLOC_FAIL
@@ -78,4 +77,5 @@ class mempool {
   static size_t alloc_bitmaps[ALLOC_SIZE_GROUPS];
   static size_t heap_start, heap_end;
   static size_t size_grp_start_addr[ALLOC_SIZE_GROUPS];
+  static bool init_complete;
 };

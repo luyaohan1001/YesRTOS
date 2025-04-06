@@ -1,7 +1,8 @@
 /**
- * @file scheduler.hpp
+ * @file rr_scheduler.hpp
  * @author Luyao Han (luyaohan1001@gmail.com)
- * @brief YesRTOS scheduler header.
+ * @brief YesRTOS scheduler definition for round-robin scheduler. The classes are designed for singleton pattern.
+ * @note Defining class as singleton pattern requires 'static' on each method, which avoid global instance. However, it limits polymorphism and flexibility.
  * @version 1.0
  * @date 2024-07-12
  * @copyright Copyright (c) 2024
@@ -14,20 +15,13 @@
 
 namespace YesRTOS {
 
-/*
-@note
-  With Templates: When templates are used, the compiler only knows the types when it instantiates the class with specific types.
-  Because of this, the compiler needs explicit instructions to access members from the base class.
-  Thus 'this->' is required to explicitly access members inherited from a templated base class.
-*/
-template <uint32_t DEPTH>
-class RoundRobinScheduler {
+class RoundRobinScheduler final {
   public:
   static void schedule_next();
   static void start();
 
   static void add_thread(Thread* thread);
-  static Thread* thread_q[DEPTH];
+  static Thread* thread_q[TASK_QUEUE_DEPTH];
 
   /**
    * @brief Double pointer to stack of thread currently being executed.
@@ -45,9 +39,7 @@ class RoundRobinScheduler {
   RoundRobinScheduler();
   ~RoundRobinScheduler();
 
-  protected:
   static uint32_t q_size;
-  static uint32_t sched_context_stack[CONTEXT_SAVE_STACK_SIZE];
 };
 
 }  // namespace YesRTOS

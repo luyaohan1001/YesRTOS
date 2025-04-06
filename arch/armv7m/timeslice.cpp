@@ -14,7 +14,8 @@
 #include <baremetal_api.h>
 #include <config.h>
 
-#include <scheduler.hpp>
+#include <preempt_fifo_scheduler.hpp>
+#include <rr_scheduler.hpp>
 #include <thread.hpp>
 
 // SysTick memory mapped registers and bits
@@ -58,16 +59,16 @@ void SysTick_Handler() {
   // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
   __asm volatile("stmdb r1!, {r4-r11, r14}");
   // $r0 = sched.pp_active_thread_stk
-  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
   // *$r0 = r1 ==> *sched.pp_active_thread_stk = $r1 = psp (storing psp back to thread context)
   __asm volatile("str r1, [r0]");
 
   // scheduler updates pp_active_thread_stk to next thread.
-  YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::schedule_next();
+  YesRTOS::PreemptFIFOScheduler::schedule_next();
 
   // Restore context of next thread.
   // $r0 = sched.pp_active_thread_stk
-  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");
   // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp
   __asm volatile("ldr r0, [r0]");
   // load multiple, increment after. (r4=*psp;psp+=4; r5=*psp;psp+=4; r6=*psp;psp+=4;... r14=*psp;psp+=4;)
@@ -92,15 +93,15 @@ void SysTick_Handler() {
 
 extern "C" {
 void init_stack_armv7m(uint32_t **pp_stk, uint32_t *routine_ptr) {
-  (*pp_stk)--;              // walk stack pointer
+  (*pp_stk)--;              // full descending stack, decrement 1 to point to first empty position.
   (**pp_stk) = 0x01000000;  // xPSR
 
-  (*pp_stk)--;                                                    // walk stack pointer
+  (*pp_stk)--;                                                    // full descending stack, decrement 1 to point to first empty position.
   (**pp_stk) = ((uint32_t)(uintptr_t)routine_ptr) & 0xfffffffeUL; /* PC */
 
   (*pp_stk)--;  // walk stack pointer, reserve for function return address (LR)
 
-  (*pp_stk) -= 5;  // walk stack pointer, reserve for R0-R3, R12
+  (*pp_stk) -= 5;  // walk stack pointer, reserve for machine saved registers including R0, R1, R2, R3, R12.
 
   (*pp_stk)--;              // walk stack pointer
   (**pp_stk) = 0xfffffffd;  // return to handler mode using psp.
@@ -125,7 +126,7 @@ void start_first_task(void) {
  */
 extern "C" {
 void SVC_Handler(void) {
-  __asm volatile("mov r0, %0" : : "r"(YesRTOS::RoundRobinScheduler<TASK_QUEUE_DEPTH>::pp_active_thread_stk) : "memory");
+  __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");
   __asm volatile("ldr r0, [r0]");
   __asm volatile("ldmia r0!, {r4-r11, r14}");
   __asm volatile("msr psp, r0");  // Point process stack pointer to top of the stack after popping.

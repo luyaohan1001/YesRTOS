@@ -11,6 +11,7 @@ size_t mempool::min_alloc_size;
 size_t mempool::max_alloc_size;
 size_t mempool::size_grp_start_addr[ALLOC_SIZE_GROUPS];
 size_t mempool::total_capacity_byte;
+bool mempool::init_complete = false;
 
 /**
  * @brief Initialize static variables of memory pool class.
@@ -33,6 +34,7 @@ void mempool::init() {
   mempool::min_alloc_size = 1 << MIN_ALLOC_SIZE_SHAMT;
   mempool::max_alloc_size = 1 << MAX_ALLOC_SIZE_SHAMT;
   mempool::total_capacity_byte = reinterpret_cast<size_t>(_ld_end_heap) - reinterpret_cast<size_t>(_ld_start_heap);
+  init_complete = true;
 }
 
 /**
@@ -56,6 +58,7 @@ mempool::size_group_t mempool::match_size_grp(const size_t& req_size) {
  * @return Status and memory address if allocation is successful.
  */
 mempool::alloc_t mempool::malloc(const size_t& req_size) {
+  if (!init_complete) mempool::init();
   size_group_t sz_grp = match_size_grp(req_size);
   alloc_t ret = {ALLOC_FAIL, nullptr};
   if (sz_grp == SIZE_GRP_NOT_FOUND) return ret;
@@ -74,6 +77,7 @@ mempool::alloc_t mempool::malloc(const size_t& req_size) {
  * @return None.
  */
 void mempool::free(size_t* p_mem) {
+  if (!init_complete) mempool::init();
   size_t target_mem = static_cast<size_t>(reinterpret_cast<uintptr_t>(p_mem));
   for (size_t sz_grp = 0; sz_grp <= (MAX_ALLOC_SIZE_SHAMT - MIN_ALLOC_SIZE_SHAMT); ++sz_grp) {
     int32_t addr_offset = static_cast<int32_t>(target_mem - size_grp_start_addr[sz_grp]);

@@ -10,7 +10,8 @@
 #include <baremetal_api.h>
 
 #include <iostream>
-#include <scheduler.hpp>
+#include <preempt_fifo_scheduler.hpp>
+#include <rr_scheduler.hpp>
 
 using namespace YesRTOS;
 
@@ -53,16 +54,28 @@ void(thread2_routine)() {
  */
 int main() {
   // Add threads.
+  // Thread thread0(0, thread0_routine);
+  // RoundRobinScheduler::add_thread(&thread0);
+
+  // Thread thread1(1, thread1_routine);
+  // RoundRobinScheduler::add_thread(&thread1);
+
+  // Thread thread2(2, thread2_routine);
+  // RoundRobinScheduler::add_thread(&thread2);
+
+  // RoundRobinScheduler::start();
+
   Thread thread0(0, thread0_routine);
-  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread0);
+  PreemptFIFOScheduler::add_thread(&thread0, 0);
 
   Thread thread1(1, thread1_routine);
-  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread1);
+  PreemptFIFOScheduler::add_thread(&thread1, 0);
 
   Thread thread2(2, thread2_routine);
-  RoundRobinScheduler<TASK_QUEUE_DEPTH>::add_thread(&thread2);
+  PreemptFIFOScheduler::add_thread(&thread2, 0);
 
-  RoundRobinScheduler<TASK_QUEUE_DEPTH>::start();
+  PreemptFIFOScheduler::start();
+
   while (1);
   return 0;
 }
