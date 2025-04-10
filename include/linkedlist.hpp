@@ -1,7 +1,11 @@
+#include <cassert>
 #include <iostream>
 #include <utility>  // for std::move
+#include <vector>
 
 #include "mempool.hpp"
+
+namespace YesRTOS {
 
 template <typename T>
 struct list_node {
@@ -31,8 +35,11 @@ class linkedlist final {
   list_node_t<T>* lookup(T&& data) const;
   list_node_t<T>* lookup(list_node_t<T>* p_target_node) const;
   list_node<T>* get_next_node_circular(list_node_t<T>* p_curr_node) const;
+  void dump_list_to_vector(std::vector<T>& v);
   void trace_list() const;
 
-  // overload operator
+  // overload [] operator to allow array-link access syntax for linkedlist.
   list_node_t<T>* operator[](size_t& index) const;
 };
+
+}  // namespace YesRTOS

@@ -42,15 +42,18 @@ void test_alloc_free_size_lt_32() {
     mempool::size_group_t sz_grp = mempool::match_size_grp(test_req_size);
     assert(alloc_res.status == mempool::ALLOC_SUCCESS);
     mempool::free(alloc_res.addr);
-    assert(mempool::get_alloc_bitmap(sz_grp) == 0);
+    assert(get_alloc_bitmap(sz_grp) == 0);
   }
 }
 
 // Testing allocation invalid size
-void test_alloc_size_0xFF() {
+void test_alloc_invalid_size() {
   mempool::init();
 
-  auto alloc_res = mempool::malloc(0xFF);
+  auto alloc_res = mempool::malloc(-1);
+  assert(alloc_res.status == mempool::ALLOC_FAIL);
+
+  alloc_res = mempool::malloc(9999999999999);
   assert(alloc_res.status == mempool::ALLOC_FAIL);
 }
 
@@ -63,19 +66,64 @@ void test_alloc_size_128() {
   mempool::size_group_t sz_grp = mempool::match_size_grp(128);
   assert(alloc_res.status == mempool::ALLOC_SUCCESS);
 
-  assert(mempool::get_alloc_bitmap(mempool::SIZE_GRP_128_BYTE) == 1);
+  assert(get_alloc_bitmap(mempool::SIZE_GRP_128_BYTE) == 1);
+}
+
+// Testing allocating more than max counter per size group
+void test_alloc_more_than_max_cnt() {
+  mempool::init();
+  auto test_req_size = 0x30;
+
+  mempool::alloc_t alloc_res = {mempool::ALLOC_FAIL, nullptr};
+  for (auto loop = 0; loop < mempool::MAX_CNT_PER_SIZE_GRP; ++loop) {
+    alloc_res = mempool::malloc(test_req_size);
+    assert(alloc_res.status == mempool::ALLOC_SUCCESS);
+  }
+
+  alloc_res = mempool::malloc(test_req_size);
+  assert(alloc_res.status == mempool::ALLOC_FAIL);
+}
+
+void test_init_address() {
+  mempool::init();
+
+  size_t* p_alloc_bitmap = get_size_grp_start_addr();
+  size_t alloc_size_groups = get_alloc_size_groups();
+  for (int i = 0; i < alloc_size_groups; ++i) {
+    assert(p_alloc_bitmap[i] != 0); // check address initialization
+    assert(p_alloc_bitmap[i] >= _ld_start_heap); // check address validity
+    assert(p_alloc_bitmap[i] < _ld_end_heap); // check address validity
+  }
 }
 
 int main(int argc, char** argv) {
-  std::string in_str(argv[0]);
-  if (in_str == std::string("alloc size < 32")) {
-    test_alloc_size_lt_32();
-  } else if (in_str == std::string("alloc and free size < 32")) {
-    test_alloc_free_size_lt_32();
-  } else if (in_str == std::string("alloc size 128")) {
-    test_alloc_size_128();
-  } else if (in_str == std::string("invalid size")) {
-    test_alloc_size_0xFF();
+  if (!argv[1]) {
+    std::cerr << "Usage: Run 'ctest' OR './mempool_unit_test <TEST_ID>'" << std::endl;
+    exit(1);
+  }
+
+  std::string in_str(argv[1]);
+  auto unit_test_id = std::stoi(in_str);
+  switch (unit_test_id) {
+    case 0:
+      test_alloc_size_lt_32();
+      break;
+    case 1:
+      test_alloc_free_size_lt_32();
+      break;
+    case 2:
+      test_alloc_size_128();
+      break;
+    case 3:
+      test_alloc_invalid_size();
+      break;
+    case 4:
+      test_alloc_more_than_max_cnt();
+      break;
+    case 5:
+      test_init_address();
+      break;
+    default: break;
   }
   return 0;
 }

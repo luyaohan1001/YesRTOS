@@ -25,9 +25,10 @@ void itm_initialize() {
 }
 
 /**
- * @brief Push to instrumentation trace macrocell fifo.
- *
+ * @brief Push to instrumentation trace macro cell register.
  * @param ch Character to push to fifo.
+ * @note The ITM stimulus ports are write-only registers that directly push data into the trace funnel.
+ *       ITM is not general purpose logging device with minimal silicon overhead, so only writing single byte is supported.
  */
 void itm_write_char(char ch) {
   // block FIFO until it's clear

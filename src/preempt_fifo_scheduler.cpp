@@ -47,6 +47,7 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
 
   linkedlist<Thread>* p_list = array_of_list[prio_level];
   p_list->insert_front(*t);
+  p_list->trace_list();
 }
 
 /**
@@ -90,6 +91,8 @@ void PreemptFIFOScheduler::schedule_next() {
     p_curr_thread_node = array_of_list_node[prio_idx];
     p_next_thread_node = array_of_list[prio_idx]->get_next_node_circular(p_curr_thread_node);
   }
+
+  array_of_list_node[curr_prio] = p_next_thread_node;
 
   PreemptFIFOScheduler::pp_active_thread_stk = &p_next_thread_node->data.stkptr;
 }

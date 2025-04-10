@@ -2,6 +2,8 @@
 
 #include "thread.hpp"
 
+namespace YesRTOS {
+
 template <typename T>
 linkedlist<T>::~linkedlist() {
   list_node_t<T>* p_node_itr = this->head;
@@ -23,13 +25,14 @@ bool linkedlist<T>::is_empty() const {
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::insert_front(T& data) {
-  return insert_front(std::move(data));
+  return insert_front(std::move(data));  // moves lvalue -> rvalue
 }
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::insert_front(T&& data) {
   mempool::alloc_t alloc_res = mempool::malloc(sizeof(list_node_t<T>));
   if (alloc_res.status == mempool::ALLOC_FAIL) {
+    assert(0);
     return nullptr;
   }
   list_node_t<T>* p_new_node = reinterpret_cast<list_node_t<T>*>(alloc_res.addr);
@@ -107,18 +110,29 @@ list_node_t<T>* linkedlist<T>::operator[](size_t& index) const {
 }
 
 template <typename T>
+void linkedlist<T>::dump_list_to_vector(std::vector<T>& v) {
+  list_node_t<T>* p_node_itr = this->head;
+  while (p_node_itr) {
+    v.push_back(p_node_itr->data);
+    p_node_itr = p_node_itr->next;
+  }
+}
+
+template <typename T>
 void linkedlist<T>::trace_list() const {
   list_node_t<T>* p_node_itr = this->head;
   while (p_node_itr) {
-    // std::cout << p_node_itr->data << " -> ";
+    std::cout << p_node_itr->data << " -> ";
     p_node_itr = p_node_itr->next;
   }
-  // std::cout << "[NULL]" << std::endl;
+  std::cout << "[NULL]" << std::endl;
 }
 
-// explicit instantiation
+// explicit instantiation of template (does not allocate memory)
 template class linkedlist<size_t>;
 template struct list_node<size_t>;
 
 template class linkedlist<YesRTOS::Thread>;
 template struct list_node<YesRTOS::Thread>;
+
+}  // namespace YesRTOS

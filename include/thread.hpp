@@ -1,9 +1,10 @@
 /**
  * @file thread.hpp
  * @author Luyao Han (luyaohan1001@gmail.com)
- * @brief YesRTOS thread header.
+ * @brief YesRTOS thread header declaration.
  * @version 1.0
  * @date 2024-07-12
+ * @note This class functions like a task control block that encapsulates all run-time context of a single thread on YesRTOS.
  * @copyright Copyright (c) 2024
  */
 
@@ -11,6 +12,8 @@
 
 #include <armv7m.h>
 #include <baremetal_api.h>
+
+#include <iostream>
 
 namespace YesRTOS {
 
@@ -45,10 +48,17 @@ class Thread {
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
   uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
+
   // Stack pointer pointing to top of the stack.
   uint32_t* stkptr;
 
   private:
   thread_info_t thread_info;
+
+  public:
+  friend std::ostream& operator<<(std::ostream& os, const Thread& t) {
+    os << "thread id: " << t.thread_info.id;
+    return os;  // Return the ostream to allow chaining of <<
+  }
 };
 }  // namespace YesRTOS

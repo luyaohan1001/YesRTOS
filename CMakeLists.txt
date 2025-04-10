@@ -1,3 +1,5 @@
+# CMake top configuration file for entire YesRTOS build.
+
 #### 1) Define toolchain related settings
 cmake_minimum_required(VERSION 3.10)
 
@@ -40,6 +42,9 @@ target_include_directories(LibYesRTOSTopLayer INTERFACE
     ${CMAKE_SOURCE_DIR}/include/)
 
 add_subdirectory(arch/armv7m)
+
+# Define using arch armv7m
+add_definitions(-DARCH_ARMV7M)
 
 #### 3) Linking - Create executable
 add_executable(${PROJECT_NAME})

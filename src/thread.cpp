@@ -11,7 +11,7 @@
 
 #include <thread.hpp>
 
-using namespace YesRTOS;
+namespace YesRTOS {
 
 /**
  * @brief Construct a new Thread object
@@ -41,9 +41,12 @@ Thread::~Thread() {
 /**
  * @brief Initialize thread stack for necessary context.
  * @note  This function is a wrapper call for any architecture dependent thread stack initialization.
+ *        The ARCH_ARMV7M switch also strips away machine dependent function for unit testing higher level data structure explicitly instantiate 'Thread' class for unit testing.
  */
 void Thread::init_stack() {
+#if defined(ARCH_ARMV7M)
   init_stack_armv7m(&this->stkptr, (uint32_t*)(uintptr_t)this->thread_info.routine_ptr);
+#endif
 }
 
 const thread_state_t& Thread::get_state() const {
@@ -89,3 +92,5 @@ void Thread::wake_up() {
 void Thread::to_sleep() {
   this->thread_info.state = SLEEP;
 }
+
+}  // namespace YesRTOS

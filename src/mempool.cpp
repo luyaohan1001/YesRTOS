@@ -23,7 +23,7 @@ void mempool::init() {
   mempool::heap_end = _ld_end_heap;
 
   mempool::size_grp_start_addr[0] = mempool::heap_start;
-  for (size_t i = MIN_ALLOC_SIZE_SHAMT + 1; i <= MAX_ALLOC_SIZE_SHAMT; ++i) {
+  for (size_t i = 1; i <= (MAX_ALLOC_SIZE_SHAMT - MIN_ALLOC_SIZE_SHAMT); ++i) {
     mempool::size_grp_start_addr[i] = mempool::size_grp_start_addr[i - 1] + static_cast<size_t>(32 * (1 << (i - 1)));
   }
 
@@ -86,4 +86,16 @@ void mempool::free(size_t* p_mem) {
     clr_bitpos(alloc_bitmaps[sz_grp], bitpos);
     return;
   }
+}
+
+size_t get_alloc_bitmap(mempool::size_group_t sz_grp) {
+  return mempool::alloc_bitmaps[sz_grp];
+}
+
+size_t* get_size_grp_start_addr() {
+  return &mempool::size_grp_start_addr[0];
+}
+
+size_t get_alloc_size_groups() {
+  return mempool::ALLOC_SIZE_GROUPS;
 }

@@ -26,7 +26,9 @@ target_include_directories(mempool_unit_test PRIVATE
     ${CMAKE_SOURCE_DIR}/../../include)
 
 enable_testing()
-add_test(NAME mempool_unit_test0 COMMAND ./mempool_unit_test "alloc size < 32")
-add_test(NAME mempool_unit_test1 COMMAND ./mempool_unit_test "alloc and free size < 32")
-add_test(NAME mempool_unit_test2 COMMAND ./mempool_unit_test "alloc size 128")
-add_test(NAME mempool_unit_test3 COMMAND ./mempool_unit_test "invalid size")
+add_test(NAME mempool_unit_test0 COMMAND ./mempool_unit_test 0)
+add_test(NAME mempool_unit_test1 COMMAND ./mempool_unit_test 1)
+add_test(NAME mempool_unit_test2 COMMAND ./mempool_unit_test 2)
+add_test(NAME mempool_unit_test3 COMMAND ./mempool_unit_test 3)
+add_test(NAME mempool_unit_test4 COMMAND ./mempool_unit_test 4)
+add_test(NAME mempool_unit_test5 COMMAND ./mempool_unit_test 5)

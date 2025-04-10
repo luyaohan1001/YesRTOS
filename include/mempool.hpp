@@ -53,11 +53,11 @@ class mempool {
   mempool();
   ~mempool() = delete;
 
-  // friend function
+  // friend function (mainly for unit testing)
   public:
-  static size_t get_alloc_bitmap(size_group_t sz_grp) {
-    return alloc_bitmaps[sz_grp];
-  }
+  friend size_t get_alloc_bitmap(size_group_t sz_grp);
+  friend size_t* get_size_grp_start_addr();
+  friend size_t get_alloc_size_groups();
 
   public:
   static size_t min_alloc_size, max_alloc_size;
@@ -71,7 +71,7 @@ class mempool {
   constexpr static size_t ALLOC_SIZE_GROUPS = 5;     // corresponding to 32 / 64 / 128 / 256 / 512 byte defined in size_group_t
   constexpr static size_t MIN_ALLOC_SIZE_SHAMT = 5;  // 1 << 5 = 32
   constexpr static size_t MAX_ALLOC_SIZE_SHAMT = 9;  // 1 << 9 = 512
-  constexpr static size_t BITMAP_FULL_MASK = 0xFFFFFFFF;
+  constexpr static size_t BITMAP_FULL_MASK = (~0);   // 0xFF....FF avoiding hardcode value to adapt for 32 / 64 bit system.
 
   // below are only declared, required external instantiation later.
   static size_t alloc_bitmaps[ALLOC_SIZE_GROUPS];
@@ -79,3 +79,8 @@ class mempool {
   static size_t size_grp_start_addr[ALLOC_SIZE_GROUPS];
   static bool init_complete;
 };
+
+// Declaration of utility function declared friend in mempool class.
+size_t get_alloc_bitmap(mempool::size_group_t sz_grp);
+size_t* get_size_grp_start_addr();
+size_t get_alloc_size_groups();
