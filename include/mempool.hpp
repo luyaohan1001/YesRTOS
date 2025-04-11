@@ -48,6 +48,21 @@ class mempool {
   static void free(size_t* p_mem);
   static void init();
 
+  /**
+   * @brief Function template to call memory allocator to allocate for class T, and construct class T at allocated address return from malloc.
+   *
+   * @tparam T type of the class
+   * @tparam variadic_args_type class constructor (variadic) argument list type
+   * @param variadic_arg class constructor (variadic) argument list
+   * @return T* Pointer to address of the constructed class.
+   */
+  template <typename T, typename... variadic_args_type>
+  static T* malloc_construct(variadic_args_type&&... variadic_arg) {
+    mempool::alloc_t alloc_res = mempool::malloc(sizeof(T));
+    if (alloc_res.status == ALLOC_FAIL) return nullptr;
+    return new (alloc_res.addr) T(variadic_arg...);
+  }
+
   private:
   // hide constructor and destructor to avoid external instantiation of this class.
   mempool();

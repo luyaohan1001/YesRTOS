@@ -88,6 +88,7 @@ void mempool::free(size_t* p_mem) {
   }
 }
 
+// Friend functions
 size_t get_alloc_bitmap(mempool::size_group_t sz_grp) {
   return mempool::alloc_bitmaps[sz_grp];
 }

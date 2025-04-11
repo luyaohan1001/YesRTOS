@@ -5,6 +5,9 @@
 namespace YesRTOS {
 
 template <typename T>
+linkedlist<T>::linkedlist() : head(nullptr){};
+
+template <typename T>
 linkedlist<T>::~linkedlist() {
   list_node_t<T>* p_node_itr = this->head;
   // single node list
@@ -63,26 +66,26 @@ void linkedlist<T>::delete_node(list_node_t<T>* p_del_target) {
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::lookup(T&& data) const {
-  // list_node_t<T>* p_node_itr = this->head;
-  // while (p_node_itr) {
-  //   if (p_node_itr->data == data) {
-  //     return p_node_itr;
-  //   }
-  //   p_node_itr = p_node_itr->next;
-  // }
-  // return nullptr;
+  list_node_t<T>* p_node_itr = this->head;
+  while (p_node_itr) {
+    if (p_node_itr->data == data) {
+      return p_node_itr;
+    }
+    p_node_itr = p_node_itr->next;
+  }
+  return nullptr;
 }
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::lookup(list_node_t<T>* p_target_node) const {
-  // list_node_t<T>* p_node_itr = this->head;
-  // while (p_node_itr) {
-  //   if (p_node_itr->data == p_target_node->data) {
-  //     return p_node_itr;
-  //   }
-  //   p_node_itr = p_node_itr->next;
-  // }
-  // return nullptr;
+  list_node_t<T>* p_node_itr = this->head;
+  while (p_node_itr) {
+    if (p_node_itr->data == p_target_node->data) {
+      return p_node_itr;
+    }
+    p_node_itr = p_node_itr->next;
+  }
+  return nullptr;
 }
 
 template <typename T>

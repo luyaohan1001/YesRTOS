@@ -9,6 +9,7 @@ namespace YesRTOS {
 
 template <typename T>
 struct list_node {
+  public:
   T data;
   struct list_node* next;
 
@@ -16,6 +17,13 @@ struct list_node {
   }
   list_node(T init_val, struct list_node* next) : data(init_val), next(next) {
   }
+
+  bool operator==(const struct list_node& other) const {
+    return (this->data == other.data && this->next == other.next);
+  }
+
+  private:
+  // nothing private
 };
 template <typename T>
 using list_node_t = struct list_node<T>;
@@ -23,7 +31,7 @@ using list_node_t = struct list_node<T>;
 template <typename T>
 class linkedlist final {
   public:
-  linkedlist() : head(nullptr){};
+  linkedlist();
   ~linkedlist();
 
   list_node_t<T>* head;

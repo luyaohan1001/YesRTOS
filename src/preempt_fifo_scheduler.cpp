@@ -31,8 +31,10 @@ void PreemptFIFOScheduler::init() {
   mempool::init();
 
   for (size_t prio_idx = 0; prio_idx < MAX_PRIO_LEVEL; ++prio_idx) {
-    mempool::alloc_t alloc_res = mempool::malloc(sizeof(linkedlist<Thread>));
-    array_of_list[prio_idx] = reinterpret_cast<linkedlist<Thread>*>(alloc_res.addr);
+    linkedlist<Thread>* p_list = mempool::malloc_construct<linkedlist<Thread>>();
+    // mempool::alloc_t alloc_res = mempool::malloc(sizeof(linkedlist<Thread>));
+    // linkedlist<Thread>* p_list = reinterpret_cast<linkedlist<Thread>*>(alloc_res.addr);
+    array_of_list[prio_idx] = p_list;
     array_of_list_node[prio_idx] = array_of_list[prio_idx]->head;
   }
 

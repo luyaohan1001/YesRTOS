@@ -44,6 +44,7 @@ class Thread {
   void wake_up();
   void to_sleep();
   void run();
+  bool operator==(const Thread& other) const;
 
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.

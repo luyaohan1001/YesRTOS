@@ -93,4 +93,10 @@ void Thread::to_sleep() {
   this->thread_info.state = SLEEP;
 }
 
+bool Thread::operator==(const Thread& other) const {
+  bool equal = (&this->allocated_stack[0] == &other.allocated_stack[0]) && (this->stkptr == other.stkptr) && (this->thread_info.id == other.thread_info.id) &&
+               (this->thread_info.routine_ptr == other.thread_info.routine_ptr);
+  return equal;
+}
+
 }  // namespace YesRTOS
