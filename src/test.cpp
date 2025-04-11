@@ -8,10 +8,12 @@
  */
 
 #include <baremetal_api.h>
-
-#include <iostream>
 #include <preempt_fifo_scheduler.hpp>
 #include <rr_scheduler.hpp>
+
+#if defined (HOST_PLATFORM)
+#include <iostream>
+#endif
 
 using namespace YesRTOS;
 
@@ -20,12 +22,7 @@ using namespace YesRTOS;
  */
 void(thread0_routine)() {
   while (1) {
-    // std::cout << "️♥ Thread 0 ♥️" << std::endl;
     // itm_trace("Thread 0\n");
-    int a = 15;
-    int b = 13;
-    int c = 14;
-    int d = 11;
   }
 }
 
@@ -35,8 +32,6 @@ void(thread0_routine)() {
 void(thread1_routine)() {
   while (1) {
     // itm_trace("Thread 1\n");
-    int a = 10;
-    // std::cout << "️♥ Thread 1 ♥️" << std::endl;
   }
 }
 
@@ -45,7 +40,6 @@ void(thread1_routine)() {
  */
 void(thread2_routine)() {
   while (1) {
-    // std::cout << "️♥ Thread 2 ♥️" << std::endl;
   }
 }
 

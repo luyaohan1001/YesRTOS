@@ -1,6 +1,8 @@
 #include "mempool.hpp"
 
+#if defined (HOST_PLATFORM)
 #include <iostream>
+#endif
 
 // External instantiation of static variable declared in class.
 size_t mempool::heap_start;

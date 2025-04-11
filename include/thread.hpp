@@ -13,7 +13,9 @@
 #include <armv7m.h>
 #include <baremetal_api.h>
 
+#if defined (HOST_PLATFORM)
 #include <iostream>
+#endif
 
 namespace YesRTOS {
 
@@ -57,9 +59,11 @@ class Thread {
   thread_info_t thread_info;
 
   public:
+  #if defined (HOST_PLATFORM)
   friend std::ostream& operator<<(std::ostream& os, const Thread& t) {
     os << "thread id: " << t.thread_info.id;
     return os;  // Return the ostream to allow chaining of <<
   }
+  #endif
 };
 }  // namespace YesRTOS

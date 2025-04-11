@@ -112,6 +112,7 @@ list_node_t<T>* linkedlist<T>::operator[](size_t& index) const {
   return nullptr;
 }
 
+#if defined (HOST_PLATFORM)
 template <typename T>
 void linkedlist<T>::dump_list_to_vector(std::vector<T>& v) {
   list_node_t<T>* p_node_itr = this->head;
@@ -120,7 +121,9 @@ void linkedlist<T>::dump_list_to_vector(std::vector<T>& v) {
     p_node_itr = p_node_itr->next;
   }
 }
+#endif
 
+#if defined (HOST_PLATFORM)
 template <typename T>
 void linkedlist<T>::trace_list() const {
   list_node_t<T>* p_node_itr = this->head;
@@ -130,6 +133,7 @@ void linkedlist<T>::trace_list() const {
   }
   std::cout << "[NULL]" << std::endl;
 }
+#endif
 
 // explicit instantiation of template (does not allocate memory)
 template class linkedlist<size_t>;

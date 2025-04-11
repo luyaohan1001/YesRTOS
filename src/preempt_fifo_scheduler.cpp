@@ -11,7 +11,9 @@
 
 #include <baremetal_api.h>
 
+#if defined (HOST_PLATFORM)
 #include <iostream>
+#endif
 
 #include "mempool.hpp"
 
@@ -49,7 +51,6 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
 
   linkedlist<Thread>* p_list = array_of_list[prio_level];
   p_list->insert_front(*t);
-  p_list->trace_list();
 }
 
 /**

@@ -15,3 +15,5 @@
 #define TASK_QUEUE_DEPTH        (32U)           // RoundRobinScheduler
 
 #define MAX_PRIO_LEVEL          (8U)            // PreemptFIFOScheduler
+
+// #define HOST_PLATFORM // Host platform of cross-compilation; used to control native traces to iostream.

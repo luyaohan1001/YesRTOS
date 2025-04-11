@@ -75,9 +75,16 @@ add_custom_target(dump_symbol_table
         --demangle
         --size-sort
         --print-size
-        --reverse-sort
+        --numeric-sort
         --line-numbers
+        --radix=decimal
         YesRTOS.elf > symtable.dump
+)
+
+# Dump size from ELF (executable and linkable format) file.
+add_custom_target(dump_section_size
+        arm-none-eabi-size -A
+        YesRTOS.elf > size.dump
 )
 
 
