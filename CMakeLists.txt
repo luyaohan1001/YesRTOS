@@ -69,6 +69,18 @@ COMMAND openocd
             -c 'program ${CMAKE_SOURCE_DIR}/build/${PROJECT_NAME}.elf verify reset exit'
 )
 
+# Dump symbol table using nm util.
+add_custom_target(dump_symbol_table
+        arm-none-eabi-nm
+        --demangle
+        --size-sort
+        --print-size
+        --reverse-sort
+        --line-numbers
+        YesRTOS.elf > symtable.dump
+)
+
+
 # Launch QEMU with the YesRTOS image
 add_custom_target(qemu
 COMMAND qemu-system-arm
