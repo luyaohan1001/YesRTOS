@@ -5,7 +5,7 @@
 namespace YesRTOS {
 
 template <typename T>
-linkedlist<T>::linkedlist() : head(nullptr){};
+linkedlist<T>::linkedlist() : head(nullptr){}
 
 template <typename T>
 linkedlist<T>::~linkedlist() {

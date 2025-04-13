@@ -27,7 +27,12 @@
 ## Tracing
 * ARM ITM/SWO
 
-## YesRTOS Architecture Diagram
+## YesRTOS Architecture
+* The kernel follows modular pattern with various *static* libraries:
+  * LibStartupASM
+  * LibBareMetal
+  * LibYesRTOSKernel.
+
 ![alt text](/docs/diagrams/architecture.png)
 
 ## Design Phase of YesRTOS

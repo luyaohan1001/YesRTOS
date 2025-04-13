@@ -86,3 +86,21 @@ The linker scripts and startup scripts are provided by STMicroelectronics throug
   4. Why "extern C" key word is necessary, regarding C++ name mangling
       https://web.mit.edu/tibbetts/Public/inside-c/www/mangling.html
 
+# Importance of 'gcc-arm-none-eabi.cmake'
+  * This is the CMake module specifying cross-compilation tool chain configuration to build ARM executable on MacOS.
+
+Below code is to avoid error such as:
+arm-none-eabi-g++: error: arm64: No such file or directory
+arm-none-eabi-g++: error: unrecognized command-line option '-arch'; did you mean '-march='?
+```
+# Specify a generic embedded target system and ARM architecture for cross-compilation.
+set(CMAKE_SYSTEM_NAME               Generic)
+set(CMAKE_SYSTEM_PROCESSOR          arm)
+
+# Force CMake to treat specified compilers as valid GNU C/C++ compilers without detection.
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+set(CMAKE_C_COMPILER_ID GNU)
+set(CMAKE_CXX_COMPILER_ID GNU)
+```
+
