@@ -39,7 +39,6 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/bitops.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/test.cpp
 )
 
 target_include_directories(${LIBRARY_NAME} PRIVATE
