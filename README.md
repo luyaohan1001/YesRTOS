@@ -10,7 +10,9 @@
 * Lightweight real time operating system for ARM-Cortex M.
 
 ## Language
-* C++17, C11, and GNU ARM assembly.
+* C++17
+* C11
+* [GNU ARM assembly with C Expression Operands](https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html)
 
 ## Build System
 * CMake, Make
