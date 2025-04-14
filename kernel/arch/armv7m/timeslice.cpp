@@ -50,6 +50,7 @@ void systick_clk_init(void) {
  * @note stmdb, pseudo instruction: https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STMDB--STMFD
  * @note stmia, pseudo instruction:
  * https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STM--STMIA--STMEA
+ * @note According to AAPCS, R0, R1, R2, R3, R12, LR, PC, xPSR are automatically saved by harware during exception, thus they are allowed to overwrite immediately entering this handler function.
  */
 extern "C" {
 void SysTick_Handler() {
