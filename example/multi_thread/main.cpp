@@ -22,7 +22,6 @@ using namespace YesRTOS;
  */
 void(thread0_routine)() {
   while (1) {
-    // itm_trace("Thread 0\n");
   }
 }
 
@@ -31,7 +30,6 @@ void(thread0_routine)() {
  */
 void(thread1_routine)() {
   while (1) {
-    // itm_trace("Thread 1\n");
   }
 }
 

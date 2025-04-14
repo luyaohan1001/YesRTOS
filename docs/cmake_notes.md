@@ -28,3 +28,12 @@
   CMAKE_C_COMPILER= /Library/Developer/CommandLineTools/usr/bin/cc
   CMAKE_CXX_COMPILER= /Library/Developer/CommandLineTools/usr/bin/c++
   ```
+
+# Generating debug symbol for break point debugging.
+  Below allows to attach '-g' flag to GCC compiler for debug symbols. Include in CMakeList to allow default Debug mode generation.
+  ```
+  if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug")
+  set(CMAKE_CXX_FLAGS_DEBUG "-g")
+  endif()
+  ```

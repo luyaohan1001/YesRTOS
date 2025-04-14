@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 3.10)
 # Cross compilation tool chain.
 include(${CMAKE_CURRENT_SOURCE_DIR}/arch/armv7m/gcc-arm-none-eabi.cmake)
 
+# Linker script for address-related symbol resolution (stack start address, etc.)
+set(LINKER_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/STM32F767ZITx_FLASH.ld)
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -T ${LINKER_SCRIPT_PATH}")
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -T \"${LINKER_SCRIPT_PATH}\"")
+
 # Setup project and source.
 set(PROJECT_NAME YesRTOSKernel)
 project(${PROJECT_NAME}
@@ -39,6 +44,7 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/bitops.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
 )
 
 target_include_directories(${LIBRARY_NAME} PRIVATE
@@ -51,29 +57,3 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
 
 # Define using arch armv7m
 add_definitions(-DARCH_ARMV7M)
-
-# Flash command.
-add_custom_target(flash
-COMMAND openocd
-            -f interface/stlink-v2-1.cfg
-            -f target/stm32f7x.cfg
-            -c 'program ${CMAKE_CURRENT_LIST_DIR}/build/${PROJECT_NAME}.elf verify reset exit'
-)
-
-# Dump symbol table using nm util.
-add_custom_target(dump_symbol_table
-        arm-none-eabi-nm
-        --demangle
-        --size-sort
-        --print-size
-        --numeric-sort
-        --line-numbers
-        --radix=decimal
-        YesRTOS.elf > symtable.dump
-)
-
-# Dump size from ELF (executable and linkable format) file.
-add_custom_target(dump_section_size
-        arm-none-eabi-size -A
-        YesRTOS.elf > size.dump
-)

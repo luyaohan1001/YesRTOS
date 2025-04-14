@@ -59,12 +59,12 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
 void PreemptFIFOScheduler::start() {
   if (!init_complete) PreemptFIFOScheduler::init();
 
-  linkedlist<Thread>* p_list;
+  linkedlist<Thread>* p_list = nullptr;
 
   size_t prio_idx;
   for (prio_idx = 0; prio_idx < MAX_PRIO_LEVEL; ++prio_idx) {
-    p_list = array_of_list[0];
-    if (p_list) break;
+    p_list = array_of_list[prio_idx];
+    if (p_list->head) break;
   }
   if (!p_list) return;
 

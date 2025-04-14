@@ -20,8 +20,8 @@
 /**
  * @brief Linker symbol to be defined for preallocated heap region, typically from a linker script.
  */
-extern size_t _ld_start_heap;
-extern size_t _ld_end_heap;
+extern size_t _ld_start_heap[];
+extern size_t _ld_end_heap[];
 
 class mempool {
   public:

@@ -1,10 +1,11 @@
 {
   "configurations": [
+
       {
           // Attributes: https://github.com/Marus/cortex-debug/blob/master/debug_attributes.md
           "name": "Cortex Debug (STM32F767 ST-Link)",   // Required VSCode extension: "Cortex-Debug"
           "cwd": "${workspaceRoot}",
-          "executable": "${workspaceRoot}/build/YesRTOS.elf",
+          "executable": "${workspaceRoot}/example/multi_thread/build/multi_thread.elf",
           "request": "launch",
           "type": "cortex-debug",
           "servertype": "openocd",
@@ -15,7 +16,7 @@
           ],
           // "preLaunchCommands": ["make -j8", "make flash"],
           "runToEntryPoint": "main",
-          "svdFile": "${workspaceRoot}/armv7m/STM32F767.svd",
+          "svdFile": "${workspaceRoot}/kernel/arch/armv7m/STM32F767.svd",
           "openOCDLaunchCommands": [
             "init",
             "reset init",
