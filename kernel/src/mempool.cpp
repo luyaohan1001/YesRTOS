@@ -21,8 +21,8 @@ bool mempool::init_complete = false;
  * @note It should be called only once in the system initialization.
  */
 void mempool::init() {
-  mempool::heap_start = reinterpret_cast<size_t>(&_ld_start_heap[0]);
-  mempool::heap_end = reinterpret_cast<size_t>(&_ld_end_heap[0]);
+  mempool::heap_start = reinterpret_cast<size_t>(_ld_start_heap);
+  mempool::heap_end = reinterpret_cast<size_t>(_ld_end_heap);
 
   mempool::size_grp_start_addr[0] = mempool::heap_start;
   for (size_t i = 1; i <= (MAX_ALLOC_SIZE_SHAMT - MIN_ALLOC_SIZE_SHAMT); ++i) {

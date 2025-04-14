@@ -98,4 +98,29 @@
   2. A 'template class' - entire class is parameterized. Functions inside the class can use the class's template parameter.
   3. 'template function' in regular class- a member function of a regular class can itself be a template.
 
+# Value dereference on linker script defined symbols
+  1. When certain symbols are defined in linker script, such as '_ld_start_heap' (specifying starting address of the heap), it is important to specify the type in CPP correctly.
+  2. For example, when specifying as
+  ```
+  extern size_t _ld_start_heap;
+  ```
+
+  or
+
+  ```
+  extern void* _ld_start_heap;
+  ```
+  The linker automatically dereferences from this address, meaning take the value on this address and assign to _ld_start_heap in cpp context. It is not expected behavior as the address is expected to be stored as size_t only.
+
+  As fix, it is necessary to declare it correctly as
+  ```
+  extern void* _ld_start_heap[];
+  ```
+
+  and typecast as size_t
+
+  ```
+    mempool::heap_start = reinterpret_cast<size_t>(_ld_start_heap);
+  ```
+
 
