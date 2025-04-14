@@ -50,7 +50,8 @@ void systick_clk_init(void) {
  * @note stmdb, pseudo instruction: https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STMDB--STMFD
  * @note stmia, pseudo instruction:
  * https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STM--STMIA--STMEA
- * @note According to AAPCS, R0, R1, R2, R3, R12, LR, PC, xPSR are automatically saved by harware during exception, thus they are allowed to overwrite immediately entering this handler function.
+ * @note According to AAPCS, R0, R1, R2, R3, R12, LR, PC, xPSR are automatically saved by hardware during exception, thus they are allowed to overwrite immediately entering this handler function.
+ * @note Assembler Instructions with C Expression Operands: https://gcc.gnu.org/onlinedocs/gcc-3.2.3/gcc/Extended-Asm.html
  */
 extern "C" {
 void SysTick_Handler() {
@@ -60,6 +61,7 @@ void SysTick_Handler() {
   // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
   __asm volatile("stmdb r1!, {r4-r11, r14}");
   // $r0 = sched.pp_active_thread_stk
+  // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
   __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
   // *$r0 = r1 ==> *sched.pp_active_thread_stk = $r1 = psp (storing psp back to thread context)
   __asm volatile("str r1, [r0]");
@@ -69,6 +71,7 @@ void SysTick_Handler() {
 
   // Restore context of next thread.
   // $r0 = sched.pp_active_thread_stk
+  // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
   __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");
   // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp
   __asm volatile("ldr r0, [r0]");

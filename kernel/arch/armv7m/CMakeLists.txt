@@ -16,6 +16,7 @@ add_library(LibStartupASM ./startup_stm32f767xx.s)
 # Add second library which includes all other bare metal code.
 add_library(LibBareMetal
     ${CMAKE_CURRENT_LIST_DIR}/trace.c
+    ${CMAKE_CURRENT_LIST_DIR}/atomic.cpp
     ${CMAKE_CURRENT_LIST_DIR}/timeslice.cpp
 )
 target_include_directories(LibBareMetal PRIVATE
