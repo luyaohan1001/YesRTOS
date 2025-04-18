@@ -72,6 +72,7 @@ void PreemptFIFOScheduler::start() {
   array_of_list_node[prio_idx] = p_list->head;
   PreemptFIFOScheduler::pp_active_thread_stk = &p_list->head->data.stkptr;
 
+  itm_initialize();
   systick_clk_init();
   start_first_task();
 }

@@ -14,7 +14,7 @@
               "interface/stlink-v2-1.cfg",
               "target/stm32f7x.cfg",
           ],
-          // "preLaunchCommands": ["make -j8", "make flash"],
+          "preLaunchCommands": ["make -j8", "make flash"],
           "runToEntryPoint": "main",
           "svdFile": "${workspaceRoot}/kernel/arch/armv7m/STM32F767.svd",
           "openOCDLaunchCommands": [
@@ -28,12 +28,12 @@
               "source": "probe",
               "decoders": [
                   {
-                      "type": "console",
+                      "type": "console",  // expecting for a new terminal to be created for tracing the SWO.
                       "port": 0,
                       "label": "hdm",
-                      "logfile": "${workspaceRoot}/swo_trace.txt",
+                      "logfile": "${workspaceRoot}/swo_trace.txt", // expecting traces saved in text file.
                       "showOnStartup": true,
-                      "timestamp": false
+                      "timestamp": true
                   }
               ],
           },

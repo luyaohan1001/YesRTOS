@@ -55,35 +55,51 @@ void systick_clk_init(void) {
  */
 extern "C" {
 void SysTick_Handler() {
-  // Saving context of current thread.
-  // $r1 = process stack pointer
-  __asm volatile("mrs r1, psp");
-  // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
-  __asm volatile("stmdb r1!, {r4-r11, r14}");
-  // $r0 = sched.pp_active_thread_stk
-  // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
-  __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");  // $r0 = pointer to current active thread's stack pointer
-  // *$r0 = r1 ==> *sched.pp_active_thread_stk = $r1 = psp (storing psp back to thread context)
-  __asm volatile("str r1, [r0]");
-
-  // scheduler updates pp_active_thread_stk to next thread.
-  YesRTOS::PreemptFIFOScheduler::schedule_next();
-
-  // Restore context of next thread.
-  // $r0 = sched.pp_active_thread_stk
-  // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
-  __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");
-  // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp
-  __asm volatile("ldr r0, [r0]");
-  // load multiple, increment after. (r4=*psp;psp+=4; r5=*psp;psp+=4; r6=*psp;psp+=4;... r14=*psp;psp+=4;)
-  __asm volatile("ldmia r0!, {r4-r11, r14}");
-  // psp = r0 ==> update process stack pointer to top of the stack
-  __asm volatile("msr psp, r0");
+  ICSR |= PENDSVSET_BIT;
 }
 }
 
 /**
- * @brief Initialize stack for any running thread for the first time.
+ * @brief 
+ * @note __attribute__((naked)) is extremely important to compile as pure assembly function without C prologue
+ */
+extern "C" {
+  void __attribute__((naked)) PendSV_Handler() {
+    // Saving context of current thread.
+    // $r1 = process stack pointer
+    __asm volatile("mrs r1, psp":::"r1");
+    __asm volatile("isb");
+    // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
+    __asm volatile("stmdb r1!, {r4-r11}":::"r1");
+    // $r0 = sched.pp_active_thread_stk
+    // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
+    __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "r0", "memory");  // $r0 = pointer to current active thread's stack pointer
+    // *$r0 = r1 ==> *sched.pp_active_thread_stk = $r1 = psp (storing psp back to thread context)
+    __asm volatile("str r1, [r0]":::"r0", "r1");
+    __asm volatile("push {r4-r11, lr} ");
+
+    // scheduler updates pp_active_thread_stk to next thread.
+    YesRTOS::PreemptFIFOScheduler::schedule_next();
+
+    __asm volatile("pop {r4-r11, lr} ");
+
+    // Restore context of next thread.
+    // $r0 = sched.pp_active_thread_stk
+    // no output operand. %0: input operand, load pp_active_thread_stk into register, memory clobber.
+    __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "r0", "memory");
+    // $r0 = *$r0 = *sched.pp_active_thread_stk which gives psp
+    __asm volatile("ldr r0, [r0]"::: "r0");
+    // load multiple, increment after. (r4=*psp;psp+=4; r5=*psp;psp+=4; r6=*psp;psp+=4;... r14=*psp;psp+=4;)
+    __asm volatile("ldmia r0!, {r4-r11}":::"r0");
+    // psp = r0 ==> update process stack pointer to top of the stack
+    __asm volatile("msr psp, r0":::"r0");
+    __asm volatile("isb");
+    __asm volatile("bx lr");
+  }
+  }
+
+/**
+ * @brief Initialize stack for any running thread for the first time, it is MIMICKING AN EXCEPTION STACK!
  * @param [in] pp_stk Pointer to stack pointer.
                       (*pp_stk)--; to grow stack
  *                    (**pp_stk)=0xBEEF; to assign value to stack location.
@@ -97,6 +113,7 @@ void SysTick_Handler() {
 
 extern "C" {
 void init_stack_armv7m(uint32_t **pp_stk, uint32_t *routine_ptr) {
+  // Exception-entry HW saved registers. Mimic the stack context of an exception.
   (*pp_stk)--;              // full descending stack, decrement 1 to point to first empty position.
   (**pp_stk) = 0x01000000;  // xPSR
 
@@ -104,13 +121,13 @@ void init_stack_armv7m(uint32_t **pp_stk, uint32_t *routine_ptr) {
   (**pp_stk) = ((uint32_t)(uintptr_t)routine_ptr) & 0xfffffffeUL; /* PC */
 
   (*pp_stk)--;  // walk stack pointer, reserve for function return address (LR)
+  (**pp_stk) = 0xDEADBEEF;
 
   (*pp_stk) -= 5;  // walk stack pointer, reserve for machine saved registers including R0, R1, R2, R3, R12.
 
-  (*pp_stk)--;              // walk stack pointer
-  (**pp_stk) = 0xfffffffd;  // return to handler mode using psp.
-
+  // Software saved registers.
   (*pp_stk) -= 8;  // walk stack pointer, reserve for R11-R4
+
 }
 }
 
@@ -129,11 +146,12 @@ void start_first_task(void) {
  * @note Exception handler by which the core services a SVC. Handler mode.
  */
 extern "C" {
-void SVC_Handler(void) {
+void __attribute__((naked)) SVC_Handler(void) {
   __asm volatile("mov r0, %0" : : "r"(YesRTOS::PreemptFIFOScheduler::pp_active_thread_stk) : "memory");
   __asm volatile("ldr r0, [r0]");
-  __asm volatile("ldmia r0!, {r4-r11, r14}");
+  __asm volatile("ldmia r0!, {r4-r11}");
   __asm volatile("msr psp, r0");  // Point process stack pointer to top of the stack after popping.
-  __asm volatile("bx r14");       // r14 expected 0xfffffffd (indicate exiting handler mode to thread mode using Procees Stack Pointer)
+  __asm volatile("ldr lr, =0xFFFFFFFD");       // r14 expected 0xfffffffd (indicate exiting handler mode to thread mode using Procees Stack Pointer)
+  __asm volatile("bx lr");       // r14 expected 0xfffffffd (indicate exiting handler mode to thread mode using Procees Stack Pointer)
 }
 }

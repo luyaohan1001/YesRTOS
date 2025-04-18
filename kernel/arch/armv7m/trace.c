@@ -11,7 +11,6 @@
 #include "stdint.h"
 
 // Memory mapped addresses for ARM-v7 M core registers.
-
 #define DEMCR                  *((volatile uint32_t*) 0xE000EDFCU ) // Debug Exception and Monitor Control Register
 #define ITM_STIM0              *((volatile uint32_t*) 0xE0000000 )  // Stimulus Port Register 0
 #define ITM_TER0               *((volatile uint32_t*) 0xE0000E00 )  // Trace Enable Register 0
@@ -44,8 +43,11 @@ void itm_write_char(char ch) {
  * @todo Add lock to function for thread safety.
  */
 void itm_trace(const char* ptr) {
-  itm_initialize();
+  __asm volatile("cpsid if");  // Disable interrupts
+  __asm volatile("dsb");
+  __asm volatile("isb");
   do {
     itm_write_char(*ptr++);
   } while (*ptr != '\0');
+  __asm volatile("cpsie if");
 }

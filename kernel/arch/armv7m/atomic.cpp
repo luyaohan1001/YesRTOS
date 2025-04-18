@@ -7,23 +7,33 @@
  * @note Assembler Instructions with C expressions Operand doc: https://gcc.gnu.org/onlinedocs/gcc-3.2.3/gcc/Extended-Asm.html
 */
 extern "C" {
-  bool compare_and_swap(size_t* addr, size_t old_val, size_t new_val) {
+  bool atomic_compare_and_swap(bool *const p_mem, size_t old_val, size_t new_val) {
     // load the lock value
-    size_t addr_val;
-    // %0: output operand, store register value into addr_val. %1: input operand, load from addr into register, [] indicates address read.
-    // pseudo code: ldrex addr_val, [addr]
-    __asm volatile("ldrex %0, [%1]" : "=r"(addr_val) : "r"(addr) : "memory");
+    volatile size_t mem_read;
+    volatile size_t status;
+    // %0: output operand, store register value into mem_read. %1: input operand, load from p_mem into register, [] indicates address read.
+    // pseudo code: ldrex mem_read, [p_mem]
+    __asm volatile("ldrex r0, [%0]" :: "r"(p_mem) : "memory");
+    // move r0 to mem_read
+    __asm volatile("mov %0, r0" : "=r"(mem_read) :: "memory");
 
-    // is the lock already taken?
-    if (addr_val != old_val) {
+    // in case of try locking, is the lock already taken?
+    if (mem_read != old_val) {
       return true;
     }
 
-    // did try locking succeed?
-    size_t status;
-    // %0: output operand, store register value into status. %1: inout operand, load from new_val into register. %2: input operand, load from addr into register, [] indicates address read.
-    // pseudo code: strex status, new_val, [addr]
-    __asm volatile("strex %0, %1, [%2]": "=r"(status) : "r"(new_val), "r"(addr) : "memory");
+    // in case of try locking, did it succeed?
+    // %0: output operand, store register value into status. %1: inout operand, load from new_val into register. %2: input operand, load from p_mem into register, [] indicates address read.
+    // pseudo code: strex status, new_val, [p_mem]
+    // status: 0 := success
+
+    // Below caused infinite loop
+    __asm volatile("strex r0, %0, [%1]": : "r"(new_val), "r"(p_mem) : "memory");
+    __asm volatile("str r0, [%0]": "=r"(status) :: "memory");
+
+    // Separate into different instructions
+    // __asm volatile("strex r1, %0, [%1]": : "r"(new_val), "r"(p_mem) : "memory");
+    // __asm volatile("str r1, [%0]": "=r"(status) :: "memory");
 
     return status;
   }

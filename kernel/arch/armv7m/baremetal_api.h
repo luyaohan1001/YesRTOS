@@ -8,6 +8,7 @@
  */
 
 #include "stdint.h"
+#include "stdbool.h"
 
 /**
  * @brief APIs
@@ -20,10 +21,12 @@ extern "C" {
   extern void save_sched_context();
   extern void start_first_task();
   //  Interfaces implemented in trace.c
+  extern void itm_initialize();
   extern void itm_trace(const char* ptr);
   // Interfaces implemented in timeslice.c
   extern void systick_clk_init(void);
   extern void init_stack_armv7m(uint32_t** pp_stk, uint32_t* routine_ptr);
+  extern bool atomic_compare_and_swap(bool *const p_mem, uint32_t old_val, uint32_t new_val);
 #if defined(__cplusplus)
 }
 #endif

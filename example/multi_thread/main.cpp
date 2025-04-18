@@ -7,9 +7,10 @@
  * @copyright Copyright (c) 2024
  */
 
-#include <baremetal_api.h>
-#include <preempt_fifo_scheduler.hpp>
-#include <rr_scheduler.hpp>
+#include "baremetal_api.h"
+#include "preempt_fifo_scheduler.hpp"
+#include "rr_scheduler.hpp"
+#include "mutex.hpp"
 
 #if defined (HOST_PLATFORM)
 #include <iostream>
@@ -17,11 +18,16 @@
 
 using namespace YesRTOS;
 
+// declare lock to protect tracer critical section.
+YesRTOS::mutex tracer_lock;
+
+
 /**
  * @brief Thread0 routine.
  */
 void(thread0_routine)() {
   while (1) {
+    itm_trace("thread 0\n");
   }
 }
 
@@ -30,6 +36,7 @@ void(thread0_routine)() {
  */
 void(thread1_routine)() {
   while (1) {
+    itm_trace("thread 1\n");
   }
 }
 
@@ -38,6 +45,16 @@ void(thread1_routine)() {
  */
 void(thread2_routine)() {
   while (1) {
+     itm_trace("thread 2\n");
+  }
+}
+
+/**
+ * @brief Thread1 routine.
+ */
+void(thread3_routine)() {
+  while (1) {
+     itm_trace("thread 3\n");
   }
 }
 
@@ -45,26 +62,17 @@ void(thread2_routine)() {
  * @brief YesRTOS Cooperative style scheduling demo between two threads.
  */
 int main() {
-  // Add threads.
-  // Thread thread0(0, thread0_routine);
-  // RoundRobinScheduler::add_thread(&thread0);
-
-  // Thread thread1(1, thread1_routine);
-  // RoundRobinScheduler::add_thread(&thread1);
-
-  // Thread thread2(2, thread2_routine);
-  // RoundRobinScheduler::add_thread(&thread2);
-
-  // RoundRobinScheduler::start();
-
   Thread thread0(0, thread0_routine);
   PreemptFIFOScheduler::add_thread(&thread0, 0);
 
   Thread thread1(1, thread1_routine);
   PreemptFIFOScheduler::add_thread(&thread1, 0);
 
-  Thread thread2(2, thread2_routine);
+  Thread thread2(1, thread2_routine);
   PreemptFIFOScheduler::add_thread(&thread2, 0);
+
+  Thread thread3(1, thread3_routine);
+  PreemptFIFOScheduler::add_thread(&thread3, 0);
 
   PreemptFIFOScheduler::start();
 
