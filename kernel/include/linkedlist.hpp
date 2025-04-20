@@ -1,7 +1,7 @@
 #include <cassert>
 #include <utility>  // for std::move
 
-#if defined (HOST_PLATFORM)
+#if defined(HOST_PLATFORM)
 #include <iostream>
 #include <vector>
 #endif
@@ -46,7 +46,7 @@ class linkedlist final {
   list_node_t<T>* lookup(T&& data) const;
   list_node_t<T>* lookup(list_node_t<T>* p_target_node) const;
   list_node<T>* get_next_node_circular(list_node_t<T>* p_curr_node) const;
-#if defined (HOST_PLATFORM)
+#if defined(HOST_PLATFORM)
   void dump_list_to_vector(std::vector<T>& v);
   void trace_list() const;
 #endif

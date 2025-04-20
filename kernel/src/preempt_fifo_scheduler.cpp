@@ -11,7 +11,7 @@
 
 #include <baremetal_api.h>
 
-#if defined (HOST_PLATFORM)
+#if defined(HOST_PLATFORM)
 #include <iostream>
 #endif
 

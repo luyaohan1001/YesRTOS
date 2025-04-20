@@ -9,7 +9,6 @@ mutex::mutex() {
 mutex::~mutex() {
 }
 
-
 mutex::op_res_t mutex::try_lock() {
   size_t ret = atomic_compare_and_swap(&this->atomic_val, mutex::UNLOCKED, mutex::LOCKED);
   return static_cast<mutex::op_res_t>(ret);
@@ -20,4 +19,4 @@ mutex::op_res_t mutex::try_unlock() {
   return static_cast<mutex::op_res_t>(ret);
 }
 
-}
+}  // namespace YesRTOS

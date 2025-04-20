@@ -1,6 +1,6 @@
 #include "mempool.hpp"
 
-#if defined (HOST_PLATFORM)
+#if defined(HOST_PLATFORM)
 #include <iostream>
 #endif
 

@@ -8,10 +8,11 @@
  */
 
 #include <baremetal_api.h>
+
 #include <mempool.hpp>
 #include <rr_scheduler.hpp>
 
-#if defined (HOST_PLATFORM)
+#if defined(HOST_PLATFORM)
 #include <iostream>
 #endif
 

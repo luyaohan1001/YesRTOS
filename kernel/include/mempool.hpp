@@ -13,7 +13,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <new>   // required for placement new in C++17
+#include <new>  // required for placement new in C++17
 
 #include "bitops.hpp"
 
