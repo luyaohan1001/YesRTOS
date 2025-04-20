@@ -18,7 +18,7 @@ class mutex {
 
   public:
   constexpr static size_t UNLOCKED = 0;
-  constexpr static size_t LOCKED = 0;
+  constexpr static size_t LOCKED = 1;
 
   private:
   bool atomic_val;
