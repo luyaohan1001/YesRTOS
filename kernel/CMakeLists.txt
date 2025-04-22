@@ -37,11 +37,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 # Define static library for YesRTOSKernel.
 set(LIBRARY_NAME LibYesRTOSKernel)
 
+# Define using arch armv7m
 add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/rr_scheduler.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/preempt_fifo_scheduler.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/bitops.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
@@ -52,8 +54,8 @@ target_include_directories(${LIBRARY_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
 )
 
+target_compile_definitions(${LIBRARY_NAME} PRIVATE ARCH_ARMV7M)
+
 # Include subdirectory to build sub-component together as part of the kernel.
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
 
-# Define using arch armv7m
-add_definitions(-DARCH_ARMV7M)
