@@ -58,3 +58,42 @@ bool atomic_compare_and_swap(bool *const p_mem, size_t old_val, size_t new_val) 
   return status;
 }
 }
+
+/**
+ * @brief Disable exception.
+ * @note CPSID, Change Processor State Interrupt Disable.
+ * @note When issuing CPSID the effect is not immediate for instructions in pipeline. Inject barrier to enforce any instructions after barrier to recognize new system state.
+ *
+ *  From the CPU pipeline from cycles it looks like below such as:
+ *       F: INSTR1 D: INSTR2 E: INSTR3 ...
+ *       F: CPSID  D: INSTR1 E: INSTR2 ...
+ *       F: ISB    D: CPSID  E: INSTR1 ...
+ *       F: ISB    D: ISB    E: CPSID  ...
+ *       F: ISB    D: ISB    E: ISB    ...
+ *       F: INSTR4 D: ISB    E: ISB    ...
+ *       ......
+ *       With F = FETCH D = DECODE, E = EXECUTE.
+ */
+extern "C" {
+void disable_exception() {
+  // disable exception, clear PRIMASK to 0.
+  __asm volatile("cpsid i");
+  // flush instruction pipeline.
+  __asm volatile("isb");
+  // synchronize memory load/store.
+  __asm volatile("dsb");
+}
+}
+
+/**
+ * @brief Enable exception.
+ * @note CPSIE, Change Processor State Interrupt Enable.
+ * @note Counterpart to void disable_exception().
+ */
+extern "C" {
+void enable_exception() {
+  __asm volatile("cpsie i");
+  __asm volatile("isb");
+  __asm volatile("dsb");
+}
+}

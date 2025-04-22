@@ -20,8 +20,20 @@
 /**
  * @brief Linker symbol to be defined for preallocated heap region, typically from a linker script.
  */
-extern size_t _ld_start_heap[];
-extern size_t _ld_end_heap[];
+
+#if defined (HOST_PLATFORM)
+// defined in unit test allocated memory
+extern "C" {
+  extern size_t _ld_start_heap;
+  extern size_t _ld_end_heap;
+}
+#elif defined(ARCH_ARMV7M)
+// linker script symbol
+extern "C" {
+  extern size_t _ld_start_heap[];
+  extern size_t _ld_end_heap[];
+}
+#endif
 
 class mempool {
   public:

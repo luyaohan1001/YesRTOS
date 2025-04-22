@@ -43,11 +43,7 @@ void itm_write_char(char ch) {
  * @todo Add lock to function for thread safety.
  */
 void itm_trace(const char* ptr) {
-  __asm volatile("cpsid if");  // Disable interrupts
-  __asm volatile("dsb");
-  __asm volatile("isb");
   do {
     itm_write_char(*ptr++);
   } while (*ptr != '\0');
-  __asm volatile("cpsie if");
 }

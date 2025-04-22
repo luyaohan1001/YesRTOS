@@ -11,6 +11,7 @@
 #include "preempt_fifo_scheduler.hpp"
 #include "rr_scheduler.hpp"
 #include "mutex.hpp"
+#include "atomic_section.hpp"
 
 #if defined (HOST_PLATFORM)
 #include <iostream>
@@ -27,7 +28,12 @@ YesRTOS::mutex tracer_lock;
  */
 void(thread0_routine)() {
   while (1) {
-    itm_trace("thread 0\n");
+    {
+      {
+      atomic_section a;
+      itm_trace("thread 0\n");
+      }
+    }
   }
 }
 
@@ -36,25 +42,36 @@ void(thread0_routine)() {
  */
 void(thread1_routine)() {
   while (1) {
-    itm_trace("thread 1\n");
+    {
+      {
+      atomic_section a;
+      itm_trace("thread 1\n");
+      }
+    }
   }
 }
 
 /**
- * @brief Thread1 routine.
+ * @brief Thread2 routine.
  */
 void(thread2_routine)() {
   while (1) {
-     itm_trace("thread 2\n");
+    {
+      atomic_section a;
+      itm_trace("thread 2\n");
+    }
   }
 }
 
 /**
- * @brief Thread1 routine.
+ * @brief Thread3 routine.
  */
 void(thread3_routine)() {
   while (1) {
-     itm_trace("thread 3\n");
+    {
+      atomic_section a;
+      itm_trace("thread 3\n");
+    }
   }
 }
 
@@ -68,11 +85,11 @@ int main() {
   Thread thread1(1, thread1_routine);
   PreemptFIFOScheduler::add_thread(&thread1, 0);
 
-  Thread thread2(1, thread2_routine);
-  PreemptFIFOScheduler::add_thread(&thread2, 0);
+  // Thread thread2(1, thread2_routine);
+  // PreemptFIFOScheduler::add_thread(&thread2, 0);
 
-  Thread thread3(1, thread3_routine);
-  PreemptFIFOScheduler::add_thread(&thread3, 0);
+  // Thread thread3(1, thread3_routine);
+  // PreemptFIFOScheduler::add_thread(&thread3, 0);
 
   PreemptFIFOScheduler::start();
 

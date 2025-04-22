@@ -5,8 +5,8 @@
 #endif
 
 // External instantiation of static variable declared in class.
-size_t mempool::heap_start;
-size_t mempool::heap_end;
+uintptr_t mempool::heap_start;
+uintptr_t mempool::heap_end;
 size_t mempool::alloc_bitmaps[ALLOC_SIZE_GROUPS];
 
 size_t mempool::min_alloc_size;

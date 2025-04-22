@@ -46,7 +46,7 @@
         "name": "Debug C++ Native MacOS",
         "type": "cppdbg", // dependency: "C/C++" extension on VSCode
         "request": "launch",
-        "program": "${workspaceFolder}/unit_tests/mempool_unit_tests/build/mempool_unit_test",
+        "program": "${workspaceFolder}/unit_tests/linkedlist_unit_tests/build/linkedlist_unit_test",
         "args": ["5"],  // unit test variation
         "stopAtEntry": true,
         "cwd": "${workspaceFolder}",
