@@ -74,7 +74,7 @@
   1. None 'static' or 'friend' functions are normal functions with an extra argument in the front, 'this', which is pointer pointing to current class instance.
   2. 'struct', like 'class' in C++, also have a 'this' pointer.
 
-# 'placement' 'new'
+# 'placement new'
   ```
   void* buffer = std::malloc(sizeof(MyClass)); // request a raw memory
   MyClass* obj = new(buffer) MyClass(42);      // 'placement new' to construct (call constructor) of MyClass in the pre-allocated memory
@@ -121,6 +121,18 @@
 
   ```
     mempool::heap_start = reinterpret_cast<size_t>(_ld_start_heap);
+  ```
+
+# Defining a new scope with '{}'
+  1. Below define a new scope
+  ```
+  while (1) {
+    {
+      // new scope because it is in {}
+      atomic_section a;
+    }
+    // here ~atomic_section() will be called because it is out of scope.
+  }
   ```
 
 
