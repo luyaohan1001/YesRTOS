@@ -80,16 +80,16 @@ void(thread3_routine)() {
  */
 int main() {
   Thread thread0(0, thread0_routine);
-  PreemptFIFOScheduler::add_thread(&thread0, 0);
+  PreemptFIFOScheduler::add_thread(&thread0, 4);
 
   Thread thread1(1, thread1_routine);
-  PreemptFIFOScheduler::add_thread(&thread1, 0);
+  PreemptFIFOScheduler::add_thread(&thread1, 4);
 
-  // Thread thread2(1, thread2_routine);
-  // PreemptFIFOScheduler::add_thread(&thread2, 0);
+  Thread thread2(1, thread2_routine);
+  PreemptFIFOScheduler::add_thread(&thread2, 4);
 
-  // Thread thread3(1, thread3_routine);
-  // PreemptFIFOScheduler::add_thread(&thread3, 0);
+  Thread thread3(1, thread3_routine);
+  PreemptFIFOScheduler::add_thread(&thread3, 4);
 
   PreemptFIFOScheduler::start();
 

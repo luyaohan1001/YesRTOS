@@ -2,9 +2,7 @@
 
 # YesRTOS - A Real-Time Operating System
 
-![alt text](/docs/diagrams/github_profile.jpg)
-
-[AI art generated with Magic Studio](https://magicstudio.com/ai-art-generator/)
+![alt text](/docs/diagrams/YesRTOS_LOGO.png)
 
 ## Goal of the Project
 * Lightweight real time operating system for ARM-Cortex M.
