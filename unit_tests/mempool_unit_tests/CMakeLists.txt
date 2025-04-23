@@ -17,14 +17,17 @@ endif()
 # Enable compile command dumping to json
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
+# Build flags
+add_compile_definitions("-DHOST_PLATFORM")
+
 add_executable(mempool_unit_test
   ${CMAKE_SOURCE_DIR}/mempool_unit_test.cpp
-  ${CMAKE_SOURCE_DIR}/../../src/mempool.cpp
-  ${CMAKE_SOURCE_DIR}/../../src/bitops.cpp
+  ${CMAKE_SOURCE_DIR}/../../kernel/src/mempool.cpp
+  ${CMAKE_SOURCE_DIR}/../../kernel/src/bitops.cpp
 )
 
 target_include_directories(mempool_unit_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/../../include)
+    ${CMAKE_SOURCE_DIR}/../../kernel/include)
 
 enable_testing()
 add_test(NAME mempool_unit_test0 COMMAND ./mempool_unit_test 0)
