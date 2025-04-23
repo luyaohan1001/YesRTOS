@@ -45,8 +45,8 @@ class PreemptFIFOScheduler final {
   ~PreemptFIFOScheduler() = delete;
 
   private:
-  static linkedlist<Thread>* array_of_list[MAX_PRIO_LEVEL];        // points to list of threads for each priority level.
-  static list_node_t<Thread>* array_of_list_node[MAX_PRIO_LEVEL];  // points to node of execution for each priority level.
+  static linkedlist<Thread>* ready_list[MAX_PRIO_LEVEL];        // points to list of threads for each priority level.
+  static list_node_t<Thread>* running_threads[MAX_PRIO_LEVEL];  // points to node of execution for each priority level.
 };
 
 }  // namespace YesRTOS
