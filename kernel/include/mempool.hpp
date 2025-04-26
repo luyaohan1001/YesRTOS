@@ -53,6 +53,8 @@ class mempool {
     SIZE_GRP_128_BYTE = 2,
     SIZE_GRP_256_BYTE = 3,
     SIZE_GRP_512_BYTE = 4,
+    SIZE_GRP_1024_BYTE = 5,
+    SIZE_GRP_2048_BYTE = 6,
     SIZE_GRP_NOT_FOUND,
   } size_group_t;
 
@@ -98,7 +100,7 @@ class mempool {
   // below has declaration and and constexpr allows internal instantiation (memory allocated here).
   constexpr static size_t ALLOC_SIZE_GROUPS = 5;     // corresponding to 32 / 64 / 128 / 256 / 512 byte defined in size_group_t
   constexpr static size_t MIN_ALLOC_SIZE_SHAMT = 5;  // 1 << 5 = 32
-  constexpr static size_t MAX_ALLOC_SIZE_SHAMT = 9;  // 1 << 9 = 512
+  constexpr static size_t MAX_ALLOC_SIZE_SHAMT = 11;  // 1 << 9 = 512
   constexpr static size_t BITMAP_FULL_MASK = (~0);   // 0xFF....FF avoiding hardcode value to adapt for 32 / 64 bit system.
 
   // below are only declared, required external instantiation later.

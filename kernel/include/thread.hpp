@@ -50,7 +50,7 @@ class Thread {
 
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
-  uint32_t allocated_stack[STACK_ALLOCATION_SIZE] = {0};
+  uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
 
   // Stack pointer pointing to top of the stack.
   uint32_t* stkptr;

@@ -41,6 +41,10 @@ class linkedlist final {
   list_node_t<T>* insert_front(T& data);
   list_node_t<T>* insert_front(T&& data);
 
+  list_node_t<T>* insert_tail(T& data);
+  list_node_t<T>* insert_tail(T&& data);
+
+  bool detect_loop() const;
   void delete_node(list_node_t<T>* p_del_target);
   bool is_empty() const;
   list_node_t<T>* lookup(T&& data) const;

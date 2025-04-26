@@ -9,4 +9,4 @@
 #pragma once
 
 #define CONTEXT_SAVE_STACK_SIZE ((uint32_t) 17)
-#define STACK_ALLOCATION_SIZE ((uint32_t) 100)
+#define STACK_ALLOCATION_SIZE ((uint32_t) 256)

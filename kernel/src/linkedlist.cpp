@@ -46,6 +46,29 @@ list_node_t<T>* linkedlist<T>::insert_front(T&& data) {
   return p_new_node;
 }
 
+template<typename T>
+list_node_t<T>* linkedlist<T>::insert_tail(T& data) {
+  return insert_tail(std::move(data));
+}
+
+template<typename T>
+list_node_t<T>* linkedlist<T>::insert_tail(T&& data) {
+  mempool::alloc_t alloc_res = mempool::malloc(sizeof(list_node_t<T>));
+  if (alloc_res.status == mempool::ALLOC_FAIL) assert(0);
+  list_node_t<T>* p_new_node = reinterpret_cast<list_node_t<T>*>(alloc_res.addr);
+  p_new_node->data = data;
+  p_new_node->next= nullptr;
+
+  if (head) {
+    list_node_t<T>* p_node_itr = head;
+    while (p_node_itr->next) p_node_itr = p_node_itr->next;
+    p_node_itr->next = p_new_node;
+  } else {
+    head = p_new_node;
+  }
+  return p_new_node;
+}
+
 template <typename T>
 void linkedlist<T>::delete_node(list_node_t<T>* p_del_target) {
   if (this->is_empty()) return;

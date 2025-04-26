@@ -50,7 +50,7 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
   if (!init_complete) PreemptFIFOScheduler::init();
 
   linkedlist<Thread>* p_list = ready_list[prio_level];
-  p_list->insert_front(*t);
+  p_list->insert_tail(*t);
 }
 
 /**
