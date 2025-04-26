@@ -1,13 +1,4 @@
 # Following flags are used for cross-compilation for ARM platform.
-
-  -mfloat-abi=soft
-
-  To resolve following error due to objects and having inconsistenct float point abi:
-
-  /opt/homebrew/Cellar/arm-none-eabi-gcc/10.3-2021.10/gcc/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/bin/ld: error: YesRTOS.elf uses VFP register arguments, CMakeFiles/YesRTOS.dir/src/test.cpp.obj does not
-
-  ----
-
   --specs=nosys.specs
 
   To suppress the compiler from looking for syscall symbols:
