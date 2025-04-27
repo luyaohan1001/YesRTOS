@@ -23,7 +23,7 @@ linkedlist<Thread>* PreemptFIFOScheduler::ready_list[MAX_PRIO_LEVEL];
 
 list_node_t<Thread>* PreemptFIFOScheduler::running_threads[MAX_PRIO_LEVEL];
 
-uint32_t** PreemptFIFOScheduler::pp_active_thread_stk = nullptr;
+volatile uint32_t** PreemptFIFOScheduler::pp_active_thread_stk = nullptr;
 
 size_t PreemptFIFOScheduler::curr_prio = 0;
 
@@ -50,7 +50,7 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
   if (!init_complete) PreemptFIFOScheduler::init();
 
   linkedlist<Thread>* p_list = ready_list[prio_level];
-  p_list->insert_tail(*t);
+  p_list->insert_front(*t);
 }
 
 /**
@@ -80,7 +80,8 @@ void PreemptFIFOScheduler::start() {
 /**
  * @brief Return the next thread to run.
  */
-void PreemptFIFOScheduler::schedule_next() {
+__attribute__((optimize("O0")))
+volatile void PreemptFIFOScheduler::schedule_next() {
   list_node_t<Thread>* p_curr_thread_node = running_threads[curr_prio];
   list_node_t<Thread>* p_next_thread_node = ready_list[curr_prio]->get_next_node_circular(p_curr_thread_node);
 

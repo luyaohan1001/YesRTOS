@@ -19,7 +19,7 @@ namespace YesRTOS {
 
 class PreemptFIFOScheduler final {
   public:
-  static void schedule_next();
+  volatile static void schedule_next();
   static void start();
   static void init();
 
@@ -31,7 +31,7 @@ class PreemptFIFOScheduler final {
    *       *pp_active_thread_stk ==> the stack pointer, SP. Allocate space by (*pp_active_thread_stk)--, vise versa.
    *       **pp_active_thread_stk ==> content of the entry pointed by SP. We could write to that stack entry by (**pp_active_thread_stk)=value.
    */
-  static uint32_t** pp_active_thread_stk;
+  volatile static uint32_t** pp_active_thread_stk;
 
   static size_t curr_prio;  // records priority index of list to visit to schedule next thread.
 

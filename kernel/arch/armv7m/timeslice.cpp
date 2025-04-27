@@ -112,7 +112,7 @@ void __attribute__((naked)) PendSV_Handler() {
  */
 
 extern "C" {
-void init_stack_armv7m(uint32_t **pp_stk, uint32_t *routine_ptr) {
+void init_stack_armv7m(volatile uint32_t **pp_stk, uint32_t *routine_ptr) {
   // Exception-entry HW saved registers. Mimic the stack context of an exception.
   (*pp_stk)--;              // full descending stack, decrement 1 to point to first empty position.
   (**pp_stk) = 0x01000000;  // xPSR

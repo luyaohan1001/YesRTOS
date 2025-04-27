@@ -25,7 +25,7 @@ extern "C" {
   extern void itm_trace(const char* ptr);
   // Interfaces implemented in timeslice.c
   extern void systick_clk_init(void);
-  extern void init_stack_armv7m(uint32_t** pp_stk, uint32_t* routine_ptr);
+  extern void init_stack_armv7m(volatile uint32_t** pp_stk, uint32_t* routine_ptr);
   extern bool atomic_compare_and_swap(bool *const p_mem, uint32_t old_val, uint32_t new_val);
   void disable_exception();
   void enable_exception();

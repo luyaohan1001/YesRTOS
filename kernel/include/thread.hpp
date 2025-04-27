@@ -53,7 +53,7 @@ class Thread {
   uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
 
   // Stack pointer pointing to top of the stack.
-  uint32_t* stkptr;
+  volatile uint32_t* stkptr;
 
   private:
   thread_info_t thread_info;

@@ -10,7 +10,7 @@
  */
 
 #define CPU_CLK_FREQ_HZ         (16000000UL)    // Core frequency.
-#define TIMESLICE_FREQ_HZ       (6000UL)           // Timeslice frequency.
+#define TIMESLICE_FREQ_HZ       (100UL)           // Timeslice frequency.
 
 #define TASK_QUEUE_DEPTH        (32U)           // RoundRobinScheduler
 

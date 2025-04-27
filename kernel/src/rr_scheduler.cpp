@@ -21,7 +21,7 @@ using namespace YesRTOS;
 // Static storage definition with internal linkage. https://en.cppreference.com/w/c/language/static_storage_duration
 Thread* RoundRobinScheduler::thread_q[TASK_QUEUE_DEPTH];
 
-uint32_t** RoundRobinScheduler::pp_active_thread_stk = nullptr;
+volatile uint32_t** RoundRobinScheduler::pp_active_thread_stk = nullptr;
 
 uint32_t RoundRobinScheduler::curr_thread_cnt;
 
