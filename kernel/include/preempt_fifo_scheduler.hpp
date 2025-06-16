@@ -19,7 +19,7 @@ namespace YesRTOS {
 
 class PreemptFIFOScheduler final {
   public:
-  volatile static void schedule_next();
+  static void schedule_next();
   static void start();
   static void init();
 

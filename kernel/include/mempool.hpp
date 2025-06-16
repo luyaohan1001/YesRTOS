@@ -33,6 +33,8 @@ extern "C" {
   extern size_t _ld_start_heap[];
   extern size_t _ld_end_heap[];
 }
+#else
+static_assert(0, "invalid architecture");
 #endif
 
 class mempool {

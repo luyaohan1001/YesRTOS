@@ -45,20 +45,16 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/preempt_fifo_scheduler.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/bitops.cpp
-  # ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
-  # ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
-)
-
-target_include_directories(${LIBRARY_NAME} PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/include/
+  ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
 )
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   target_compile_definitions(${LIBRARY_NAME} PRIVATE ARMV7M)
 
-  target_include_directories(${LIBRARY_NAME} PRIVATE 
+  target_include_directories(${LIBRARY_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
     ${CMAKE_CURRENT_LIST_DIR}/include/
     )

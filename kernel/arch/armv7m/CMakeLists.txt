@@ -21,3 +21,5 @@ target_include_directories(LibBareMetal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}   # ${CMAKE_CURRENT_LIST_DIR} maps to current folder: arch/armv7m
     ${CMAKE_CURRENT_LIST_DIR}/../../include
 )
+
+target_compile_definitions(LibBareMetal PRIVATE ARMV7M)

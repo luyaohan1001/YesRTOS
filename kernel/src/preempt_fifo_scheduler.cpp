@@ -85,7 +85,7 @@ void PreemptFIFOScheduler::start() {
  * @brief Return the next thread to run.
  */
 __attribute__((optimize("O0")))
-volatile void PreemptFIFOScheduler::schedule_next() {
+void PreemptFIFOScheduler::schedule_next() {
   list_node_t<Thread>* p_curr_thread_node = running_threads[curr_prio];
   list_node_t<Thread>* p_next_thread_node = ready_list[curr_prio]->get_next_node_circular(p_curr_thread_node);
 
