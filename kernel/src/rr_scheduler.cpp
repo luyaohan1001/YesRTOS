@@ -6,8 +6,9 @@
  * @date 2024-07-12
  * @copyright Copyright (c) 2024
  */
-
+#if defined(ARMV7M)
 #include <baremetal_api.h>
+#endif
 
 #include <mempool.hpp>
 #include <rr_scheduler.hpp>
@@ -44,8 +45,10 @@ void RoundRobinScheduler::start() {
 
   RoundRobinScheduler::curr_thread_cnt = 0;
   RoundRobinScheduler::pp_active_thread_stk = &RoundRobinScheduler::thread_q[RoundRobinScheduler::curr_thread_cnt]->stkptr;
+  #if defined(ARMV7M)
   systick_clk_init();
   start_first_task();
+  #endif
 }
 
 /**

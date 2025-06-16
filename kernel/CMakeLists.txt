@@ -4,12 +4,14 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Cross compilation tool chain.
-include(${CMAKE_CURRENT_SOURCE_DIR}/arch/armv7m/gcc-arm-none-eabi.cmake)
+if (ARCH_DEFINED STREQUAL "ARMV7M")
+  include(${CMAKE_CURRENT_SOURCE_DIR}/arch/armv7m/gcc-arm-none-eabi.cmake)
+elseif (ARCH_DEFINED STREQUAL "RV32I")
+  include(${CMAKE_CURRENT_SOURCE_DIR}/arch/rv32i/gcc-riscv-none-eabi.cmake)
+else()
+  message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
+endif()
 
-# Linker script for address-related symbol resolution (stack start address, etc.)
-set(LINKER_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/STM32F767ZITx_FLASH.ld)
-set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -T ${LINKER_SCRIPT_PATH}")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -T \"${LINKER_SCRIPT_PATH}\"")
 
 # Setup project and source.
 set(PROJECT_NAME YesRTOSKernel)
@@ -43,19 +45,39 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/preempt_fifo_scheduler.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/bitops.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
+  # ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
+  # ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
 )
 
 target_include_directories(${LIBRARY_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/
-    ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
 )
 
-target_compile_definitions(${LIBRARY_NAME} PRIVATE ARCH_ARMV7M)
+if (ARCH_DEFINED STREQUAL "ARMV7M")
+  target_compile_definitions(${LIBRARY_NAME} PRIVATE ARMV7M)
 
-# Include subdirectory to build sub-component together as part of the kernel.
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
+  target_include_directories(${LIBRARY_NAME} PRIVATE 
+    ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
+    ${CMAKE_CURRENT_LIST_DIR}/include/
+    )
+
+  # Include subdirectory to build sub-component together as part of the kernel.
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
+elseif (ARCH_DEFINED STREQUAL "RV32I")
+  target_compile_definitions(${LIBRARY_NAME} PRIVATE RV32I)
+
+  target_include_directories(${LIBRARY_NAME} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/arch/rv32i/
+    ${CMAKE_CURRENT_LIST_DIR}/include/
+  )
+
+  # Include subdirectory to build sub-component together as part of the kernel.
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/rv32i)
+else()
+  message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
+endif()
+
+
 

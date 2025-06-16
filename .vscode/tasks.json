@@ -1,5 +1,23 @@
-{  
+{
     "tasks": [
+        {
+          "label": "Run QEMU",
+          "type": "shell",
+          "command": "qemu-system-riscv32",
+          "args": [
+            "-machine", "spike",                  // Adjust for your RISC-V target machine
+            "-nographic",
+            "-kernel", "${workspaceRoot}/example/multi_thread/build/multi_thread.elf",
+            "-gdb", "tcp::1234",
+            "-S"                                     // Freeze CPU at startup (wait for GDB)
+          ],
+          "problemMatcher": [],
+          "group": {
+            "kind": "build",
+            "isDefault": true
+          }
+        },
+
         {
             "type": "shell",
             "label": "reset",
@@ -25,7 +43,7 @@
             "options": {
             },
             "problemMatcher": [
-                
+
             ],
             "group": {
                 "kind": "build",
@@ -53,7 +71,7 @@
             "options": {
             },
             "problemMatcher": [
-                
+
             ],
             "group": {
                 "kind": "build",

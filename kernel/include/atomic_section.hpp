@@ -12,7 +12,9 @@
  * @copyright Copyright (c) 2025
  *
  */
+#if defined(ARMV7M)
 #include "baremetal_api.h"
+#endif
 
 class atomic_section {
   public:

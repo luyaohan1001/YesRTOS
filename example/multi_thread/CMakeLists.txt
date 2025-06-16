@@ -1,13 +1,16 @@
 # CMake version.
 cmake_minimum_required(VERSION 3.10)
 
-# Cross compilation tool chain.
-include(${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m/gcc-arm-none-eabi.cmake)
-
 # Linker script for address-related symbol resolution (stack start address, etc.)
-set(LINKER_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m/STM32F767ZITx_FLASH.ld)
-set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -T ${LINKER_SCRIPT_PATH}")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -T \"${LINKER_SCRIPT_PATH}\"")
+if (ARCH_DEFINED STREQUAL "ARMV7M")
+  include(${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m/gcc-arm-none-eabi.cmake)
+elseif (ARCH_DEFINED STREQUAL "RV32I")
+  include(${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/rv32i/gcc-riscv-none-eabi.cmake)
+else()
+  message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
+endif()
+
+# set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -T \"${LINKER_SCRIPT_PATH}\"")
 
 # Build Debug mode for gdb debugging.
 if(NOT CMAKE_BUILD_TYPE)
@@ -22,6 +25,15 @@ target_sources(${PROJECT_NAME} PRIVATE
   main.cpp
 )
 
+if (ARCH_DEFINED STREQUAL "ARMV7M")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE ARMV7M)
+elseif (ARCH_DEFINED STREQUAL "RV32I")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE RV32I)
+else()
+  message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
+endif()
+
+
 # Specify CMake subdirectory. It will parse CMakeLists.txt in specified directory, and build artifact for that CMakeList.txt.
 add_subdirectory(
   ${CMAKE_CURRENT_LIST_DIR}/../../kernel
@@ -31,12 +43,20 @@ add_subdirectory(
 # Header include directory.
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/../../kernel/include
-  ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m
 )
+
+if (ARCH_DEFINED STREQUAL "ARMV7M")
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m
+  )
+elseif (ARCH_DEFINED STREQUAL "RV32I")
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/rv32i
+  )
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   LibYesRTOSKernel
-  LibStartupASM
   LibBareMetal
 )
 

@@ -39,6 +39,21 @@
           },
       },
 
+      {
+          "name": "RISC-V QEMU",   // Required VSCode extension: "Cortex-Debug"
+          "type": "cppdbg",
+          "request": "launch",
+          "program": "${workspaceRoot}/example/multi_thread/build/multi_thread.elf",
+          "cwd": "${workspaceRoot}",
+          "miDebuggerPath": "/opt/homebrew/bin/gdb",
+          "miDebuggerServerAddress": "localhost:1234",
+          "stopAtEntry": true,
+          // "preLaunchTask": "Run QEMU",
+          "MIMode": "gdb"
+          // requires brew install gdb-multiarch
+          // "preLaunchTask": "Run QEMU"
+      },
+
 
 
       // Native testing environment on HOST MACHINE (MacOS) for offline unit testing.

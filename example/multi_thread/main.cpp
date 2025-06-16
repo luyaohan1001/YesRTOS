@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2024
  */
 
-#include "baremetal_api.h"
+// #include "baremetal_api.h"
 #include "preempt_fifo_scheduler.hpp"
 #include "rr_scheduler.hpp"
 #include "mutex.hpp"
@@ -20,7 +20,7 @@
 using namespace YesRTOS;
 
 // declare lock to protect tracer critical section.
-YesRTOS::mutex tracer_lock;
+// YesRTOS::mutex tracer_lock;
 
 
 /**
@@ -30,8 +30,8 @@ void(thread0_routine)() {
   while (1) {
     {
       {
-      atomic_section a;
-      itm_trace("thread 0\n");
+      // atomic_section a;
+      // itm_trace("thread 0\n");
       }
     }
   }
@@ -44,8 +44,8 @@ void(thread1_routine)() {
   while (1) {
     {
       {
-      atomic_section a;
-      itm_trace("thread 1\n");
+      // atomic_section a;
+      // itm_trace("thread 1\n");
       }
     }
   }
@@ -57,8 +57,8 @@ void(thread1_routine)() {
 void(thread2_routine)() {
   while (1) {
     {
-      atomic_section a;
-      itm_trace("thread 2\n");
+      // atomic_section a;
+      // itm_trace("thread 2\n");
     }
   }
 }
@@ -69,8 +69,8 @@ void(thread2_routine)() {
 void(thread3_routine)() {
   while (1) {
     {
-      atomic_section a;
-      itm_trace("thread 3\n");
+      // atomic_section a;
+      // itm_trace("thread 3\n");
     }
   }
 }

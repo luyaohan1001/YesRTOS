@@ -1,6 +1,6 @@
 #include "atomic_section.hpp"
 
-#if defined(ARCH_ARMV7M)
+#if defined(ARMV7M)
 atomic_section::atomic_section() {
     disable_exception();
 }

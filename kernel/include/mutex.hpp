@@ -1,6 +1,8 @@
 #include <cstddef>  // size_t
 
+#if defined(ARMV7M)
 #include "baremetal_api.h"
+#endif
 
 namespace YesRTOS {
 

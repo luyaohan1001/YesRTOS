@@ -10,11 +10,9 @@ project(${PROJECT_NAME})
  # Enable C, C++, and ASM languages for the project.
 enable_language(C CXX ASM)
 
-# Add first library including startup code in assembly.
-add_library(LibStartupASM ./startup_stm32f767xx.s)
-
-# Add second library which includes all other bare metal code.
+# Add library which includes all other bare metal code.
 add_library(LibBareMetal
+    ${CMAKE_CURRENT_LIST_DIR}/startup_stm32f767xx.s
     ${CMAKE_CURRENT_LIST_DIR}/trace.c
     ${CMAKE_CURRENT_LIST_DIR}/atomic.cpp
     ${CMAKE_CURRENT_LIST_DIR}/timeslice.cpp
