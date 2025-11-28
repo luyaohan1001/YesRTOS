@@ -86,12 +86,16 @@ void PreemptFIFOScheduler::start() {
  */
 __attribute__((optimize("O0")))
 void PreemptFIFOScheduler::schedule_next() {
+
   list_node_t<Thread>* p_curr_thread_node = running_threads[curr_prio];
   list_node_t<Thread>* p_next_thread_node = ready_list[curr_prio]->get_next_node_circular(p_curr_thread_node);
 
-  if (p_next_thread_node == p_curr_thread_node) {
+  // iterate the next ready list when tasks at current prio are not at ready state.
+  if (p_next_thread_node == p_curr_thread_node && p_curr_thread_node->data.get_state() != ACTIVE ) {
     uint32_t prio_idx_prev = PreemptFIFOScheduler::curr_prio;
     uint32_t prio_idx;
+
+    // iterate the next prio level ready list
     do {
       prio_idx = (PreemptFIFOScheduler::curr_prio + 1) % MAX_PRIO_LEVEL;
       if (ready_list[prio_idx] != nullptr) break;
@@ -101,6 +105,8 @@ void PreemptFIFOScheduler::schedule_next() {
     p_next_thread_node = ready_list[prio_idx]->get_next_node_circular(p_curr_thread_node);
   }
 
+  // TODO we need to implement an assert that explicitly prints error messages when it fails.
+  // assert(p_next_thread_node);
   running_threads[curr_prio] = p_next_thread_node;
 
   PreemptFIFOScheduler::pp_active_thread_stk = &p_next_thread_node->data.stkptr;

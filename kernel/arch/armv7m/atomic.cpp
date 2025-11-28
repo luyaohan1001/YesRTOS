@@ -7,6 +7,7 @@
  * @note LDREX instruction https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/ldrex
  * @note pseudo code: $r0 = *p_mem
  *                    mem_read = $r0
+ * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
  */
 extern "C" {
   size_t exclusive_load(bool *const p_mem) {
@@ -27,6 +28,7 @@ extern "C" {
  *                  else: *pmem = new_val; return 0;
  * $r0 = *p_mem
  *                    mem_read = $r0
+ * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
  */
 extern "C" {
   bool exclusive_store(bool *const p_mem, size_t new_val) {
@@ -41,7 +43,7 @@ extern "C" {
 
 /**
  * @brief Compare and swap (https://en.wikipedia.org/wiki/Compare-and-swap)
- * @note Leverage LDREX and STREX instruction to achieve atomic swap on memory.
+ * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
  */
 extern "C" {
 bool atomic_compare_and_swap(bool *const p_mem, size_t old_val, size_t new_val) {

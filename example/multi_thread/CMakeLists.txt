@@ -60,6 +60,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   LibBareMetal
 )
 
+# Kill debug session
+add_custom_target(kill
+COMMAND pkill openocd
+)
+
 # Flash command.
 add_custom_target(flash
 COMMAND openocd

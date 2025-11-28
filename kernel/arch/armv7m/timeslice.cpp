@@ -26,8 +26,10 @@
 #define SYST_TICKINT_BIT (1UL << 1UL)
 #define SYST_ENABLE_BIT (1UL << 0UL)
 
-// SysTick register reload count calculation.
+// SysTick register reload count calculation, systick counts from the reload to zero.
 #define SYSTICK_RELOAD_CNT ((CPU_CLK_FREQ_HZ / TIMESLICE_FREQ_HZ) - 1UL)
+static_assert(SYSTICK_RELOAD_CNT >  0x0);
+static_assert(SYSTICK_RELOAD_CNT <=  0x00FFFFFF);
 
 // Interrupt memory mapped registers
 #define ICSR (*((volatile uint32_t *)0xe000ed04))  // Interrupt control and status register

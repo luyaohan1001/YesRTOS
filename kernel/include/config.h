@@ -9,8 +9,15 @@
  *
  */
 
-#define CPU_CLK_FREQ_HZ         (16000000UL)    // Core frequency.
-#define TIMESLICE_FREQ_HZ       (100UL)           // Timeslice frequency.
+/*
+Example:
+PERIOD = 10 ms
+FREQ = 1 / PERIOD
+10ms = 0.01s = 0.01s / (1/16000000)s/cycle = 160,000 cycles (to load to register).
+TIMESLIDE_FREQ_HZ to program = 1 / 0.01s = 100Hz
+*/
+#define CPU_CLK_FREQ_HZ         (16000000UL)            // Core frequency.
+#define TIMESLICE_FREQ_HZ       (100UL)                 // Timeslice frequency.
 
 #define TASK_QUEUE_DEPTH        (32U)           // RoundRobinScheduler
 
