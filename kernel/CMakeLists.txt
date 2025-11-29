@@ -49,6 +49,7 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/spinlock.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
 )
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")

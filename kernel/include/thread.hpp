@@ -28,6 +28,9 @@
 
 namespace YesRTOS {
 
+// forward declaration
+class Thread;
+
 typedef enum thread_state {
   ACTIVE,
   RUNNING,
@@ -40,6 +43,7 @@ typedef struct thread_info {
   uint32_t id;
   thread_state_t state;
   void (*routine_ptr)(void);
+  Thread* p_next;
 } thread_info_t;
 
 class Thread {
@@ -63,8 +67,6 @@ class Thread {
 
   // Stack pointer pointing to top of the stack.
   volatile uint32_t* stkptr;
-
-  private:
   thread_info_t thread_info;
 
   public:

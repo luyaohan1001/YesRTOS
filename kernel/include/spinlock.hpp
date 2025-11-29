@@ -10,6 +10,7 @@ namespace YesRTOS {
 
 class spinlock {
   public:
+
   spinlock();
   ~spinlock();
   void lock();
@@ -17,7 +18,7 @@ class spinlock {
 
   private:
   // uint32_t atomic_val;
-  std::atomic<bool> locked;
+  std::atomic<bool> locked {0};
 };
 
 }  // namespace YesRTOS

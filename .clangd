@@ -1,0 +1,10 @@
+# .clangd file at your project root
+CompileFlags:
+  Add: [
+    # Core ARM GCC include paths
+    "-I/opt/homebrew/Cellar/arm-none-eabi-gcc/10.3-2021.10/arm-none-eabi/include",
+    "-I/opt/homebrew/Cellar/arm-none-eabi-gcc/10.3-2021.10/arm-none-eabi/include/c++/10.3.1",
+    "-I/opt/homebrew/Cellar/arm-none-eabi-gcc/10.3-2021.10/arm-none-eabi/include/c++/10.3.1/arm-none-eabi",
+    "-I/opt/homebrew/Cellar/arm-none-eabi-gcc/10.3-2021.10/lib/gcc/arm-none-eabi/10.3.1/include"
+  ]
+
