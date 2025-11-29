@@ -26,12 +26,13 @@ class PreemptFIFOScheduler final {
   static void add_thread(Thread* thread, size_t prio_level);
 
   /**
-   * @brief Double pointer to stack of thread currently being executed.
-   * @note This is a pointer to pointer.
-   *       *pp_active_thread_stk ==> the stack pointer, SP. Allocate space by (*pp_active_thread_stk)--, vise versa.
-   *       **pp_active_thread_stk ==> content of the entry pointed by SP. We could write to that stack entry by (**pp_active_thread_stk)=value.
+   * @brief Pointer to the thread currently being executed.
+   * @note This points to the active Thread object.
+   *       - p_active_thread       ==> pointer to the currently running thread.
+   *       - *p_active_thread      ==> the Thread object itself.
+   *       This is used by the scheduler and context switching routines to track and manipulate the currently active thread.
    */
-  volatile static uint32_t** pp_active_thread_stk;
+  volatile static Thread* p_active_thread;
 
   static size_t curr_prio;  // records priority index of list to visit to schedule next thread.
 

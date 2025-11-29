@@ -22,7 +22,7 @@ using namespace YesRTOS;
 // Static storage definition with internal linkage. https://en.cppreference.com/w/c/language/static_storage_duration
 Thread* RoundRobinScheduler::thread_q[TASK_QUEUE_DEPTH];
 
-volatile uint32_t** RoundRobinScheduler::pp_active_thread_stk = nullptr;
+volatile Thread* RoundRobinScheduler::p_active_thread = nullptr;
 
 uint32_t RoundRobinScheduler::curr_thread_cnt;
 
@@ -44,7 +44,7 @@ void RoundRobinScheduler::start() {
   }
 
   RoundRobinScheduler::curr_thread_cnt = 0;
-  RoundRobinScheduler::pp_active_thread_stk = &RoundRobinScheduler::thread_q[RoundRobinScheduler::curr_thread_cnt]->stkptr;
+  RoundRobinScheduler::p_active_thread = RoundRobinScheduler::thread_q[RoundRobinScheduler::curr_thread_cnt];
   #if defined(ARMV7M)
   systick_clk_init();
   start_first_task();
@@ -58,5 +58,5 @@ void RoundRobinScheduler::schedule_next() {
   RoundRobinScheduler::curr_thread_cnt += 1;
   RoundRobinScheduler::curr_thread_cnt %= RoundRobinScheduler::q_size;
   Thread* thread_ptr = RoundRobinScheduler::thread_q[RoundRobinScheduler::curr_thread_cnt];
-  RoundRobinScheduler::pp_active_thread_stk = &thread_ptr->stkptr;
+  RoundRobinScheduler::p_active_thread = thread_ptr;
 }

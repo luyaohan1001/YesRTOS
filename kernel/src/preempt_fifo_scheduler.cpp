@@ -21,7 +21,7 @@
 
 using namespace YesRTOS;
 
-volatile uint32_t** PreemptFIFOScheduler::pp_active_thread_stk = nullptr;
+volatile Thread* PreemptFIFOScheduler::p_active_thread = nullptr;
 
 size_t PreemptFIFOScheduler::curr_prio = 0;
 
@@ -54,7 +54,7 @@ void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
 void PreemptFIFOScheduler::start() {
   if (!init_complete) PreemptFIFOScheduler::init();
   current = ready_list;
-  PreemptFIFOScheduler::pp_active_thread_stk = &current->stkptr;
+  PreemptFIFOScheduler::p_active_thread = current;
 #if defined (ARMV7M)
   itm_initialize();
   systick_clk_init();
@@ -70,5 +70,5 @@ void PreemptFIFOScheduler::schedule_next() {
   Thread* next_sched_thread = current->thread_info.p_next;
   if (!next_sched_thread) next_sched_thread = ready_list;
   current = next_sched_thread;
-  PreemptFIFOScheduler::pp_active_thread_stk = &next_sched_thread->stkptr;
+  PreemptFIFOScheduler::p_active_thread = next_sched_thread;
 }

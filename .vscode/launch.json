@@ -5,7 +5,7 @@
           // Attributes: https://github.com/Marus/cortex-debug/blob/master/debug_attributes.md
           "name": "Cortex Debug (STM32F767 ST-Link)",   // Required VSCode extension: "Cortex-Debug"
           "cwd": "${workspaceRoot}",
-          "executable": "${workspaceRoot}/example/multi_thread/build/multi_thread.elf",
+          "executable": "${workspaceRoot}/app/multi_thread/build/multi_thread.elf",
           "request": "launch",
           "type": "cortex-debug",
           "servertype": "openocd",
@@ -43,7 +43,7 @@
           "name": "RISC-V QEMU",   // Required VSCode extension: "Cortex-Debug"
           "type": "cppdbg",
           "request": "launch",
-          "program": "${workspaceRoot}/example/multi_thread/build/multi_thread.elf",
+          "program": "${workspaceRoot}/app/multi_thread/build/multi_thread.elf",
           "cwd": "${workspaceRoot}",
           "miDebuggerPath": "/opt/homebrew/bin/gdb",
           "miDebuggerServerAddress": "localhost:1234",
