@@ -1,0 +1,15 @@
+CompileFlags:
+  Add:
+    # Target triple
+    - "--target=arm-none-eabi"
+
+    # Include paths for your local toolchain
+    - "-isystem"
+    - "/Users/lhan/Projects/YesRTOS/compiler/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/c++"
+    - "-isystem"
+    - "/Users/lhan/Projects/YesRTOS/compiler/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/c++/arm-none-eabi"
+    - "-isystem"
+    - "/Users/lhan/Projects/YesRTOS/compiler/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include"
+    - "-isystem"
+    - "/Users/lhan/Projects/YesRTOS/compiler/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/arm-none-eabi/include"
+

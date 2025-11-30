@@ -14,24 +14,18 @@ set(CMAKE_C_COMPILER_ID GNU)
 set(CMAKE_CXX_COMPILER_ID GNU)
 
 # Ensure arm-none-eabi toolchain is installed on macOS via Homebrew if not found.
-find_program(ARM_GCC arm-none-eabi-gcc)
+find_program(
+    ARM_GCC 
+    NAMES arm-none-eabi-gcc
+    PATHS ENV PATH
+)
 
-if(NOT ARM_GCC)
-    message(STATUS "arm-none-eabi-gcc not found. Attempting to install via Homebrew...")
-    execute_process(
-        COMMAND brew install arm-none-eabi-gcc
-        RESULT_VARIABLE BREW_RESULT
-    )
-    if(NOT BREW_RESULT EQUAL 0)
-        message(FATAL_ERROR "Failed to install arm-none-eabi-gcc using Homebrew.")
-    endif()
-else()
-    message(STATUS "Found arm-none-eabi-gcc: ${ARM_GCC}")
+if (NOT ARM_GCC)
+    message(FATAL_ERROR "Failed to find arm-none-eabi-gcc compiler binary. Please install and add executable path to environment variable.")
 endif()
 
 # Define tool chain path.
-set(TOOLCHAIN_PATH_MACOS            /opt/homebrew/bin)
-set(TOOLCHAIN_PREFIX                ${TOOLCHAIN_PATH_MACOS}/arm-none-eabi-)
+set(TOOLCHAIN_PREFIX                arm-none-eabi-)
 
 set(CMAKE_C_COMPILER                ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_ASM_COMPILER              ${CMAKE_C_COMPILER})
@@ -72,9 +66,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-threadsafe-
 
 set(CMAKE_C_LINK_FLAGS "${TARGET_FLAGS}")
 set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -T \"${LINKER_SCRIPT_PATH}/STM32F767ZITx_FLASH.ld\"")
-set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} --specs=nano.specs")
 set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,-Map=${CMAKE_PROJECT_NAME}.map -Wl,--gc-sections")
 set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group -lc -lm -Wl,--end-group")
 set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--print-memory-usage")
 
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group -lstdc++ -lsupc++ -Wl,--end-group --specs=nosys.specs")
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group -lstdc++ -lsupc++ -Wl,--end-group")
