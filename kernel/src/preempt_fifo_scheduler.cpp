@@ -38,13 +38,19 @@ void PreemptFIFOScheduler::init() {
 /**
  * @brief Add thread to scheduler queue.
  */
-void PreemptFIFOScheduler::add_thread(Thread* t, size_t prio_level) {
+void PreemptFIFOScheduler::add_thread(Thread* p_new, size_t prio_level) {
   if (!init_complete) PreemptFIFOScheduler::init();
   if (!ready_list) {
-    ready_list = t;
+    // head [p_new] ==> nullptr
+    ready_list = p_new;
+    p_new->thread_info.p_next = nullptr;
+    p_new->thread_info.p_prev = nullptr;
   } else {
-    t->thread_info.p_next = ready_list;
-    ready_list = t;
+    // head [p_new] <==> existing node <==> existing node ==> nullptr
+    ready_list->thread_info.p_prev = p_new;
+    p_new->thread_info.p_next = ready_list;
+    p_new->thread_info.p_prev = nullptr;
+    ready_list = p_new;
   }
 }
 
@@ -65,10 +71,40 @@ void PreemptFIFOScheduler::start() {
 /**
  * @brief Return the next thread to run.
  */
-__attribute__((optimize("O0")))
 void PreemptFIFOScheduler::schedule_next() {
   Thread* next_sched_thread = current->thread_info.p_next;
   if (!next_sched_thread) next_sched_thread = ready_list;
   current = next_sched_thread;
   PreemptFIFOScheduler::p_active_thread = next_sched_thread;
+}
+
+
+void PreemptFIFOScheduler::move_node(Thread** src_list, Thread** dest_list, Thread* node) {
+    if (!node) {
+        return;
+    }
+
+    // node deletion
+    Thread* p_prev = node->thread_info.p_prev;
+    Thread* p_next = node->thread_info.p_next;
+    if (p_prev) {
+        // prev ==> p_next
+        p_prev->thread_info.p_next = node->thread_info.p_next;
+    } else {
+        // (head) p_next 
+        *src_list = node->thread_info.p_next;
+    }
+    if (p_next) p_next->thread_info.p_prev = p_prev;
+
+    // node addition to the new list
+    if (*dest_list) {
+        (*dest_list)->thread_info.p_prev = node;
+        node->thread_info.p_next = *dest_list;
+        node->thread_info.p_prev = nullptr;
+        *dest_list = node;
+    } else {
+        node->thread_info.p_next = nullptr;
+        node->thread_info.p_prev = nullptr;
+        *dest_list = node;
+    }
 }

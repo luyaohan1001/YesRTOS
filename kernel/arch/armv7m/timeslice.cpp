@@ -39,30 +39,34 @@ static_assert(SYSTICK_RELOAD_CNT <=  0x00FFFFFF);
  * @brief Start systick timer.
  */
 extern "C" {
-void systick_clk_init(void) {
-  SYST_CSR = SYST_CVR = 0UL;                                             // clear status and current value
-  SYST_RVR = SYSTICK_RELOAD_CNT;                                         // set reload value
-  SYST_CSR = (SYST_CLKSOURCE_BIT | SYST_TICKINT_BIT | SYST_ENABLE_BIT);  // enable and make count to 0 trigger the SysTick exception.
-}
+  void systick_clk_init(void) {
+    SYST_CSR = SYST_CVR = 0UL;                                             // clear status and current value
+    SYST_RVR = SYSTICK_RELOAD_CNT;                                         // set reload value
+    SYST_CSR = (SYST_CLKSOURCE_BIT | SYST_TICKINT_BIT | SYST_ENABLE_BIT);  // enable and make count to 0 trigger the SysTick exception.
+  }
 }
 
+extern "C" {
+  void request_context_switch() {
+    ICSR |= PENDSVSET_BIT;
+  }
+}
+
+extern "C" {
+  void SysTick_Handler() {
+    request_context_switch();
+  }
+}
+
+
 /**
- * @brief SysTick exception handler.
+ * @brief PendSV exception handler.
  *        On each entry it saves context for current running thread, and load context to next thread pointed by scheduler.
  * @note stmdb, pseudo instruction: https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STMDB--STMFD
  * @note stmia, pseudo instruction:
  * https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STM--STMIA--STMEA
  * @note According to AAPCS, R0, R1, R2, R3, R12, LR, PC, xPSR are automatically saved by hardware during exception, thus they are allowed to overwrite immediately entering this handler function.
  * @note Assembler Instructions with C Expression Operands: https://gcc.gnu.org/onlinedocs/gcc-3.2.3/gcc/Extended-Asm.html
- */
-extern "C" {
-void SysTick_Handler() {
-  ICSR |= PENDSVSET_BIT;
-}
-}
-
-/**
- * @brief
  * @note __attribute__((naked)) is extremely important to compile as pure assembly function without C prologue
  */
 extern "C" {
@@ -78,12 +82,14 @@ void __attribute__((naked)) PendSV_Handler() {
   __asm volatile("mov r0, %0" : : "r"(&YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr) : "r0", "memory");  // $r0 = pointer to current active thread's stack pointer
   // *$r0 = r1 ==> *sched.p_active_thread = $r1 = psp (storing psp back to thread context)
   __asm volatile("str r1, [r0]" ::: "r0", "r1");
-  __asm volatile("push {r4-r11, lr} ");
+  // protect EXC_RETURN before function call.
+  __asm volatile("push {lr}");
 
   // scheduler updates p_active_thread to next thread.
   YesRTOS::PreemptFIFOScheduler::schedule_next();
 
-  __asm volatile("pop {r4-r11, lr} ");
+  // restore EXC_RETURN for exception return.
+  __asm volatile("pop {lr}");
 
   // Restore context of next thread.
   // $r0 = sched.p_active_thread

@@ -6,6 +6,7 @@
           "name": "Cortex Debug (STM32F767 ST-Link)",   // Required VSCode extension: "Cortex-Debug"
           "cwd": "${workspaceRoot}",
           "executable": "${workspaceRoot}/app/multi_thread/build/multi_thread.elf",
+          "gdbPath": "${workspaceRoot}/compiler/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/bin/arm-none-eabi-gdb",
           "request": "launch",
           "type": "cortex-debug",
           "servertype": "openocd",

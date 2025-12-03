@@ -44,6 +44,7 @@ typedef struct thread_info {
   thread_state_t state;
   void (*routine_ptr)(void);
   Thread* p_next;
+  Thread* p_prev;
 } thread_info_t;
 
 class Thread {

@@ -25,6 +25,8 @@ class PreemptFIFOScheduler final {
 
   static void add_thread(Thread* thread, size_t prio_level);
 
+  static void move_node(Thread** src_list, Thread** dest_list, Thread* node);
+
   /**
    * @brief Pointer to the thread currently being executed.
    * @note This points to the active Thread object.
@@ -38,6 +40,9 @@ class PreemptFIFOScheduler final {
 
   static bool init_complete;
 
+  static Thread* ready_list;
+
+  static Thread* current;
   private:
   /**
    * @note Static class. Hide constructor / destructor to avoid instantiation.
@@ -45,9 +50,6 @@ class PreemptFIFOScheduler final {
   PreemptFIFOScheduler() = delete;
   ~PreemptFIFOScheduler() = delete;
 
-  private:
-  static Thread* ready_list;
-  static Thread* current;
   // static linkedlist<Thread>* ready_list[MAX_PRIO_LEVEL];        // points to list of threads for each priority level.
   // static list_node_t<Thread>* running_threads[MAX_PRIO_LEVEL];  // points to node of execution for each priority level.
 };
