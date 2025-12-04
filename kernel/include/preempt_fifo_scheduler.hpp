@@ -34,7 +34,7 @@ class PreemptFIFOScheduler final {
    *       - *p_active_thread      ==> the Thread object itself.
    *       This is used by the scheduler and context switching routines to track and manipulate the currently active thread.
    */
-  volatile static Thread* p_active_thread;
+  static Thread* p_active_thread;
 
   static size_t curr_prio;  // records priority index of list to visit to schedule next thread.
 

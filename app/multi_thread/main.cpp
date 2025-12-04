@@ -23,7 +23,7 @@ using namespace YesRTOS;
 
 // declare lock to protect tracer critical section.
 // YesRTOS::spinlock tracer_lock;
-YesRTOS::spinlock tracer_lock;
+YesRTOS::mutex tracer_lock;
 
 
 
@@ -34,10 +34,10 @@ void(thread0_routine)() {
   while (1) {
     {
       {
-      // tracer_lock.lock();
-      atomic_section a;
+      tracer_lock.lock();
+      //atomic_section a;
       itm_trace("thread 0\n");
-      // tracer_lock.unlock();
+      tracer_lock.unlock();
       }
     }
   }
@@ -50,10 +50,10 @@ void(thread1_routine)() {
   while (1) {
     {
       {
-      atomic_section a;
-      // tracer_lock.lock();
+      // atomic_section a;
+      tracer_lock.lock();
       itm_trace("thread 1\n");
-      // tracer_lock.unlock();
+      tracer_lock.unlock();
       }
     }
   }
@@ -65,10 +65,10 @@ void(thread1_routine)() {
 void(thread2_routine)() {
   while (1) {
     {
-      // tracer_lock.lock();
-      atomic_section a;
+      tracer_lock.lock();
+      // atomic_section a;
       itm_trace("thread 2\n");
-      // tracer_lock.unlock();
+      tracer_lock.unlock();
     }
   }
 }
@@ -79,10 +79,10 @@ void(thread2_routine)() {
 void(thread3_routine)() {
   while (1) {
     {
-      atomic_section a;
-      // tracer_lock.lock();
+      // atomic_section a;
+      tracer_lock.lock();
       itm_trace("thread 3\n");
-      // tracer_lock.unlock();
+      tracer_lock.unlock();
     }
   }
 }

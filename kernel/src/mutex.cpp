@@ -12,20 +12,35 @@ mutex::~mutex() {
 }
 
 void mutex::lock() {
-    bool expected = false;
-    bool st = locked.compare_exchange_strong(expected, true, std::memory_order_acquire);
-    if (!st) {
-      // lock failed, yield to other thread.
-      PreemptFIFOScheduler::p_active_thread->thread_info.state = BLOCKED;
-      request_context_switch();
-    }
+  // check if mutex has been taken.
+  if (locked == true) {
+    PreemptFIFOScheduler::p_active_thread->thread_info.state = BLOCKED;
+    PreemptFIFOScheduler::move_node(&PreemptFIFOScheduler::ready_list, &this->p_blocked_list, (Thread *)PreemptFIFOScheduler::p_active_thread);
+  }
+  request_context_switch();
+
+  // block current thread until lock is released.
+  while(locked == true);
+
+  // take mutex.
+  locked = true;
+  this->owner = PreemptFIFOScheduler::p_active_thread;
 }
 
-
 void mutex::unlock() {
-  // the current thread own the lock, so it will only execute once.
-  locked.store(false, std::memory_order_release);
-  // PreemptFIFOScheduler::move_node(&this->p_blocked_list, &PreemptFIFOScheduler::ready_list, (Thread *)PreemptFIFOScheduler::p_active_thread);
+  // deny unlock for non-owner thread.
+  if (PreemptFIFOScheduler::p_active_thread != this->owner) {
+    return;
+  }
+  // unlock mutex.
+  locked = false;
+
+  // move other blocked thread to ready list.
+  if (this->p_blocked_list) {
+    PreemptFIFOScheduler::move_node(&this->p_blocked_list, &PreemptFIFOScheduler::ready_list, (Thread *)this->p_blocked_list);
+    this->p_blocked_list->thread_info.state = ACTIVE;
+  }
+  request_context_switch();
 }
 
 

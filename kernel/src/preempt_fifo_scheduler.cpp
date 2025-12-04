@@ -21,7 +21,7 @@
 
 using namespace YesRTOS;
 
-volatile Thread* PreemptFIFOScheduler::p_active_thread = nullptr;
+Thread* PreemptFIFOScheduler::p_active_thread = nullptr;
 
 size_t PreemptFIFOScheduler::curr_prio = 0;
 

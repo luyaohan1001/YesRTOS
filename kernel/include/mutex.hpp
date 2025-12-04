@@ -16,6 +16,7 @@ class mutex {
 
     std::atomic<bool> locked;
     YesRTOS::Thread* p_blocked_list;
+    YesRTOS::Thread* owner;
 };
 
 }
