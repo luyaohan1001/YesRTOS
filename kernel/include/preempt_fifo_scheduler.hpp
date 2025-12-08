@@ -23,9 +23,18 @@ class PreemptFIFOScheduler final {
   static void start();
   static void init();
 
-  static void add_thread(Thread* thread, size_t prio_level);
+  static void add_thread(Thread* thread);
 
-  static void move_node(Thread** src_list, Thread** dest_list, Thread* node);
+  /**
+   * @brief Add running thread to a blocked list and marked as BLOCKED.
+   * @param pp_blocked_list_head Double pointer to the head of a blocked list maintain by other entity such as a YesRTOS::Mutex.
+   */
+  static void block_running_thread(Thread** pp_blocked_list_head);
+  /**
+   * @brief Move another blocked thread from blocked list to ready list and marked as READY.
+   * @param pp_blocked_list_head Double pointer to the head of a blocked list maintain by other entity such as a YesRTOS::Mutex.
+   */
+  static void unblock_one_thread(Thread** pp_blocked_list_head);
 
   /**
    * @brief Pointer to the thread currently being executed.
@@ -36,22 +45,25 @@ class PreemptFIFOScheduler final {
    */
   static Thread* p_active_thread;
 
-  static size_t curr_prio;  // records priority index of list to visit to schedule next thread.
-
   static bool init_complete;
 
-  static Thread* ready_list;
+  static Thread* ready_list_heads[MAX_PRIO_LEVEL];
 
-  static Thread* current;
+  /**
+   * @brief Bitmap encoding non-empty ready list of a specific priority.
+   */
+  static uint32_t prio_bitmap;
+
   private:
   /**
    * @note Static class. Hide constructor / destructor to avoid instantiation.
    */
+
+  static void move_node(Thread** src_list, Thread** dest_list, Thread* node);
+
   PreemptFIFOScheduler() = delete;
   ~PreemptFIFOScheduler() = delete;
 
-  // static linkedlist<Thread>* ready_list[MAX_PRIO_LEVEL];        // points to list of threads for each priority level.
-  // static list_node_t<Thread>* running_threads[MAX_PRIO_LEVEL];  // points to node of execution for each priority level.
 };
 
 }  // namespace YesRTOS

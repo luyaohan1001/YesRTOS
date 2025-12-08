@@ -32,7 +32,7 @@ namespace YesRTOS {
 class Thread;
 
 typedef enum thread_state {
-  ACTIVE,
+  READY,
   RUNNING,
   BLOCKED,
   SLEEP,
@@ -40,16 +40,23 @@ typedef enum thread_state {
 } thread_state_t;
 
 typedef struct thread_info {
-  uint32_t id;
   thread_state_t state;
   void (*routine_ptr)(void);
   Thread* p_next;
   Thread* p_prev;
+  uint32_t id;
+  uint8_t priority;
 } thread_info_t;
 
 class Thread {
   public:
-  Thread(uint32_t id, void (*routine_ptr)(void));
+  /**
+   * @brief Construct a new Thread object
+   * @param id Unique ID for the thread, defined by the user.
+   * @param routine_ptr Function pointer to the execution routine.
+   * @param priority Thread priority, by default 0 (highest priority)
+   */
+  Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority = 0);
   ~Thread();
 
   public:

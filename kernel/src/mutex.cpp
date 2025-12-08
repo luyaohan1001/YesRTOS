@@ -14,10 +14,9 @@ mutex::~mutex() {
 void mutex::lock() {
   // check if mutex has been taken.
   if (locked == true) {
-    PreemptFIFOScheduler::p_active_thread->thread_info.state = BLOCKED;
-    PreemptFIFOScheduler::move_node(&PreemptFIFOScheduler::ready_list, &this->p_blocked_list, (Thread *)PreemptFIFOScheduler::p_active_thread);
+    PreemptFIFOScheduler::block_running_thread(&this->p_blocked_list);
+    request_context_switch();
   }
-  request_context_switch();
 
   // block current thread until lock is released.
   while(locked == true);
@@ -37,8 +36,7 @@ void mutex::unlock() {
 
   // move other blocked thread to ready list.
   if (this->p_blocked_list) {
-    PreemptFIFOScheduler::move_node(&this->p_blocked_list, &PreemptFIFOScheduler::ready_list, (Thread *)this->p_blocked_list);
-    this->p_blocked_list->thread_info.state = ACTIVE;
+    PreemptFIFOScheduler::unblock_one_thread(&this->p_blocked_list);
   }
   request_context_switch();
 }

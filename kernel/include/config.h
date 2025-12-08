@@ -21,6 +21,6 @@ TIMESLIDE_FREQ_HZ to program = 1 / 0.01s = 100Hz
 
 #define TASK_QUEUE_DEPTH        (32U)           // RoundRobinScheduler
 
-#define MAX_PRIO_LEVEL          (8U)            // PreemptFIFOScheduler
+#define MAX_PRIO_LEVEL          (4U)            // PreemptFIFOScheduler
 
 // #define HOST_PLATFORM // Host platform of cross-compilation; used to control native traces to iostream.

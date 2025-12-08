@@ -25,8 +25,6 @@ using namespace YesRTOS;
 // YesRTOS::spinlock tracer_lock;
 YesRTOS::mutex tracer_lock;
 
-
-
 /**
  * @brief Thread0 routine.
  */
@@ -91,17 +89,17 @@ void(thread3_routine)() {
  * @brief YesRTOS Cooperative style scheduling demo between two threads.
  */
 int main() {
-  Thread thread0(0, thread0_routine);
-  PreemptFIFOScheduler::add_thread(&thread0, 4);
+  Thread thread0(0, thread0_routine, 0);
+  PreemptFIFOScheduler::add_thread(&thread0);
 
-  Thread thread1(1, thread1_routine);
-  PreemptFIFOScheduler::add_thread(&thread1, 4);
+  Thread thread1(1, thread1_routine, 0);
+  PreemptFIFOScheduler::add_thread(&thread1);
 
-  Thread thread2(1, thread2_routine);
-  PreemptFIFOScheduler::add_thread(&thread2, 4);
+  Thread thread2(1, thread2_routine, 0);
+  PreemptFIFOScheduler::add_thread(&thread2);
 
-  Thread thread3(1, thread3_routine);
-  PreemptFIFOScheduler::add_thread(&thread3, 4);
+  Thread thread3(1, thread3_routine, 0);
+  PreemptFIFOScheduler::add_thread(&thread3);
 
   PreemptFIFOScheduler::start();
 

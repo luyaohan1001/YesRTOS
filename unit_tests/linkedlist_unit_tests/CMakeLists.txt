@@ -18,7 +18,6 @@ add_executable(linkedlist_unit_test
   ${CMAKE_SOURCE_DIR}/linkedlist_unit_test.cpp
   ${CMAKE_SOURCE_DIR}/../../kernel/src/thread.cpp
   ${CMAKE_SOURCE_DIR}/../../kernel/src/mempool.cpp
-  ${CMAKE_SOURCE_DIR}/../../kernel/src/bitops.cpp
   ${CMAKE_SOURCE_DIR}/../../kernel/src/linkedlist.cpp
 )
 

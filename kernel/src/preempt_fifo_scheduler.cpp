@@ -10,93 +10,121 @@
 #include "preempt_fifo_scheduler.hpp"
 
 #if defined(ARMV7M)
-#include <baremetal_api.h>
+#include "baremetal_api.h"
 #endif
 
 #if defined(HOST_PLATFORM)
 #include <iostream>
 #endif
 
-#include "mempool.hpp"
+#include "bitops.hpp"
 
 using namespace YesRTOS;
 
 Thread* PreemptFIFOScheduler::p_active_thread = nullptr;
 
-size_t PreemptFIFOScheduler::curr_prio = 0;
-
 bool PreemptFIFOScheduler::init_complete = false;
 
-Thread* PreemptFIFOScheduler::ready_list = nullptr;
-Thread* PreemptFIFOScheduler::current = nullptr;
+Thread* PreemptFIFOScheduler::ready_list_heads[MAX_PRIO_LEVEL] {nullptr};
+
+uint32_t PreemptFIFOScheduler::prio_bitmap;
 
 void PreemptFIFOScheduler::init() {
-  mempool::init();
   PreemptFIFOScheduler::init_complete = true;
 }
 
 /**
  * @brief Add thread to scheduler queue.
  */
-void PreemptFIFOScheduler::add_thread(Thread* p_new, size_t prio_level) {
+void PreemptFIFOScheduler::add_thread(Thread* p_new) {
   if (!init_complete) PreemptFIFOScheduler::init();
-  if (!ready_list) {
-    // head [p_new] ==> nullptr
-    ready_list = p_new;
+
+  uint8_t prio_level = p_new->thread_info.priority;
+
+  Thread** pp_head = &ready_list_heads[prio_level];
+
+  if (!(*pp_head)) {
+    // create new list
+    *pp_head = p_new;
     p_new->thread_info.p_next = nullptr;
     p_new->thread_info.p_prev = nullptr;
+
+    set_bitpos<uint32_t>(prio_bitmap, prio_level);
   } else {
-    // head [p_new] <==> existing node <==> existing node ==> nullptr
-    ready_list->thread_info.p_prev = p_new;
-    p_new->thread_info.p_next = ready_list;
+    // insert to head
+    (*pp_head)->thread_info.p_prev = p_new;
+    p_new->thread_info.p_next = *pp_head;
     p_new->thread_info.p_prev = nullptr;
-    ready_list = p_new;
+    *pp_head = p_new;
   }
 }
 
 /**
- * @brief start
+ * @brief Start preemptive scheduler.
  */
 void PreemptFIFOScheduler::start() {
   if (!init_complete) PreemptFIFOScheduler::init();
-  current = ready_list;
-  PreemptFIFOScheduler::p_active_thread = current;
+
+  uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
+  PreemptFIFOScheduler::p_active_thread = ready_list_heads[prio];
+
 #if defined (ARMV7M)
   itm_initialize();
   systick_clk_init();
   start_first_task();
+#else
+  #error "Timeslice not supported for undefined architecture."
 #endif
+}
+
+static Thread* get_next_thread_circular(Thread *p_thread, Thread *p_head) {
+  Thread *p_next = p_thread->thread_info.p_next;
+  // Circular wrap around.
+  if (!p_next) {
+    p_next = p_head;
+  }
+  return p_next;
 }
 
 /**
  * @brief Return the next thread to run.
  */
 void PreemptFIFOScheduler::schedule_next() {
-  Thread* next_sched_thread = current->thread_info.p_next;
-  if (!next_sched_thread) next_sched_thread = ready_list;
-  current = next_sched_thread;
-  PreemptFIFOScheduler::p_active_thread = next_sched_thread;
+  // Find highest priority ready task.
+  Thread *p_next_ready;
+  uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
+  if (prio == p_active_thread->thread_info.priority) {
+    p_next_ready = get_next_thread_circular(p_active_thread, ready_list_heads[prio]);
+  } else {
+    p_next_ready = ready_list_heads[prio];
+  }
+  PreemptFIFOScheduler::p_active_thread = p_next_ready;
 }
-
 
 void PreemptFIFOScheduler::move_node(Thread** src_list, Thread** dest_list, Thread* node) {
     if (!node) {
         return;
     }
 
-    // node deletion
+    /*
+    Deletion from source list:
+    If previous node exists, link previous to next. Else, mark next as the new node.
+    If next node exits, link its prev pointer to previous.
+    */
     Thread* p_prev = node->thread_info.p_prev;
     Thread* p_next = node->thread_info.p_next;
     if (p_prev) {
-        // prev ==> p_next
         p_prev->thread_info.p_next = node->thread_info.p_next;
     } else {
-        // (head) p_next 
         *src_list = node->thread_info.p_next;
     }
     if (p_next) p_next->thread_info.p_prev = p_prev;
 
-    // node addition to the new list
+    /*
+    Addition to the destination list head.
+    If list exists, make the node its new head, linking the node to its original head.
+    If list does not exist, create the list by pointing the head to this node.
+    */
     if (*dest_list) {
         (*dest_list)->thread_info.p_prev = node;
         node->thread_info.p_next = *dest_list;
@@ -108,3 +136,21 @@ void PreemptFIFOScheduler::move_node(Thread** src_list, Thread** dest_list, Thre
         *dest_list = node;
     }
 }
+
+void PreemptFIFOScheduler::block_running_thread(Thread** pp_blocked_list_head) {
+  Thread *p_thread = p_active_thread;
+  PreemptFIFOScheduler::move_node(&ready_list_heads[p_thread->thread_info.priority], pp_blocked_list_head, p_thread);
+  p_thread->thread_info.state = BLOCKED;
+
+  if (ready_list_heads[p_thread->thread_info.priority] == nullptr) {
+    clr_bitpos<uint32_t>(prio_bitmap, p_thread->thread_info.priority);
+  }
+}
+
+void PreemptFIFOScheduler::unblock_one_thread(Thread** pp_blocked_list_head) {
+  Thread *p_thread = PreemptFIFOScheduler::p_active_thread;
+  PreemptFIFOScheduler::move_node(pp_blocked_list_head, &ready_list_heads[p_thread->thread_info.priority], *pp_blocked_list_head);
+  p_thread->thread_info.state = READY;
+  set_bitpos<uint32_t>(prio_bitmap, p_thread->thread_info.priority);
+}
+

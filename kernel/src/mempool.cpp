@@ -66,7 +66,7 @@ mempool::alloc_t mempool::malloc(const size_t& req_size) {
   if (sz_grp == SIZE_GRP_NOT_FOUND) return ret;
   if (alloc_bitmaps[sz_grp] == BITMAP_FULL_MASK) return ret;
 
-  size_t bitpos = find_bitpos_rightmost_zero(alloc_bitmaps[sz_grp]);
+  size_t bitpos = count_trailing_zero(alloc_bitmaps[sz_grp]);
   alloc_bitmaps[sz_grp] |= 1 << bitpos;
   ret.addr = reinterpret_cast<size_t*>(size_grp_start_addr[sz_grp] + bitpos * (1 << (sz_grp + MIN_ALLOC_SIZE_SHAMT)));
   ret.status = ALLOC_SUCCESS;

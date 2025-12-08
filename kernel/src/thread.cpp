@@ -14,20 +14,15 @@
 
 namespace YesRTOS {
 
-/**
- * @brief Construct a new Thread object
- * @param id Unique ID for the thread, defined by the user.
- * @param routine_ptr Function pointer to the execution routine.
- */
-Thread::Thread(uint32_t id, void (*routine_ptr)(void)) {
+Thread::Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority) {
   this->thread_info.id = id;
-  this->thread_info.state = ACTIVE;
+  this->thread_info.state = READY;
+  this->thread_info.priority = priority;
   this->set_routine(routine_ptr);
 
+  // Initialize thread routine stack (PSP).
   uint32_t* contxt_stk_bottom = (uint32_t*)(&this->allocated_stack[0] + STACK_ALLOCATION_SIZE);
   this->stkptr = contxt_stk_bottom;
-
-  // Initialize stack context for the thread to run for the first time.
   this->init_stack();
 }
 
@@ -60,7 +55,7 @@ const thread_state_t& Thread::get_state() const {
  */
 void Thread::set_routine(void (*routine_ptr)(void)) {
   this->thread_info.routine_ptr = routine_ptr;
-  this->thread_info.state = ACTIVE;
+  this->thread_info.state = READY;
 }
 
 /**
@@ -84,7 +79,7 @@ void Thread::set_state(thread_state_t cfg) {
  * @brief Wake up thread from sleep.
  */
 void Thread::wake_up() {
-  this->thread_info.state = ACTIVE;
+  this->thread_info.state = READY;
 }
 
 /**
