@@ -9,7 +9,6 @@
 
 #include "baremetal_api.h"
 #include "preempt_fifo_scheduler.hpp"
-#include "rr_scheduler.hpp"
 #include "spinlock.hpp"
 #include "atomic_section.hpp"
 #include <atomic>
@@ -23,7 +22,7 @@ using namespace YesRTOS;
 
 // declare lock to protect tracer critical section.
 // YesRTOS::spinlock tracer_lock;
-YesRTOS::mutex tracer_lock;
+YesRTOS::Mutex tracer_lock;
 
 /**
  * @brief Thread0 routine.
@@ -103,6 +102,6 @@ int main() {
 
   PreemptFIFOScheduler::start();
 
-  while (1);
+  // while (1);
   return 0;
 }

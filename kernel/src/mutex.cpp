@@ -3,15 +3,15 @@
 
 using namespace YesRTOS;
 
-mutex::mutex() {
+Mutex::Mutex() {
     this->locked.store(false);
     this->p_blocked_list = nullptr;
 }
 
-mutex::~mutex() {
+Mutex::~Mutex() {
 }
 
-void mutex::lock() {
+void Mutex::lock() {
   // check if mutex has been taken.
   if (locked == true) {
     PreemptFIFOScheduler::block_running_thread(&this->p_blocked_list);
@@ -26,7 +26,7 @@ void mutex::lock() {
   this->owner = PreemptFIFOScheduler::p_active_thread;
 }
 
-void mutex::unlock() {
+void Mutex::unlock() {
   // deny unlock for non-owner thread.
   if (PreemptFIFOScheduler::p_active_thread != this->owner) {
     return;

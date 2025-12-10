@@ -20,7 +20,7 @@ namespace YesRTOS {
  *  - Thread ownership tracking
  *  - Safe unlock by owner only
  */
-class mutex {
+class Mutex {
 public:
     /**
      * @brief Construct a new mutex object.
@@ -29,7 +29,7 @@ public:
      * No thread owns the mutex at creation time.
      * The blocked list is initially empty.
      */
-    mutex();
+    Mutex();
 
     /**
      * @brief Destroy the mutex object.
@@ -37,7 +37,7 @@ public:
      * The mutex must NOT be destroyed while still locked.
      * Destroying a locked mutex leads to undefined behavior.
      */
-    ~mutex();
+    ~Mutex();
 
     /**
      * @brief Acquire the mutex lock.
