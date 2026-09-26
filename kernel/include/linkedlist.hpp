@@ -6,7 +6,7 @@
 #include <vector>
 #endif
 
-#include "mempool.hpp"
+#include "heap.hpp"
 
 namespace YesRTOS {
 

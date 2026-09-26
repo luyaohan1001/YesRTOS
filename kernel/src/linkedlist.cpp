@@ -1,8 +1,32 @@
 #include "linkedlist.hpp"
 
+#include <new>  // placement new
+
 #include "thread.hpp"
 
 namespace YesRTOS {
+
+/**
+ * @brief Allocate a node on the kernel heap and construct it in place.
+ * @return nullptr when the heap is exhausted.
+ */
+template <typename T>
+static list_node_t<T>* new_node(T&& data, list_node_t<T>* next) {
+  void* p_mem = Heap::allocate(sizeof(list_node_t<T>));
+  if (!p_mem) {
+    return nullptr;
+  }
+  return new (p_mem) list_node_t<T>(std::move(data), next);
+}
+
+/**
+ * @brief Destroy a node created by new_node() and return its memory to the heap.
+ */
+template <typename T>
+static void delete_list_node(list_node_t<T>* p_node) {
+  p_node->~list_node_t<T>();
+  Heap::free(p_node);
+}
 
 template <typename T>
 linkedlist<T>::linkedlist() : head(nullptr) {
@@ -16,7 +40,7 @@ linkedlist<T>::~linkedlist() {
 
   while (p_node_itr) {
     list_node_t<T>* p_next_node = p_node_itr->next;
-    mempool::free(reinterpret_cast<size_t*>(p_node_itr));
+    delete_list_node(p_node_itr);
     p_node_itr = p_next_node;
   }
   this->head = nullptr;
@@ -34,14 +58,10 @@ list_node_t<T>* linkedlist<T>::insert_front(T& data) {
 
 template <typename T>
 list_node_t<T>* linkedlist<T>::insert_front(T&& data) {
-  mempool::alloc_t alloc_res = mempool::malloc(sizeof(list_node_t<T>));
-  if (alloc_res.status == mempool::ALLOC_FAIL) {
-    assert(0);
+  list_node_t<T>* p_new_node = new_node(std::move(data), this->head);
+  if (!p_new_node) {
     return nullptr;
   }
-  list_node_t<T>* p_new_node = reinterpret_cast<list_node_t<T>*>(alloc_res.addr);
-  p_new_node->data = data;
-  p_new_node->next = head;
   this->head = p_new_node;
   return p_new_node;
 }
@@ -53,11 +73,10 @@ list_node_t<T>* linkedlist<T>::insert_tail(T& data) {
 
 template<typename T>
 list_node_t<T>* linkedlist<T>::insert_tail(T&& data) {
-  mempool::alloc_t alloc_res = mempool::malloc(sizeof(list_node_t<T>));
-  if (alloc_res.status == mempool::ALLOC_FAIL) assert(0);
-  list_node_t<T>* p_new_node = reinterpret_cast<list_node_t<T>*>(alloc_res.addr);
-  p_new_node->data = data;
-  p_new_node->next= nullptr;
+  list_node_t<T>* p_new_node = new_node(std::move(data), static_cast<list_node_t<T>*>(nullptr));
+  if (!p_new_node) {
+    return nullptr;
+  }
 
   if (head) {
     list_node_t<T>* p_node_itr = head;
@@ -80,7 +99,7 @@ void linkedlist<T>::delete_node(list_node_t<T>* p_del_target) {
         p_prev_node->next = p_node_itr->next;
       else
         this->head = p_node_itr->next;
-      mempool::free(reinterpret_cast<size_t*>(p_node_itr));
+      delete_list_node(p_node_itr);
       break;
     }
     p_prev_node = p_node_itr;

@@ -12,8 +12,6 @@
 #include <thread.hpp>
 
 #include "config.h"
-#include "linkedlist.hpp"
-#include "mempool.hpp"
 
 /**
  * @brief Called by the idle thread on every pass of its loop, before it waits for the next interrupt.

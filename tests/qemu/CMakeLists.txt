@@ -14,6 +14,7 @@ set(YESRTOS_QEMU_TESTS
   add_thread
   mutex_states
   heap
+  linkedlist
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
