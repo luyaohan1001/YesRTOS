@@ -66,6 +66,34 @@
 #### Phase 5
 * Other advanced topics
 
+## Case Studies
+
+Real bugs found while building YesRTOS, kept as reminders of RTOS design rules. Each links to the hazard, a minimal
+example, the fix and how it was found.
+
+<details>
+<summary><b>15 case studies</b> (race conditions, atomicity, memory ordering, interrupt priority, undefined behaviour, stack usage) - click to expand</summary>
+
+| ID | Issue | Category | Design rule | Status |
+|----|-------|----------|-------------|--------|
+| [CS-001](docs/case_studies/CS-001-mutex-wakeup-race.md) | Mutex wake-up without ownership | Race condition | Hand a released lock directly to a waiter; test lock implementations by forcing contention, not by hoping for it. | Fixed `c4067fe` |
+| [CS-002](docs/case_studies/CS-002-scheduling-through-stale-links.md) | Scheduling through a blocked thread's list links | Data integrity | A node moved to another list must not be traversed through its old links; act on the node you moved, not on the current thread. | Fixed `1970288` |
+| [CS-003](docs/case_studies/CS-003-weak-split-cas.md) | Compare-and-swap split across functions | Atomicity | Keep an LDREX/STREX pair in a single asm block, and retry lost reservations so a failed CAS always means a different value. | Fixed `c1c34b6` |
+| [CS-004](docs/case_studies/CS-004-non-nestable-critical-section.md) | Critical section re-enables interrupts when nested | Race condition | Restore the saved interrupt state instead of forcing it on; never block inside a critical section. | Fixed `a57be71` |
+| [CS-005](docs/case_studies/CS-005-interrupt-disable-without-compiler-barrier.md) | Disabling interrupts is not a compiler barrier | Memory ordering | Every instruction that starts or ends a critical section must also be a compiler barrier. | Fixed `334c620` |
+| [CS-006](docs/case_studies/CS-006-spinlock-on-single-core.md) | Spinlock across priorities on a single core | Deadlock | On a single core, block instead of spinning; spinlocks belong to multi-core code. | Documented |
+| [CS-007](docs/case_studies/CS-007-unaligned-thread-stacks.md) | Thread stacks not 8-byte aligned | Undefined behaviour (ABI) | A thread's initial stack pointer must satisfy the ABI's alignment: align the stack storage, not just its size. | Fixed `bececfb` |
+| [CS-008](docs/case_studies/CS-008-extended-asm-in-naked-handlers.md) | Extended asm in naked exception handlers | Undefined behaviour (compiler dependent) | Naked handlers contain only basic asm; call a normal C function for anything the compiler must generate. | Fixed `c1aef96` |
+| [CS-009](docs/case_studies/CS-009-pendsv-at-highest-priority.md) | PendSV and SysTick at the highest priority | Interrupt priority | The context switch exception runs at the lowest priority, after every interrupt handler has finished. | Fixed `1099c2a` |
+| [CS-010](docs/case_studies/CS-010-empty-ready-set.md) | No thread ready: count_trailing_zero(0) | Undefined behaviour | The ready set must never be empty: give the scheduler an idle thread. | Fixed `1ff6d5b` |
+| [CS-011](docs/case_studies/CS-011-thread-routine-return.md) | Thread routine returning into 0xDEADBEEF | Undefined behaviour | Every thread needs a defined way to end: point its initial return address at an exit routine. | Fixed `34446ac` |
+| [CS-012](docs/case_studies/CS-012-unchecked-add-thread.md) | add_thread() without validation or locking | Data integrity | Validate every index that comes from the API before using it, and treat public kernel calls as callable at any time. | Fixed `2f7410e` |
+| [CS-013](docs/case_studies/CS-013-linkedlist-unconstructed-nodes.md) | Linked list nodes used without construction | Undefined behaviour | Memory from an allocator is not an object until it is constructed; an allocation failure is a return value, not an assert. | Fixed `e5b77ee` |
+| [CS-014](docs/case_studies/CS-014-fpu-context-not-saved.md) | FPU context not saved on context switch | Data integrity | If threads may use the FPU, the FPU registers are part of the thread context. | **Open** |
+| [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Thread objects on the main stack, no stack reserve | Stack overflow | Size and reserve every stack explicitly, including the exception stack; do not put thread stacks on it. | **Open** |
+
+</details>
+
 ## Intended Application in Future
 * ⌚️ IoT Devices
 * 🚇 Automotive Systems
