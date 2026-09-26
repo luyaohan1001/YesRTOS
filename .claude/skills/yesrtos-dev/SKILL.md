@@ -42,7 +42,7 @@ Examples:
 
 ## Size
 
-Count the changed lines of the staged diff:
+Count the changed lines of the staged diff before writing the subject, never estimate:
 
 ```
 git diff --cached --shortstat    # insertions + deletions
@@ -130,7 +130,9 @@ Co-Authored-By: ...
 
 RTOS design bugs are kept as case studies, so the design rule behind each fix is not
 forgotten. Write one when a `[BUG FIX]` has category race condition, atomicity, memory
-ordering, data integrity, deadlock, stack overflow or interrupt priority. Known but unfixed
+ordering, data integrity, deadlock, stack overflow, interrupt priority, or undefined
+behaviour / ABI violations in the kernel or machine layer (stack alignment, naked
+handlers, empty ready set, ...). Known but unfixed
 issues of those kinds get a case study too, with status **Open**.
 
 ### Where
@@ -212,6 +214,10 @@ hunks that belong to this change:
   temporary worktree, then `git diff --cached > change.patch` there and
   `git apply --cached change.patch` in the main checkout.
 - Never commit `build/` output or files the author did not ask to include.
+- Keep each file's line endings. Some files are CRLF (`timeslice.cpp`, the linker scripts,
+  the startup file): edit them with tools that preserve `\r\n` (e.g. Python
+  `open(path, newline='')`), and check `git diff --cached --stat` for a whole-file rewrite
+  before committing.
 - Never run `git stash` inside a helper worktree: the stash is shared with the main
   checkout and mixes with the author's own stashes.
 
@@ -241,7 +247,9 @@ A bug fix adds a test to `tests/qemu/` (listed in `YESRTOS_QEMU_TESTS` in its
 CMakeLists.txt) that fails on the old code and passes on the fix. Check both directions:
 a test that also passes on the buggy code does not guard anything. Prefer forcing the
 interleaving (e.g. yielding with `request_context_switch()` inside a critical section)
-over hoping SysTick lands in the right place.
+over hoping SysTick lands in the right place, and make multi-thread tests independent of
+the order threads first run in (a 10 kHz tick preempts anywhere). Repeat new tests, e.g.
+`ctest --preset qemu-stress --repeat until-fail:15`, before trusting them.
 
 ## Do not
 
