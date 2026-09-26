@@ -4,8 +4,6 @@ cmake_minimum_required(VERSION 3.10)
 # Linker script for address-related symbol resolution (stack start address, etc.)
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   include(${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m/gcc-arm-none-eabi.cmake)
-elseif (ARCH_DEFINED STREQUAL "RV32I")
-  include(${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/rv32i/gcc-riscv-none-eabi.cmake)
 else()
   message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
 endif()
@@ -27,8 +25,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   target_compile_definitions(${PROJECT_NAME} PRIVATE ARMV7M)
-elseif (ARCH_DEFINED STREQUAL "RV32I")
-  target_compile_definitions(${PROJECT_NAME} PRIVATE RV32I)
 else()
   message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
 endif()
@@ -52,10 +48,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/armv7m
-  )
-elseif (ARCH_DEFINED STREQUAL "RV32I")
-  target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/../../kernel/arch/rv32i
   )
 endif()
 

@@ -27,7 +27,7 @@ extern "C" {
   extern size_t _ld_start_heap;
   extern size_t _ld_end_heap;
 }
-#elif defined(ARMV7M) || defined (RV32I)
+#elif defined(ARMV7M)
 // linker script symbol
 extern "C" {
   extern size_t _ld_start_heap[];

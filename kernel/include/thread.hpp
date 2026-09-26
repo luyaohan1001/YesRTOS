@@ -13,8 +13,6 @@
 #if defined(ARMV7M)
   #include <armv7m.h>
   #include <baremetal_api.h>
-#elif defined(RV32I)
-  #include <rv32i.h>
 #else
   static_assert(0, "ARCH not defined");
 #endif

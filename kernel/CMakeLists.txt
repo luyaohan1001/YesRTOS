@@ -6,8 +6,6 @@ cmake_minimum_required(VERSION 3.10)
 # Cross compilation tool chain.
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   include(${CMAKE_CURRENT_SOURCE_DIR}/arch/armv7m/gcc-arm-none-eabi.cmake)
-elseif (ARCH_DEFINED STREQUAL "RV32I")
-  include(${CMAKE_CURRENT_SOURCE_DIR}/arch/rv32i/gcc-riscv-none-eabi.cmake)
 else()
   message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
 endif()
@@ -61,16 +59,6 @@ if (ARCH_DEFINED STREQUAL "ARMV7M")
 
   # Include subdirectory to build sub-component together as part of the kernel.
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
-elseif (ARCH_DEFINED STREQUAL "RV32I")
-  target_compile_definitions(${LIBRARY_NAME} PRIVATE RV32I)
-
-  target_include_directories(${LIBRARY_NAME} PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/arch/rv32i/
-    ${CMAKE_CURRENT_LIST_DIR}/include/
-  )
-
-  # Include subdirectory to build sub-component together as part of the kernel.
-  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/rv32i)
 else()
   message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
 endif()
