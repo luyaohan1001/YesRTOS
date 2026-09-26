@@ -43,16 +43,3 @@ jobs:
 
     - name: QEMU regression tests
       run: ctest --preset qemu
-
-    - name: Configure CMake for Unit Tests
-      run: cmake -S ${{github.workspace}}/unit_tests/mempool_unit_tests -B ${{github.workspace}}/unit_tests/mempool_unit_tests/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-
-    - name: Build for Unit Tests
-      run: cmake --build ${{github.workspace}}/unit_tests/mempool_unit_tests/build --config ${{env.BUILD_TYPE}}
-
-    - name: Run Unit Tests
-      working-directory: ${{github.workspace}}/unit_tests/mempool_unit_tests/build
-      # Execute tests defined by the CMake configuration.
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest
-

@@ -10,7 +10,6 @@
 #include <baremetal_api.h>
 #endif
 
-#include <mempool.hpp>
 #include <rr_scheduler.hpp>
 
 #if defined(HOST_PLATFORM)

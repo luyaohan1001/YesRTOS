@@ -17,12 +17,14 @@ add_compile_definitions("-DHOST_PLATFORM")
 add_executable(linkedlist_unit_test
   ${CMAKE_SOURCE_DIR}/linkedlist_unit_test.cpp
   ${CMAKE_SOURCE_DIR}/../../kernel/src/thread.cpp
-  ${CMAKE_SOURCE_DIR}/../../kernel/src/mempool.cpp
+  ${CMAKE_SOURCE_DIR}/../../kernel/src/heap.cpp
+  ${CMAKE_SOURCE_DIR}/../../third_party/o1heap/o1heap.c
   ${CMAKE_SOURCE_DIR}/../../kernel/src/linkedlist.cpp
 )
 
 target_include_directories(linkedlist_unit_test PRIVATE
     ${CMAKE_SOURCE_DIR}/../../kernel/include
+    ${CMAKE_SOURCE_DIR}/../../third_party/o1heap
     ${CMAKE_SOURCE_DIR}/../../kernel/arch/armv7m)
 
 enable_testing()

@@ -17,7 +17,6 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/preempt_fifo_scheduler.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/atomic_section.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/mempool.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/spinlock.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
