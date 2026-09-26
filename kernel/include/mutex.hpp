@@ -71,13 +71,13 @@ public:
     void unlock();
 
 public:
-    /** 
-     * @brief Atomic flag indicating whether the mutex is locked.
-     * 
-     * true  -> locked
-     * false -> unlocked
+    /**
+     * @brief Flag indicating whether the mutex is locked. Only accessed with exceptions disabled.
+     *
+     * 1  -> locked
+     * 0 -> unlocked
      */
-    std::atomic<bool> locked;
+    uint32_t locked;
 
     /**
      * @brief Linked list of threads blocked on this mutex.
