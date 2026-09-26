@@ -6,6 +6,21 @@ YesRTOS middleware interacts with this layer to complete the important kernel fu
 
 The linker scripts and startup scripts are provided by STMicroelectronics through CubeMX code generator.
 
+## Running on QEMU (no hardware)
+
+QEMU has no STM32F7 machine, so the port is built for the `netduinoplus2` board (STM32F405, Cortex-M4F) instead.
+SysTick, PendSV and SVC are architectural in ARMv7-M, so the kernel and this layer are unchanged; only the CPU flags,
+the linker script (`qemu_netduinoplus2.ld`) and the trace backend (`trace_qemu_usart.c`, as QEMU does not emulate the ITM) differ.
+
+```
+cmake --preset qemu
+cmake --build --preset qemu --target qemu        # run, exit with Ctrl-A X
+cmake --build --preset qemu --target qemu-gdb    # halt at reset, attach arm-none-eabi-gdb to localhost:1234
+```
+
+To stress preemption, use the `qemu-stress` preset (10 kHz timeslice) instead of `qemu`.
+QEMU is not cycle accurate, so use it for functional checks, not timing.
+
 ## ARM Cortex M7
 * In-order super-scalar processor - instruction level parallelism on dual issued instruction
 * Dynamic branch prediction

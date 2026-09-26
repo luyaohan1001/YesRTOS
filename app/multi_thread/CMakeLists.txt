@@ -44,6 +44,37 @@ COMMAND openocd
 DEPENDS ${PROJECT_NAME}
 )
 
+if (ARCH_DEFINED STREQUAL "ARMV7M" AND QEMU)
+  # Run in QEMU (exit with Ctrl-A X).
+  add_custom_target(qemu
+  COMMAND qemu-system-arm
+              -M netduinoplus2
+              -nographic
+              -kernel $<TARGET_FILE:${PROJECT_NAME}>
+  DEPENDS ${PROJECT_NAME}
+  USES_TERMINAL
+  )
+
+  # Run in QEMU halted at reset, waiting for gdb on localhost:1234.
+  add_custom_target(qemu-gdb
+  COMMAND qemu-system-arm
+              -M netduinoplus2
+              -nographic
+              -kernel $<TARGET_FILE:${PROJECT_NAME}>
+              -s -S
+  DEPENDS ${PROJECT_NAME}
+  USES_TERMINAL
+  )
+else()
+  # The ELF only runs on QEMU when built for it; point to the right configuration instead.
+  foreach(QEMU_TARGET qemu qemu-gdb)
+    add_custom_target(${QEMU_TARGET}
+    COMMAND ${CMAKE_COMMAND} -E echo "'${QEMU_TARGET}' needs a QEMU build: cmake --preset qemu && cmake --build --preset qemu --target ${QEMU_TARGET}"
+    COMMAND ${CMAKE_COMMAND} -E false
+    )
+  endforeach()
+endif()
+
 # Dump symbol table using nm util.
 add_custom_target(dump_symbol_table
         ${CMAKE_NM}

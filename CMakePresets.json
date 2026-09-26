@@ -28,10 +28,31 @@
     {
       "name": "stm32f767",
       "displayName": "STM32F767 (Cortex-M7, hardware)",
-      "inherits": "armv7m"
+      "inherits": "armv7m",
+      "cacheVariables": {
+        "QEMU": "OFF"
+      }
+    },
+    {
+      "name": "qemu",
+      "displayName": "QEMU netduinoplus2 (Cortex-M4F)",
+      "inherits": "armv7m",
+      "cacheVariables": {
+        "QEMU": "ON"
+      }
+    },
+    {
+      "name": "qemu-stress",
+      "displayName": "QEMU netduinoplus2, 10 kHz timeslice to stress preemption",
+      "inherits": "qemu",
+      "cacheVariables": {
+        "TIMESLICE_FREQ_HZ": "10000"
+      }
     }
   ],
   "buildPresets": [
-    { "name": "stm32f767",   "configurePreset": "stm32f767" }
+    { "name": "stm32f767",   "configurePreset": "stm32f767" },
+    { "name": "qemu",        "configurePreset": "qemu" },
+    { "name": "qemu-stress", "configurePreset": "qemu-stress" }
   ]
 }

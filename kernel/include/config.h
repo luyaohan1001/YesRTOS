@@ -17,7 +17,9 @@ FREQ = 1 / PERIOD
 TIMESLIDE_FREQ_HZ to program = 1 / 0.01s = 100Hz
 */
 #define CPU_CLK_FREQ_HZ         (16000000UL)            // Core frequency.
+#ifndef TIMESLICE_FREQ_HZ                               // Overridable, e.g. -DTIMESLICE_FREQ_HZ=10000UL to stress preemption.
 #define TIMESLICE_FREQ_HZ       (100UL)                 // Timeslice frequency.
+#endif
 
 #define TASK_QUEUE_DEPTH        (32U)           // RoundRobinScheduler
 

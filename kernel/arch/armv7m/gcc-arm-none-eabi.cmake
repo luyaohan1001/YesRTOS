@@ -40,8 +40,12 @@ set(CMAKE_EXECUTABLE_SUFFIX_CXX     ".elf")
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-# MCU specific flags.
-set(TARGET_FLAGS "-mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard")
+# MCU specific flags. QEMU (cache variable, set by the preset) selects the netduinoplus2 board (STM32F405, Cortex-M4F).
+if (QEMU)
+  set(TARGET_FLAGS "-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+else()
+  set(TARGET_FLAGS "-mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard")
+endif()
 
 # The *_INIT variables only seed the defaults, so flags given on the command line (e.g. -DCMAKE_CXX_FLAGS=...) are appended rather than replacing these.
 # Enable additional C compiler warnings (-Wall, -Wextra, -Wpedantic) and optimize code by placing data and functions in separate sections (-fdata-sections, -ffunction-sections) for better linker garbage collection.

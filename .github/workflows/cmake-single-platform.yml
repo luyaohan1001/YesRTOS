@@ -35,6 +35,11 @@ jobs:
         cmake --preset stm32f767 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         cmake --build --preset stm32f767
 
+    - name: Configure and build (QEMU netduinoplus2)
+      run: |
+        cmake --preset qemu -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake --build --preset qemu
+
     - name: Configure CMake for Unit Tests
       run: cmake -S ${{github.workspace}}/unit_tests/mempool_unit_tests -B ${{github.workspace}}/unit_tests/mempool_unit_tests/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 

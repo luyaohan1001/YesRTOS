@@ -13,9 +13,16 @@ project(YesRTOS
 # Target selection, normally set by the preset.
 set(ARCH_DEFINED "" CACHE STRING "Target architecture: ARMV7M")
 set_property(CACHE ARCH_DEFINED PROPERTY STRINGS ARMV7M)
+option(QEMU "Build for QEMU netduinoplus2 (Cortex-M4F) instead of STM32F767 (Cortex-M7)" OFF)
 
 if (NOT ARCH_DEFINED STREQUAL "ARMV7M")
   message(FATAL_ERROR "'ARCH_DEFINED' is not recognized: '${ARCH_DEFINED}'. Configure with a preset, e.g. 'cmake --preset stm32f767'.")
+endif()
+
+# Optional timeslice override, e.g. to stress preemption on QEMU (see the qemu-stress preset).
+set(TIMESLICE_FREQ_HZ "" CACHE STRING "Override TIMESLICE_FREQ_HZ in config.h (Hz); empty keeps the default")
+if (TIMESLICE_FREQ_HZ)
+  add_compile_definitions(TIMESLICE_FREQ_HZ=${TIMESLICE_FREQ_HZ}UL)
 endif()
 
 # Build Debug mode for gdb debugging.
