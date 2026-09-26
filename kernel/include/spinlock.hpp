@@ -17,8 +17,8 @@ class spinlock {
   void unlock();
 
   private:
-  // uint32_t atomic_val;
-  std::atomic<bool> locked {0};
+  // 1 -> locked, 0 -> unlocked. Only changed through atomic_compare_and_swap(), or by the owner in unlock().
+  volatile uint32_t locked{0};
 };
 
 }  // namespace YesRTOS

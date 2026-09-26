@@ -1,27 +1,25 @@
 #include "spinlock.hpp"
-#include <atomic>
 
 namespace YesRTOS {
 
 spinlock::spinlock() {
-    this->locked.store(false);
+  this->locked = 0;
 }
 
 spinlock::~spinlock() {
 }
 
 void spinlock::lock() {
-    bool expected = false;
-    // Try to change false -> true
-    while (!locked.compare_exchange_strong(expected, true, std::memory_order_acquire)) {
-        expected = false;  // must reset expected after failure
-    }
+  // Try to change 0 -> 1. A failed CAS means another thread holds the lock: keep spinning until it is released.
+  while (!atomic_compare_and_swap(&this->locked, 0, 1)) {
+  }
 }
 
-
 void spinlock::unlock() {
-  // the current thread own the lock, so it will only execute once.
-  locked.store(false, std::memory_order_release);
+  // the current thread own the lock, so a plain store is enough to release it.
+  // DMB first so the critical section's memory accesses complete before the lock is seen as free (release semantics).
+  __asm volatile("dmb" ::: "memory");
+  this->locked = 0;
 }
 
 }  // namespace YesRTOS

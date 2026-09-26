@@ -1,63 +1,52 @@
 #include <cstddef>  // size_t
+#include <cstdint>
 
-/**
- * @brief Load from memory and simultaneously mark the accessed memory location as being exclusively held by the current thread.
- * @param[in] p_mem Memory address to perform load.
- * @param[out] size_t Data read from memory.
- * @note LDREX instruction https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/ldrex
- * @note pseudo code: $r0 = *p_mem
- *                    mem_read = $r0
- * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
- */
-extern "C" {
-  size_t exclusive_load(bool *const p_mem) {
-  volatile size_t mem_read;
-  __asm volatile("ldrex %0, [%1]" : "=r"(mem_read) : "r"(p_mem) : "memory");
-  return mem_read;
-  }
-}
-
-/**
- * @brief Conditional store to memory. If other thread already attempted, then exclusiveness already invalidated, strex fails.
- * @param[in] p_mem Memory address to perform store.
- * @param[in] new_val Value to store.
- * @param[out] bool Status. If @p_mem exclusive flag is still set, store success and return status 0. Else, return status 1.
- * @note STREX instruction https://developer.arm.com/documentation/dui0379/e/arm-and-thumb-instructions/strex
- * @note pseudo code:
- *                  if (p_mem's EX FLAG == false) return 1;
- *                  else: *pmem = new_val; return 0;
- * $r0 = *p_mem
- *                    mem_read = $r0
- * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
- */
-extern "C" {
-  bool exclusive_store(bool *const p_mem, size_t new_val) {
-  volatile size_t status;
-  // %0: output operand to status '=&r': earlyclobber to compiler indicating 'status' filled by instruction itself. As result different register is used for it.
-  // %1: input operand, load from new_val into register.
-  // %2: input operand, load from p_mem into register, [] indicates deference.
-  __asm volatile("strex %0, %1, [%2]" : "=&r"(status) : "r"(new_val), "r"(p_mem) : "memory");
-  return status;
-  }
-}
+typedef enum {
+  SUCCESS = 0,
+  FAIL
+} eResult_t;
 
 /**
  * @brief Compare and swap (https://en.wikipedia.org/wiki/Compare-and-swap)
- * @note This function has NOT been tested. The spinlock class uses std::atomic to achieve cas operations.
+ *        Atomically: if (*p_mem == old_val) { *p_mem = new_val; return true; } else { return false; }
+ * @param[in] p_mem Word aligned memory address to update.
+ * @param[in] old_val Value expected at p_mem.
+ * @param[in] new_val Value to store if p_mem still holds old_val.
+ * @return true if new_val was stored, false if p_mem did not hold old_val.
+ * @note LDREX marks a memory address as "exclusive" for the current thread, and STREX stores a new value only if the exclusive mark is still valid.
+ *       https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/ldrex
+ *       https://developer.arm.com/documentation/dui0379/e/arm-and-thumb-instructions/strex
+ * @note Strong CAS: an exception (interrupt, context switch) between LDREX and STREX clears the exclusive mark and makes STREX fail
+ *       even though the value never changed. That case is retried here, so false always means the value differed.
+ * @note LDREX and STREX live in one asm block, so the compiler cannot place other memory accesses (stack spills, function
+ *       return) between them, and no exclusive state is left open on return (CLREX on mismatch).
+ * @note Barriers: DMB after a successful store gives acquire semantics to a lock taken with this CAS.
  */
 extern "C" {
-bool atomic_compare_and_swap(bool *const p_mem, size_t old_val, size_t new_val) {
-  // atomic load from memory.
-  volatile size_t mem_read = exclusive_load(p_mem);
+bool atomic_compare_and_swap(volatile uint32_t *p_mem, uint32_t old_val, uint32_t new_val) {
+  uint32_t loaded;
+  uint32_t status;
 
-  // memory already changed?
-  if (mem_read != old_val) {
-    return true;
-  }
+  __asm volatile(
+    "1: ldrex   %[loaded], [%[mem]]            \n"  // loaded = *p_mem, mark p_mem exclusive.
+    "   cmp     %[loaded], %[expected]         \n"
+    "   bne     2f                             \n"  // value differs: give up.
+    "   strex   %[status], %[desired], [%[mem]]\n"  // *p_mem = new_val if still exclusive; status = 0 on success, 1 on failure.
+    "   cmp     %[status], #0                  \n"
+    "   bne     1b                             \n"  // exclusive mark lost, value may still match: retry.
+    "   dmb                                    \n"
+    "   b       3f                             \n"
+    "2: clrex                                  \n"  // drop the exclusive mark taken by LDREX.
+    "3:                                        \n"
+    : [loaded] "=&r"(loaded),                       // '&' = early clobber: written before all inputs are consumed,
+      [status] "=&r"(status)                        //       so must not share a register with p_mem / old_val / new_val.
+    : [mem] "r"(p_mem),
+      [expected] "r"(old_val),
+      [desired] "r"(new_val)
+    : "cc", "memory"                                // flags are modified by CMP; memory clobber prevents reordering around the CAS.
+  );
 
-  // Not changed, attempt to change.
-  volatile bool status = exclusive_store(p_mem, new_val);
-  return status;
+  return loaded == old_val;
 }
 }
 
