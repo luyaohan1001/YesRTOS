@@ -30,7 +30,12 @@ class PreemptFIFOScheduler final {
   static void start();
   static void init();
 
-  static void add_thread(Thread* thread);
+  /**
+   * @brief Make a thread ready. Safe to call before start() and from a running thread.
+   * @param thread Thread to add; its priority must be below MAX_PRIO_LEVEL (that level is reserved for the idle thread).
+   * @return false, with nothing changed, for a null thread or a priority out of range.
+   */
+  static bool add_thread(Thread* thread);
 
   /**
    * @brief Add running thread to a blocked list and marked as BLOCKED.

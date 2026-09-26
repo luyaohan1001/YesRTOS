@@ -4,12 +4,12 @@
 
 template<typename T>
 void set_bitpos(T& bitmask, const T& bitpos) {
-  bitmask |= 1 << bitpos;
+  bitmask |= T(1) << bitpos;  // T(1): a plain 1 is a signed int, and 1 << 31 overflows it.
 }
 
 template<typename T>
 void clr_bitpos(T& bitmask, const T& bitpos) {
-  bitmask &= ~(1 << bitpos);
+  bitmask &= ~(T(1) << bitpos);
 }
 
 template<typename T>

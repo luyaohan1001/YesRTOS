@@ -57,9 +57,17 @@ void PreemptFIFOScheduler::init() {
 /**
  * @brief Add thread to scheduler queue.
  */
-void PreemptFIFOScheduler::add_thread(Thread* p_new) {
+bool PreemptFIFOScheduler::add_thread(Thread* p_new) {
+  // ready_list_heads has one entry per user level plus the idle level; anything else would index past it.
+  if (!p_new || p_new->thread_info.priority >= MAX_PRIO_LEVEL) {
+    return false;
+  }
+
+  // Once the scheduler runs, PendSV walks the same lists: keep it out while they are being linked.
+  atomic_section a;
   if (!init_complete) PreemptFIFOScheduler::init();
   PreemptFIFOScheduler::insert_ready(p_new);
+  return true;
 }
 
 /**
