@@ -21,7 +21,14 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/spinlock.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/heap.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/../third_party/o1heap/o1heap.c
 )
+
+# Vendored o1heap allocator behind YesRTOS::Heap; its build options live in src/o1heap_config.h.
+target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../third_party/o1heap)
+set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/../third_party/o1heap/o1heap.c PROPERTIES
+  COMPILE_DEFINITIONS "O1HEAP_CONFIG_HEADER=\"${CMAKE_CURRENT_LIST_DIR}/src/o1heap_config.h\"")
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   add_compile_definitions(ARMV7M)

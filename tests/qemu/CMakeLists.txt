@@ -13,6 +13,7 @@ set(YESRTOS_QEMU_TESTS
   thread_exit
   add_thread
   mutex_states
+  heap
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
