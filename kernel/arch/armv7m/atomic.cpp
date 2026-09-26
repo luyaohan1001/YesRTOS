@@ -68,7 +68,7 @@ bool atomic_compare_and_swap(volatile uint32_t *p_mem, uint32_t old_val, uint32_
 extern "C" {
 void disable_exception() {
   // disable exception, clear PRIMASK to 0.
-  __asm volatile("cpsid i");
+  __asm volatile("cpsid i" ::: "memory");
   // flush instruction pipeline.
   __asm volatile("isb");
   // synchronize memory load/store.
@@ -83,7 +83,7 @@ void disable_exception() {
  */
 extern "C" {
 void enable_exception() {
-  __asm volatile("cpsie i");
+  __asm volatile("cpsie i" ::: "memory");
   __asm volatile("isb");
   __asm volatile("dsb");
 }
