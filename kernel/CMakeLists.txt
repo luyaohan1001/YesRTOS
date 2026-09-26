@@ -40,6 +40,12 @@ if (ARCH_DEFINED STREQUAL "ARMV7M")
 
   # Include subdirectory to build sub-component together as part of the kernel.
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/arch/armv7m)
+
+  # The kernel and the machine layer call into each other (e.g. scheduler -> request_context_switch(), PendSV ->
+  # scheduler). Declaring the cycle makes CMake repeat both archives on the link line, so an image that never calls
+  # the scheduler itself still resolves the machine layer's references into the kernel.
+  target_link_libraries(${LIBRARY_NAME} PUBLIC LibBareMetal)
+  target_link_libraries(LibBareMetal PUBLIC ${LIBRARY_NAME})
 else()
   message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
 endif()
