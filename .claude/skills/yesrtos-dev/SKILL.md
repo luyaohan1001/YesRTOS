@@ -230,10 +230,18 @@ git worktree remove --force <tmp>
 Use the build commands that exist at that commit: before `CMakePresets.json` landed,
 configure with `cmake -S app/multi_thread -B <dir> -DARCH_DEFINED=ARMV7M`.
 
-For changes to the kernel or to `kernel/arch/armv7m`, also run the QEMU smoke test from a
-build that contains the change: `cmake --build --preset qemu --target qemu`, let it run
-for a few seconds, then quit with `Ctrl-A X`. Every output line must be a complete
-`thread N`; interleaved lines mean mutual exclusion is broken.
+For changes to the kernel or to `kernel/arch/armv7m`, also run the QEMU regression tests
+in both timeslice configurations:
+
+```
+ctest --preset qemu && ctest --preset qemu-stress
+```
+
+A bug fix adds a test to `tests/qemu/` (listed in `YESRTOS_QEMU_TESTS` in its
+CMakeLists.txt) that fails on the old code and passes on the fix. Check both directions:
+a test that also passes on the buggy code does not guard anything. Prefer forcing the
+interleaving (e.g. yielding with `request_context_switch()` inside a critical section)
+over hoping SysTick lands in the right place.
 
 ## Do not
 
