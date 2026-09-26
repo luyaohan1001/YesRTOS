@@ -28,6 +28,8 @@ extern "C" {
   extern bool atomic_compare_and_swap(volatile uint32_t *p_mem, uint32_t old_val, uint32_t new_val);
   void disable_exception();
   void enable_exception();
+  uint32_t save_and_disable_exception();
+  void restore_exception(uint32_t primask);
 #if defined(__cplusplus)
 }
 #endif

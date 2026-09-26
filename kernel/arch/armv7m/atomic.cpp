@@ -67,7 +67,7 @@ bool atomic_compare_and_swap(volatile uint32_t *p_mem, uint32_t old_val, uint32_
  */
 extern "C" {
 void disable_exception() {
-  // disable exception, clear PRIMASK to 0.
+  // disable exception, set PRIMASK to 1.
   __asm volatile("cpsid i" ::: "memory");
   // flush instruction pipeline.
   __asm volatile("isb");
@@ -86,5 +86,30 @@ void enable_exception() {
   __asm volatile("cpsie i" ::: "memory");
   __asm volatile("isb");
   __asm volatile("dsb");
+}
+}
+
+/**
+ * @brief Disable exception and return the previous exception mask, for critical sections that may nest.
+ * @return Previous PRIMASK value (1 if exceptions were already disabled, 0 otherwise), to hand to restore_exception().
+ */
+extern "C" {
+uint32_t save_and_disable_exception() {
+  uint32_t primask;
+  __asm volatile("mrs %0, primask" : "=r"(primask) :: "memory");
+  disable_exception();
+  return primask;
+}
+}
+
+/**
+ * @brief Restore the exception mask saved by save_and_disable_exception().
+ * @param[in] primask Previous PRIMASK value. Exceptions are only re-enabled if they were enabled before the matching save.
+ * @note An exception made pending inside the critical section (e.g. PendSV) is taken right after this call when it re-enables.
+ */
+extern "C" {
+void restore_exception(uint32_t primask) {
+  __asm volatile("msr primask, %0" :: "r"(primask) : "memory");
+  __asm volatile("isb");
 }
 }
