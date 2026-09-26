@@ -32,3 +32,9 @@ endif()
 
 add_subdirectory(kernel)
 add_subdirectory(app/multi_thread)
+
+# QEMU regression tests: ctest --preset qemu
+if (QEMU)
+  enable_testing()
+  add_subdirectory(tests/qemu)
+endif()

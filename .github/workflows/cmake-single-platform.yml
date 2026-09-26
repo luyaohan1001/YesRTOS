@@ -28,6 +28,7 @@ jobs:
       run: |
         brew update
         brew install --cask gcc-arm-embedded
+        brew install qemu
 
     - name: Configure and build (STM32F767)
       # Presets are defined in CMakePresets.json; each preset builds into build/<preset>.
@@ -39,6 +40,9 @@ jobs:
       run: |
         cmake --preset qemu -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         cmake --build --preset qemu
+
+    - name: QEMU regression tests
+      run: ctest --preset qemu
 
     - name: Configure CMake for Unit Tests
       run: cmake -S ${{github.workspace}}/unit_tests/mempool_unit_tests -B ${{github.workspace}}/unit_tests/mempool_unit_tests/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}

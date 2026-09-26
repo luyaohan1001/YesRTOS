@@ -105,5 +105,12 @@ CooperativeMultitaskingDemo.mp4
   cmake --build --preset qemu --target qemu-gdb
   ```
 
+  To run the QEMU regression tests (`tests/qemu`), each a firmware image that reports PASS/FAIL through semihosting:
+  ```bash
+  cmake --preset qemu
+  cmake --build --preset qemu
+  ctest --preset qemu          # or qemu-stress for a 10 kHz timeslice
+  ```
+
 ---
 

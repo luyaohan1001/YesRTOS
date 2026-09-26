@@ -54,5 +54,9 @@
     { "name": "stm32f767",   "configurePreset": "stm32f767" },
     { "name": "qemu",        "configurePreset": "qemu" },
     { "name": "qemu-stress", "configurePreset": "qemu-stress" }
+  ],
+  "testPresets": [
+    { "name": "qemu",        "configurePreset": "qemu",        "output": { "outputOnFailure": true } },
+    { "name": "qemu-stress", "configurePreset": "qemu-stress", "output": { "outputOnFailure": true } }
   ]
 }
