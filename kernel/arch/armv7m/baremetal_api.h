@@ -24,6 +24,7 @@ extern "C" {
   extern void request_context_switch();
   extern void start_first_task();
   extern void systick_clk_init(void);
+  extern void kernel_exception_priority_init(void);
   extern void init_stack_armv7m(volatile uint32_t** pp_stk, uint32_t* routine_ptr);
   extern bool atomic_compare_and_swap(volatile uint32_t *p_mem, uint32_t old_val, uint32_t new_val);
   void disable_exception();

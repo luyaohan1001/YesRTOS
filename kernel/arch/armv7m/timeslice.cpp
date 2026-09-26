@@ -34,6 +34,22 @@ static_assert(SYSTICK_RELOAD_CNT <=  0x00FFFFFF);
 // Interrupt memory mapped registers
 #define ICSR (*((volatile uint32_t *)0xe000ed04))  // Interrupt control and status register
 #define PENDSVSET_BIT (1UL << 28UL)                // sets the PendSV exception as pending.
+#define SHPR3 (*((volatile uint32_t *)0xe000ed20))  // System Handler Priority Register 3: PendSV [23:16], SysTick [31:24]
+#define SHPR3_PENDSV_PRI_LOWEST (0xFFUL << 16UL)
+#define SHPR3_SYSTICK_PRI_LOWEST (0xFFUL << 24UL)
+
+/**
+ * @brief Give PendSV and SysTick the lowest exception priority.
+ * @note  At reset every configurable exception has priority 0, the highest. The context switch (PendSV) must only run
+ *        once no other exception is active, otherwise it swaps thread stacks underneath an interrupted handler; the tick
+ *        only requests that switch, so it does not need to preempt interrupt handlers either. Writing 0xFF selects the
+ *        lowest priority whatever number of priority bits the core implements.
+ */
+extern "C" {
+  void kernel_exception_priority_init(void) {
+    SHPR3 |= SHPR3_PENDSV_PRI_LOWEST | SHPR3_SYSTICK_PRI_LOWEST;
+  }
+}
 
 /**
  * @brief Start systick timer.

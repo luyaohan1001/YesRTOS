@@ -46,6 +46,7 @@ void RoundRobinScheduler::start() {
   RoundRobinScheduler::curr_thread_cnt = 0;
   RoundRobinScheduler::p_active_thread = RoundRobinScheduler::thread_q[RoundRobinScheduler::curr_thread_cnt];
   #if defined(ARMV7M)
+  kernel_exception_priority_init();
   systick_clk_init();
   start_first_task();
   #endif

@@ -70,6 +70,7 @@ void PreemptFIFOScheduler::start() {
 
 #if defined (ARMV7M)
   itm_initialize();
+  kernel_exception_priority_init();
   systick_clk_init();
   start_first_task();
 #else

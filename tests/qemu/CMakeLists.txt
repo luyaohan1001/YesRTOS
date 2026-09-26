@@ -8,6 +8,7 @@ set(YESRTOS_QEMU_TESTS
   cas_spinlock
   critical_section_nesting
   stack_alignment
+  exception_priority
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
