@@ -1,6 +1,6 @@
 ---
 name: yesrtos-dev
-description: Development conventions for YesRTOS. Use whenever creating a git commit (or PR) in this repository with Claude's help, and when fixing a kernel bug - formats the subject as "[<TYPE>][<SIZE>][AI] <description>" (TYPE such as FEATURE or BUG FIX; bug fixes add CATEGORY/HAZARD/EXAMPLE/FIX sections), derives the size from the staged diff, stages only the change at hand, verifies the staged state builds, and records RTOS design bugs as case studies in docs/case_studies/ indexed from a folded README section.
+description: Development conventions for YesRTOS. Use whenever creating a git commit (or PR) in this repository with Claude's help, and when fixing a kernel bug - formats the subject as "[<TYPE>][<SIZE>][AI] <description>" (TYPE such as FEATURE or BUG FIX; bug fixes add CATEGORY/HAZARD/EXAMPLE/FIX sections), derives the size from the staged diff, stages only the change at hand, verifies the staged state builds, records RTOS design bugs as case studies in docs/case_studies/ and open problems as Known Issues, both indexed in folded README tables.
 ---
 
 # Committing to YesRTOS with Claude
@@ -203,6 +203,25 @@ One or two sentences, the general lesson (same text as the README row).
 - Prefer a regression test that reproduces the hazard on QEMU (e.g. under the
   `qemu-stress` preset) and name it in the `**Test:**` field; the document explains the
   rule, the test keeps it from regressing. Write `none` if no automated test exists yet.
+
+## Known issues
+
+Open problems are tracked in the folded `## Known Issues` table of `README.md`, right after
+`## Case Studies` (same `<details>` format and blank-line rule):
+
+```markdown
+| ID | Issue | Area | Details | Status |
+|----|-------|------|---------|--------|
+| KI-003 | Mutex has no priority inheritance | Mutex |  | Open |
+```
+
+- Add a row as soon as a problem is found and not fixed in the same commit, including
+  findings from reviews. IDs `KI-<NNN>` increase and are never reused; keep the count in
+  the `<summary>` current.
+- **Details** links a case study when one exists.
+- The commit that fixes an issue removes its row and names the ID in the body (e.g.
+  `Closes KI-003.`); if the design lesson is worth keeping, it becomes a case study.
+- When asked what is still open, answer from this table, not from memory.
 
 ## One change per commit
 

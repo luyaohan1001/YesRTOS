@@ -94,6 +94,28 @@ example, the fix and how it was found.
 
 </details>
 
+## Known Issues
+
+Open problems in the kernel, build and tests. Fixed issues are removed from this table; the ones worth remembering
+become case studies above.
+
+<details>
+<summary><b>9 open issues</b> - click to expand</summary>
+
+| ID | Issue | Area | Details | Status |
+|----|-------|------|---------|--------|
+| KI-001 | FPU registers (`s16`-`s31`, extended frame) are not saved on context switch, and the FPU is never enabled (no CPACR write) | Context switch | [CS-014](docs/case_studies/CS-014-fpu-context-not-saved.md) | Open |
+| KI-002 | Demo thread stacks live on MSP; linker scripts reserve no MSP space (`_alloc_stack_size = 0x0`); no overflow detection | Memory layout | [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Open |
+| KI-003 | Mutex has no priority inheritance: a low priority owner can be starved by medium priority threads while a high priority thread waits (the `owner` comment promises it) | Mutex |  | Open |
+| KI-004 | `RoundRobinScheduler` cannot run: PendSV/SVC only use `PreemptFIFOScheduler::p_active_thread`, and its `add_thread()` does not bound `TASK_QUEUE_DEPTH` | Scheduler |  | Open |
+| KI-005 | `PreemptFIFOScheduler` time-slices equal priorities every tick (SCHED_RR behaviour, not FIFO) | Scheduler |  | Open |
+| KI-006 | Ready lists insert at the head, so the last thread added runs first (demo starts with thread 3) | Scheduler |  | Open |
+| KI-007 | Semaphore not implemented (`kernel/src/semaphore.cpp` is empty and not built) | Kernel API |  | Open |
+| KI-008 | Host unit test `unit_tests/linkedlist_unit_tests` does not build: `thread.hpp` requires an architecture | Tests |  | Open |
+| KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
+
+</details>
+
 ## Intended Application in Future
 * ⌚️ IoT Devices
 * 🚇 Automotive Systems
