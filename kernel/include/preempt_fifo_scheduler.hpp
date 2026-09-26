@@ -31,10 +31,11 @@ class PreemptFIFOScheduler final {
    */
   static void block_running_thread(Thread** pp_blocked_list_head);
   /**
-   * @brief Move another blocked thread from blocked list to ready list and marked as READY.
+   * @brief Move the longest waiting thread from blocked list to ready list and marked as READY.
    * @param pp_blocked_list_head Double pointer to the head of a blocked list maintain by other entity such as a YesRTOS::Mutex.
+   * @return Pointer to the unblocked thread, or nullptr if the blocked list is empty.
    */
-  static void unblock_one_thread(Thread** pp_blocked_list_head);
+  static Thread* unblock_one_thread(Thread** pp_blocked_list_head);
 
   /**
    * @brief Pointer to the thread currently being executed.

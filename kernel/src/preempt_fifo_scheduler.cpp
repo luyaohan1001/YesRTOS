@@ -93,7 +93,8 @@ void PreemptFIFOScheduler::schedule_next() {
   // Find highest priority ready task.
   Thread *p_next_ready;
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
-  if (prio == p_active_thread->thread_info.priority) {
+  // A blocked thread's links point into a blocked list, so only rotate from the active thread while it is still ready.
+  if (prio == p_active_thread->thread_info.priority && p_active_thread->thread_info.state != BLOCKED) {
     p_next_ready = get_next_thread_circular(p_active_thread, ready_list_heads[prio]);
   } else {
     p_next_ready = ready_list_heads[prio];
@@ -147,10 +148,21 @@ void PreemptFIFOScheduler::block_running_thread(Thread** pp_blocked_list_head) {
   }
 }
 
-void PreemptFIFOScheduler::unblock_one_thread(Thread** pp_blocked_list_head) {
-  Thread *p_thread = PreemptFIFOScheduler::p_active_thread;
-  PreemptFIFOScheduler::move_node(pp_blocked_list_head, &ready_list_heads[p_thread->thread_info.priority], *pp_blocked_list_head);
+Thread* PreemptFIFOScheduler::unblock_one_thread(Thread** pp_blocked_list_head) {
+  Thread *p_thread = *pp_blocked_list_head;
+  if (!p_thread) {
+    return nullptr;
+  }
+
+  // Blocked threads are inserted at the head, so the tail is the longest waiting thread.
+  while (p_thread->thread_info.p_next) {
+    p_thread = p_thread->thread_info.p_next;
+  }
+
+  uint8_t prio_level = p_thread->thread_info.priority;
+  PreemptFIFOScheduler::move_node(pp_blocked_list_head, &ready_list_heads[prio_level], p_thread);
   p_thread->thread_info.state = READY;
-  set_bitpos<uint32_t>(prio_bitmap, p_thread->thread_info.priority);
+  set_bitpos<uint32_t>(prio_bitmap, prio_level);
+  return p_thread;
 }
 
