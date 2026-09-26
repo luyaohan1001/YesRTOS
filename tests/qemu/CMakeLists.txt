@@ -12,6 +12,7 @@ set(YESRTOS_QEMU_TESTS
   idle_when_all_blocked
   thread_exit
   add_thread
+  mutex_states
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})

@@ -25,6 +25,14 @@ class atomic_section {
   atomic_section();
   ~atomic_section();
 
+  /**
+   * @brief Whether exceptions were already disabled when this section started, i.e. it runs inside another critical
+   *        section. Code that needs a context switch to happen before it returns (blocking calls) must not run then.
+   */
+  bool nested() const {
+    return this->saved_primask != 0;
+  }
+
   private:
   // PRIMASK before this section disabled exceptions.
   uint32_t saved_primask;

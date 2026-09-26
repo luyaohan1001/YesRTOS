@@ -72,12 +72,20 @@ public:
 
 public:
     /**
-     * @brief Flag indicating whether the mutex is locked. Only accessed with exceptions disabled.
-     *
-     * 1  -> locked
-     * 0 -> unlocked
+     * @brief Values of `locked`.
      */
-    uint32_t locked;
+    static constexpr uint32_t UNLOCKED = 0;          // free
+    static constexpr uint32_t LOCKED = 1;            // owned, nobody waiting: unlock() is a single CAS
+    static constexpr uint32_t LOCKED_CONTENDED = 2;  // owned, threads in p_blocked_list: unlock() hands over
+
+    /**
+     * @brief Mutex state, one of UNLOCKED, LOCKED, LOCKED_CONTENDED.
+     *
+     * Changed by CAS on the fast paths, and by plain stores with exceptions disabled on the slow paths. A plain store
+     * cannot slip into another thread's CAS on this single core: the exception that switched threads cleared that
+     * CAS's exclusive reservation, so its STREX fails and it re-reads the value.
+     */
+    volatile uint32_t locked;
 
     /**
      * @brief Linked list of threads blocked on this mutex.

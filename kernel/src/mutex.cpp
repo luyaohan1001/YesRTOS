@@ -4,7 +4,7 @@
 using namespace YesRTOS;
 
 Mutex::Mutex() {
-  this->locked = 0;
+  this->locked = UNLOCKED;
   this->p_blocked_list = nullptr;
   this->owner = nullptr;
 }
@@ -15,23 +15,37 @@ Mutex::~Mutex() {
 /*
  * Lock the mutex.
  *
- * On a single core, disabling exceptions is enough to make "check" (is the lock free?)
- * and "update" (claim the lock) indivisible. It also protects the scheduler lists from
- * being modified by PendSV halfway through.
+ * Fast path: an uncontended mutex is taken with a single CAS (UNLOCKED -> LOCKED), leaving exceptions enabled.
  *
- * If the mutex is taken, the running thread is moved to the blocked list and a context switch
- * is requested. PendSV is taken as soon as the atomic section ends, and this thread resumes only
- * after unlock() has handed ownership over to it.
+ * Slow path: with exceptions disabled no other thread can run on this single core, so "check" and "block" become
+ * indivisible, and PendSV cannot run while the scheduler lists are modified. The mutex may have been released between
+ * the failed CAS and the section, so check again. Otherwise mark it LOCKED_CONTENDED, so the owner's unlock() takes
+ * its slow path and hands ownership over, then block. PendSV is taken as soon as the section ends; this thread resumes
+ * only after unlock() has made it the owner.
  */
 void Mutex::lock() {
-  atomic_section a;
-
-  if (!locked) {
-    locked = 1;
+  if (atomic_compare_and_swap(&this->locked, UNLOCKED, LOCKED)) {
     this->owner = PreemptFIFOScheduler::p_active_thread;
     return;
   }
 
+  atomic_section a;
+
+  if (this->locked == UNLOCKED) {
+    this->locked = LOCKED;
+    this->owner = PreemptFIFOScheduler::p_active_thread;
+    return;
+  }
+
+  if (a.nested()) {
+    // Called with exceptions already disabled: the context switch could not be taken before returning, and the caller
+    // would carry on without owning the mutex. Blocking calls are not allowed inside a critical section; stop here
+    // (visible in a debugger) instead of breaking mutual exclusion.
+    while (1) {
+    }
+  }
+
+  this->locked = LOCKED_CONTENDED;
   PreemptFIFOScheduler::block_running_thread(&this->p_blocked_list);
   request_context_switch();
 }
@@ -41,23 +55,33 @@ void Mutex::lock() {
  *
  * Only the owning thread can unlock the mutex, as enforced by the `owner` check.
  *
- * If there are threads blocked on this mutex, ownership is handed over to the longest waiting
- * thread and `locked` stays set, so no other thread can take the mutex in between.
- * Otherwise, the mutex is simply marked as unlocked.
+ * Fast path: nobody waits (LOCKED), release with a single CAS (LOCKED -> UNLOCKED). `owner` is cleared first: once the
+ * CAS succeeds another thread may take the mutex and set its own owner.
+ *
+ * Slow path: the CAS fails because a waiter marked the mutex LOCKED_CONTENDED. Ownership is handed over to the longest
+ * waiting thread and the mutex stays locked, so no other thread can take it in between; it drops back to LOCKED when
+ * no other thread is left waiting.
  */
 void Mutex::unlock() {
-  atomic_section a;
-
-  // deny unlock for non-owner thread.
   if (PreemptFIFOScheduler::p_active_thread != this->owner) {
     return;
   }
 
-  if (this->p_blocked_list) {
-    this->owner = PreemptFIFOScheduler::unblock_one_thread(&this->p_blocked_list);
-    request_context_switch();
-  } else {
-    locked = 0;
-    this->owner = nullptr;
+  this->owner = nullptr;
+  if (atomic_compare_and_swap(&this->locked, LOCKED, UNLOCKED)) {
+    return;
   }
+
+  atomic_section a;
+
+  if (!this->p_blocked_list) {
+    this->locked = UNLOCKED;
+    return;
+  }
+
+  this->owner = PreemptFIFOScheduler::unblock_one_thread(&this->p_blocked_list);
+  if (!this->p_blocked_list) {
+    this->locked = LOCKED;
+  }
+  request_context_switch();
 }
