@@ -69,7 +69,10 @@ class Thread {
 
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
-  uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
+  // AAPCS requires SP to be 8-byte aligned at every public function entry, and the thread starts with SP at the end of
+  // this array; uint32_t alone only guarantees 4.
+  static_assert((STACK_ALLOCATION_SIZE * sizeof(uint32_t)) % 8 == 0, "thread stack size must keep the stack top 8-byte aligned");
+  alignas(8) uint32_t allocated_stack[STACK_ALLOCATION_SIZE];
 
   // Stack pointer pointing to top of the stack.
   volatile uint32_t* stkptr;
