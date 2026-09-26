@@ -10,6 +10,7 @@ set(YESRTOS_QEMU_TESTS
   stack_alignment
   exception_priority
   idle_when_all_blocked
+  thread_exit
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})

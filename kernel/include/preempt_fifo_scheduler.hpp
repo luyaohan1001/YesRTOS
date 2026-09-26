@@ -45,6 +45,17 @@ class PreemptFIFOScheduler final {
   static Thread* unblock_one_thread(Thread** pp_blocked_list_head);
 
   /**
+   * @brief End the running thread: move it to the completed list, mark it COMPLETE and switch away for good.
+   * @note  Entered when a thread routine returns (its initial LR is yesrtos_thread_exit()). Never returns.
+   */
+  [[noreturn]] static void exit_running_thread();
+
+  /**
+   * @brief Threads whose routine returned, most recent first.
+   */
+  static Thread* completed_list;
+
+  /**
    * @brief Pointer to the thread currently being executed.
    * @note This points to the active Thread object.
    *       - p_active_thread       ==> pointer to the currently running thread.

@@ -134,6 +134,8 @@ void __attribute__((naked)) PendSV_Handler() {
 
 extern "C" {
 void init_stack_armv7m(volatile uint32_t **pp_stk, uint32_t *routine_ptr) {
+  extern void yesrtos_thread_exit(void);
+
   // Exception-entry HW saved registers. Mimic the stack context of an exception.
   (*pp_stk)--;              // full descending stack, decrement 1 to point to first empty position.
   (**pp_stk) = 0x01000000;  // xPSR
@@ -142,7 +144,7 @@ void init_stack_armv7m(volatile uint32_t **pp_stk, uint32_t *routine_ptr) {
   (**pp_stk) = ((uint32_t)(uintptr_t)routine_ptr) & 0xfffffffeUL; /* PC */
 
   (*pp_stk)--;  // walk stack pointer, reserve for function return address (LR)
-  (**pp_stk) = 0xDEADBEEF;
+  (**pp_stk) = (uint32_t)(uintptr_t)&yesrtos_thread_exit;  // a routine that returns ends its thread there.
 
   (*pp_stk) -= 5;  // walk stack pointer, reserve for machine saved registers including R0, R1, R2, R3, R12.
 

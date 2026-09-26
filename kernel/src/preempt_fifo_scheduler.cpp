@@ -17,6 +17,7 @@
 #include <iostream>
 #endif
 
+#include "atomic_section.hpp"
 #include "bitops.hpp"
 
 using namespace YesRTOS;
@@ -30,6 +31,8 @@ static_assert(MAX_PRIO_LEVEL < 32, "prio_bitmap needs one bit per user priority 
 Thread* PreemptFIFOScheduler::ready_list_heads[MAX_PRIO_LEVEL + 1] {nullptr};
 
 uint32_t PreemptFIFOScheduler::prio_bitmap;
+
+Thread* PreemptFIFOScheduler::completed_list = nullptr;
 
 extern "C" __attribute__((weak)) void yesrtos_idle_hook(void) {
 }
@@ -94,6 +97,7 @@ void PreemptFIFOScheduler::start() {
 
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
   PreemptFIFOScheduler::p_active_thread = ready_list_heads[prio];
+  PreemptFIFOScheduler::p_active_thread->thread_info.state = RUNNING;
 
 #if defined (ARMV7M)
   itm_initialize();
@@ -121,12 +125,20 @@ void PreemptFIFOScheduler::schedule_next() {
   // Find highest priority ready task.
   Thread *p_next_ready;
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
-  // A blocked thread's links point into a blocked list, so only rotate from the active thread while it is still ready.
-  if (prio == p_active_thread->thread_info.priority && p_active_thread->thread_info.state != BLOCKED) {
+  // Only rotate from the active thread while it is still in a ready list: once it blocked or completed, its links
+  // point into a blocked list or the completed list.
+  thread_state_t active_state = p_active_thread->thread_info.state;
+  bool active_in_ready_list = (active_state == RUNNING || active_state == READY);
+  if (prio == p_active_thread->thread_info.priority && active_in_ready_list) {
     p_next_ready = get_next_thread_circular(p_active_thread, ready_list_heads[prio]);
   } else {
     p_next_ready = ready_list_heads[prio];
   }
+
+  if (active_state == RUNNING) {
+    p_active_thread->thread_info.state = READY;
+  }
+  p_next_ready->thread_info.state = RUNNING;
   PreemptFIFOScheduler::p_active_thread = p_next_ready;
 }
 
@@ -174,6 +186,30 @@ void PreemptFIFOScheduler::block_running_thread(Thread** pp_blocked_list_head) {
   if (ready_list_heads[p_thread->thread_info.priority] == nullptr) {
     clr_bitpos<uint32_t>(prio_bitmap, p_thread->thread_info.priority);
   }
+}
+
+void PreemptFIFOScheduler::exit_running_thread() {
+  {
+    atomic_section a;
+    Thread* p_thread = p_active_thread;
+    uint8_t prio_level = p_thread->thread_info.priority;
+    PreemptFIFOScheduler::move_node(&ready_list_heads[prio_level], &completed_list, p_thread);
+    p_thread->thread_info.state = COMPLETE;
+    if (ready_list_heads[prio_level] == nullptr) {
+      clr_bitpos<uint32_t>(prio_bitmap, prio_level);
+    }
+    request_context_switch();
+  }
+  // PendSV is taken as soon as the atomic section ends. This thread is in no ready list, so it never resumes here.
+  while (1) {
+  }
+}
+
+/**
+ * @brief Where a thread routine returns to: its initial LR (see init_stack_armv7m()).
+ */
+extern "C" void yesrtos_thread_exit(void) {
+  PreemptFIFOScheduler::exit_running_thread();
 }
 
 Thread* PreemptFIFOScheduler::unblock_one_thread(Thread** pp_blocked_list_head) {
