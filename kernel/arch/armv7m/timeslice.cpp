@@ -60,49 +60,46 @@ extern "C" {
 
 
 /**
+ * @brief Save the outgoing thread's stack pointer, pick the next thread and return its stack pointer.
+ * @param[in] sp Outgoing thread's PSP, after PendSV_Handler pushed r4-r11 onto it.
+ * @return Incoming thread's saved stack pointer, pointing at its r4-r11.
+ * @note Plain C function called from PendSV_Handler, so the compiler handles all C++ work with the normal ABI.
+ */
+extern "C" {
+uint32_t* yesrtos_switch_context(uint32_t* sp) {
+  YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr = sp;
+  YesRTOS::PreemptFIFOScheduler::schedule_next();
+  return (uint32_t*)YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr;
+}
+}
+
+/**
  * @brief PendSV exception handler.
  *        On each entry it saves context for current running thread, and load context to next thread pointed by scheduler.
  * @note stmdb, pseudo instruction: https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STMDB--STMFD
  * @note stmia, pseudo instruction:
  * https://developer.arm.com/documentation/ddi0403/d/Application-Level-Architecture/Instruction-Details/Alphabetical-list-of-ARMv7-M-Thumb-instructions/STM--STMIA--STMEA
  * @note According to AAPCS, R0, R1, R2, R3, R12, LR, PC, xPSR are automatically saved by hardware during exception, thus they are allowed to overwrite immediately entering this handler function.
- * @note Assembler Instructions with C Expression Operands: https://gcc.gnu.org/onlinedocs/gcc-3.2.3/gcc/Extended-Asm.html
- * @note __attribute__((naked)) is extremely important to compile as pure assembly function without C prologue
+ * @note __attribute__((naked)) is extremely important to compile as pure assembly function without C prologue.
+ * @note A naked function may only contain basic asm (no operands): with operands the compiler picks registers on its
+ *       own, which could clobber r0/r1 or r4-r11 between statements, and it cannot spill anything since there is no
+ *       frame. The C++ part is therefore a normal function, yesrtos_switch_context(), taking and returning the stack
+ *       pointer in r0.
+ * @note The push/pop keeps MSP 8-byte aligned across the call, as AAPCS requires; r3 is only padding.
  */
 extern "C" {
 void __attribute__((naked)) PendSV_Handler() {
-  // Saving context of current thread.
-  // $r1 = process stack pointer
-  __asm volatile("mrs r1, psp" ::: "r1");
-  __asm volatile("isb");
-  // store multiple decrement before. (psp-=4;*psp=r14; psp-=4;*psp=r11; psp-=4;*psp=r10... psp-=4,*psp=r4)
-  __asm volatile("stmdb r1!, {r4-r11}" ::: "r1");
-  // $r0 = sched.p_active_thread
-  // no output operand. %0: input operand, load p_active_thread into register, memory clobber.
-  __asm volatile("mov r0, %0" : : "r"(&YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr) : "r0", "memory");  // $r0 = pointer to current active thread's stack pointer
-  // *$r0 = r1 ==> *sched.p_active_thread = $r1 = psp (storing psp back to thread context)
-  __asm volatile("str r1, [r0]" ::: "r0", "r1");
-  // protect EXC_RETURN before function call.
-  __asm volatile("push {lr}");
-
-  // scheduler updates p_active_thread to next thread.
-  YesRTOS::PreemptFIFOScheduler::schedule_next();
-
-  // restore EXC_RETURN for exception return.
-  __asm volatile("pop {lr}");
-
-  // Restore context of next thread.
-  // $r0 = sched.p_active_thread
-  // no output operand. %0: input operand, load p_active_thread into register, memory clobber.
-  __asm volatile("mov r0, %0" : : "r"(&YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr) : "r0", "memory");
-  // $r0 = *$r0 = *sched.p_active_thread which gives psp
-  __asm volatile("ldr r0, [r0]" ::: "r0");
-  // load multiple, increment after. (r4=*psp;psp+=4; r5=*psp;psp+=4; r6=*psp;psp+=4;... r14=*psp;psp+=4;)
-  __asm volatile("ldmia r0!, {r4-r11}" ::: "r0");
-  // psp = r0 ==> update process stack pointer to top of the stack
-  __asm volatile("msr psp, r0" ::: "r0");
-  __asm volatile("isb");
-  __asm volatile("bx lr");
+  __asm volatile(
+    "mrs    r0, psp                 \n"  // r0 = outgoing thread's stack pointer.
+    "isb                            \n"
+    "stmdb  r0!, {r4-r11}           \n"  // save the registers the hardware did not stack (psp-=4; *psp=r11; ... r4).
+    "push   {r3, lr}                \n"  // protect EXC_RETURN across the call; r3 pads the push to 8 bytes.
+    "bl     yesrtos_switch_context  \n"  // r0 = incoming thread's stack pointer.
+    "pop    {r3, lr}                \n"
+    "ldmia  r0!, {r4-r11}           \n"  // restore the incoming thread's r4-r11 (r4=*psp; psp+=4; ...).
+    "msr    psp, r0                 \n"  // the exception return pops the rest of its context from here.
+    "isb                            \n"
+    "bx     lr                      \n");
 }
 }
 
@@ -149,16 +146,29 @@ void start_first_task(void) {
 }
 }
 /**
+ * @brief Stack pointer of the first thread to run.
+ * @return Saved stack pointer of the active thread, pointing at its initial r4-r11.
+ */
+extern "C" {
+uint32_t* yesrtos_first_context(void) {
+  return (uint32_t*)YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr;
+}
+}
+
+/**
  * @brief SuperVisor Call Handler
  * @note Exception handler by which the core services a SVC. Handler mode.
+ * @note Basic asm only, for the same reason as PendSV_Handler. MSP is 8-byte aligned on exception entry, so the call
+ *       needs no padding; LR is overwritten below anyway.
  */
 extern "C" {
 void __attribute__((naked)) SVC_Handler(void) {
-  __asm volatile("mov r0, %0" : : "r"(&YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr) : "memory");
-  __asm volatile("ldr r0, [r0]");
-  __asm volatile("ldmia r0!, {r4-r11}");
-  __asm volatile("msr psp, r0");          // Point process stack pointer to top of the stack after popping.
-  __asm volatile("ldr lr, =0xFFFFFFFD");  // r14 expected 0xfffffffd (indicate exiting handler mode to thread mode using Procees Stack Pointer)
-  __asm volatile("bx lr");                // r14 expected 0xfffffffd (indicate exiting handler mode to thread mode using Procees Stack Pointer)
+  __asm volatile(
+    "bl     yesrtos_first_context  \n"  // r0 = first thread's stack pointer.
+    "ldmia  r0!, {r4-r11}          \n"
+    "msr    psp, r0                \n"  // Point process stack pointer to top of the stack after popping.
+    "isb                           \n"
+    "mvn    lr, #2                 \n"  // lr = 0xFFFFFFFD: return to Thread mode using the Process Stack Pointer.
+    "bx     lr                     \n");
 }
 }
