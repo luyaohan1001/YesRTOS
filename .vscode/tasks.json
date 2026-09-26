@@ -3,29 +3,18 @@
         {
             "type": "shell",
             "label": "reset",
-            "command": "bash -c ; rm -rf ${workspaceFolder}/build ; mkdir build"
+            "command": "rm -rf ${workspaceFolder}/build"
         },
         {
-            "dependsOn":[
-                "reset"
-            ],
+            // Presets are defined in CMakePresets.json; each preset builds into build/<preset>.
             "type": "shell",
             "label": "CMake build debug",
-            "command": "bash",
-            "args": [
-                "-c",
-                ";",
-                "cd",
-                "${workspaceFolder}/build",
-                ";",
-                "/usr/bin/cmake","-DCMAKE_BUILD_TYPE=Debug","..",
-                ";",
-                "/usr/bin/make"
-            ],
+            "command": "cmake --preset stm32f767 && cmake --build --preset stm32f767",
             "options": {
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
-
+                "$gcc"
             ],
             "group": {
                 "kind": "build",
@@ -33,27 +22,14 @@
             }
         },
         {
-            "dependsOn":[
-                "reset"
-            ],
             "type": "shell",
             "label": "CMake build release",
-            "command": "bash",
-            "args": [
-                "-c",
-                ";",
-                "cd",
-                "${workspaceFolder}/build",
-                ";",
-                "/usr/bin/cmake",
-                "..",
-                ";",
-                "/usr/bin/make"
-            ],
+            "command": "cmake --preset stm32f767 -B build/stm32f767-release -DCMAKE_BUILD_TYPE=Release && cmake --build build/stm32f767-release",
             "options": {
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
-
+                "$gcc"
             ],
             "group": {
                 "kind": "build",

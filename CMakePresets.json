@@ -1,0 +1,37 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "armv7m",
+      "hidden": true,
+      "inherits": "base",
+      "toolchainFile": "${sourceDir}/kernel/arch/armv7m/gcc-arm-none-eabi.cmake",
+      "cacheVariables": {
+        "ARCH_DEFINED": "ARMV7M"
+      }
+    },
+    {
+      "name": "stm32f767",
+      "displayName": "STM32F767 (Cortex-M7, hardware)",
+      "inherits": "armv7m"
+    }
+  ],
+  "buildPresets": [
+    { "name": "stm32f767",   "configurePreset": "stm32f767" }
+  ]
+}

@@ -81,17 +81,19 @@ CooperativeMultitaskingDemo.mp4
 
 #### Compilation
 
-  Follow these steps to compile this project.
+  The build is driven by CMake presets (`CMakePresets.json`); each preset builds into `build/<preset>`.
   ```bash
-  1. mkdir build
-  2. cd build
-  3. cmake ..
-  4. make -j8
+  cmake --preset stm32f767
+  cmake --build --preset stm32f767
   ```
+
+  | Preset        | Target                                                  |
+  |---------------|---------------------------------------------------------|
+  | `stm32f767`   | STM32F767 hardware (Cortex-M7)                          |
 
   To flash to platform using OpenOCD, use the following command:
   ```bash
-  make flash
+  cmake --build --preset stm32f767 --target flash
   ```
 
 ---

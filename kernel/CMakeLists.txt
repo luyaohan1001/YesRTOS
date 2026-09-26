@@ -1,22 +1,4 @@
-# CMake configuration for YesRTOS kernel build.
-
-# CMake version.
-cmake_minimum_required(VERSION 3.10)
-
-# Cross compilation tool chain.
-if (ARCH_DEFINED STREQUAL "ARMV7M")
-  include(${CMAKE_CURRENT_SOURCE_DIR}/arch/armv7m/gcc-arm-none-eabi.cmake)
-else()
-  message("'ARCH_DEFINED' is not recognized: ${ARCH_DEFINED}")
-endif()
-
-
-# Setup project and source.
-set(PROJECT_NAME YesRTOSKernel)
-project(${PROJECT_NAME}
-        LANGUAGES C CXX ASM
-        VERSION 1.0
-)
+# CMake configuration for YesRTOS kernel build. Added from the top-level CMakeLists.txt; the toolchain comes from CMAKE_TOOLCHAIN_FILE.
 
 # Specify C standard.
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -25,14 +7,6 @@ set(CMAKE_C_STANDARD 11)
 # Specify Cpp standard.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# Build Debug mode for gdb debugging.
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
-# Enable compile command export to json (for CMake debugging).
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Define static library for YesRTOSKernel.
 set(LIBRARY_NAME LibYesRTOSKernel)
@@ -50,9 +24,9 @@ add_library(${LIBRARY_NAME} STATIC
 )
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")
-  target_compile_definitions(${LIBRARY_NAME} PRIVATE ARMV7M)
+  add_compile_definitions(ARMV7M)
 
-  target_include_directories(${LIBRARY_NAME} PRIVATE
+  target_include_directories(${LIBRARY_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
     ${CMAKE_CURRENT_LIST_DIR}/include/
     )
