@@ -9,6 +9,7 @@ set(YESRTOS_QEMU_TESTS
   critical_section_nesting
   stack_alignment
   exception_priority
+  idle_when_all_blocked
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
@@ -31,5 +32,5 @@ foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
       -kernel $<TARGET_FILE:${TEST_TARGET}>
   )
   # A faulting test spins in Default_Handler; the timeout turns that into a failure.
-  set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 30)
+  set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10)
 endforeach()

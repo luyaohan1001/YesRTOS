@@ -15,6 +15,13 @@
 #include "linkedlist.hpp"
 #include "mempool.hpp"
 
+/**
+ * @brief Called by the idle thread on every pass of its loop, before it waits for the next interrupt.
+ * @note  Weak default does nothing; an application may define it (e.g. for power management or statistics). It runs in
+ *        the idle thread, so it must never block.
+ */
+extern "C" void yesrtos_idle_hook(void);
+
 namespace YesRTOS {
 
 class PreemptFIFOScheduler final {
@@ -48,7 +55,16 @@ class PreemptFIFOScheduler final {
 
   static bool init_complete;
 
-  static Thread* ready_list_heads[MAX_PRIO_LEVEL];
+  /**
+   * @brief Priority level of the idle thread: one below the lowest user priority (MAX_PRIO_LEVEL - 1), so it only runs
+   *        when no user thread is ready.
+   */
+  static constexpr uint8_t IDLE_PRIO = MAX_PRIO_LEVEL;
+
+  /**
+   * @brief Ready list per priority level; the extra last level holds only the idle thread.
+   */
+  static Thread* ready_list_heads[MAX_PRIO_LEVEL + 1];
 
   /**
    * @brief Bitmap encoding non-empty ready list of a specific priority.
@@ -61,6 +77,8 @@ class PreemptFIFOScheduler final {
    */
 
   static void move_node(Thread** src_list, Thread** dest_list, Thread* node);
+
+  static void insert_ready(Thread* p_new);
 
   PreemptFIFOScheduler() = delete;
   ~PreemptFIFOScheduler() = delete;

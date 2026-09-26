@@ -25,9 +25,27 @@ Thread* PreemptFIFOScheduler::p_active_thread = nullptr;
 
 bool PreemptFIFOScheduler::init_complete = false;
 
-Thread* PreemptFIFOScheduler::ready_list_heads[MAX_PRIO_LEVEL] {nullptr};
+static_assert(MAX_PRIO_LEVEL < 32, "prio_bitmap needs one bit per user priority level plus one for the idle thread");
+
+Thread* PreemptFIFOScheduler::ready_list_heads[MAX_PRIO_LEVEL + 1] {nullptr};
 
 uint32_t PreemptFIFOScheduler::prio_bitmap;
+
+extern "C" __attribute__((weak)) void yesrtos_idle_hook(void) {
+}
+
+/**
+ * @brief Idle thread routine: always ready at the lowest priority, so the scheduler always has a thread to pick, even
+ *        when every user thread is blocked.
+ */
+static void idle_routine() {
+  while (1) {
+    yesrtos_idle_hook();
+    __asm volatile("wfi");  // sleep until the next interrupt (e.g. SysTick) instead of spinning.
+  }
+}
+
+static Thread idle_thread(UINT32_MAX, idle_routine, PreemptFIFOScheduler::IDLE_PRIO);
 
 void PreemptFIFOScheduler::init() {
   PreemptFIFOScheduler::init_complete = true;
@@ -38,7 +56,13 @@ void PreemptFIFOScheduler::init() {
  */
 void PreemptFIFOScheduler::add_thread(Thread* p_new) {
   if (!init_complete) PreemptFIFOScheduler::init();
+  PreemptFIFOScheduler::insert_ready(p_new);
+}
 
+/**
+ * @brief Insert a thread at the head of the ready list of its priority.
+ */
+void PreemptFIFOScheduler::insert_ready(Thread* p_new) {
   uint8_t prio_level = p_new->thread_info.priority;
 
   Thread** pp_head = &ready_list_heads[prio_level];
@@ -64,6 +88,9 @@ void PreemptFIFOScheduler::add_thread(Thread* p_new) {
  */
 void PreemptFIFOScheduler::start() {
   if (!init_complete) PreemptFIFOScheduler::init();
+
+  // The idle thread keeps prio_bitmap non-zero: count_trailing_zero(0) is undefined.
+  PreemptFIFOScheduler::insert_ready(&idle_thread);
 
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
   PreemptFIFOScheduler::p_active_thread = ready_list_heads[prio];
