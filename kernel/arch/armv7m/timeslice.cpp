@@ -81,6 +81,14 @@ extern "C" {
  * @return Incoming thread's saved stack pointer, pointing at its r4-r11.
  * @note Plain C function called from PendSV_Handler, so the compiler handles all C++ work with the normal ABI.
  */
+/**
+ * @brief Non-zero once SVC_Handler has switched to the first thread. Before that PSP does not point at a thread stack,
+ *        so PendSV_Handler must not save or restore any context.
+ */
+extern "C" {
+volatile uint32_t yesrtos_scheduler_started = 0;
+}
+
 extern "C" {
 uint32_t* yesrtos_switch_context(uint32_t* sp) {
   YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr = sp;
@@ -102,10 +110,16 @@ uint32_t* yesrtos_switch_context(uint32_t* sp) {
  *       frame. The C++ part is therefore a normal function, yesrtos_switch_context(), taking and returning the stack
  *       pointer in r0.
  * @note The push/pop keeps MSP 8-byte aligned across the call, as AAPCS requires; r3 is only padding.
+ * @note A switch can be requested before the first thread runs (e.g. SysTick firing between systick_clk_init() and the
+ *       SVC in start()). There is no thread context then, so the handler returns at once; the scheduler starts the
+ *       first thread through SVC_Handler.
  */
 extern "C" {
 void __attribute__((naked)) PendSV_Handler() {
   __asm volatile(
+    "ldr    r0, =yesrtos_scheduler_started \n"
+    "ldr    r0, [r0]                \n"
+    "cbz    r0, 1f                  \n"  // scheduler not started: nothing to switch from.
     "mrs    r0, psp                 \n"  // r0 = outgoing thread's stack pointer.
     "isb                            \n"
     "stmdb  r0!, {r4-r11}           \n"  // save the registers the hardware did not stack (psp-=4; *psp=r11; ... r4).
@@ -115,6 +129,8 @@ void __attribute__((naked)) PendSV_Handler() {
     "ldmia  r0!, {r4-r11}           \n"  // restore the incoming thread's r4-r11 (r4=*psp; psp+=4; ...).
     "msr    psp, r0                 \n"  // the exception return pops the rest of its context from here.
     "isb                            \n"
+    "bx     lr                      \n"
+    "1:                             \n"
     "bx     lr                      \n");
 }
 }
@@ -169,6 +185,7 @@ void start_first_task(void) {
  */
 extern "C" {
 uint32_t* yesrtos_first_context(void) {
+  yesrtos_scheduler_started = 1;
   return (uint32_t*)YesRTOS::PreemptFIFOScheduler::p_active_thread->stkptr;
 }
 }
