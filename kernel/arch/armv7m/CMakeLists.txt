@@ -13,6 +13,11 @@ if (BOARD STREQUAL "netduinoplus2")
   target_sources(LibBareMetal PRIVATE ${CMAKE_CURRENT_LIST_DIR}/trace_qemu_usart.c)
   set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/qemu_netduinoplus2.ld)
   target_compile_definitions(LibBareMetal PUBLIC CPU_CLK_FREQ_HZ=168000000UL)   # QEMU runs the STM32F405 at 168 MHz
+elseif (BOARD STREQUAL "ast1030")
+  # Aspeed AST1030 (QEMU ast1030-evb): traces on the 16550 UART5, program and data in its 768 KB SRAM.
+  target_sources(LibBareMetal PRIVATE ${CMAKE_CURRENT_LIST_DIR}/trace_ast1030_uart.c)
+  set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/qemu_ast1030.ld)
+  target_compile_definitions(LibBareMetal PUBLIC CPU_CLK_FREQ_HZ=200000000UL)   # QEMU runs the AST1030 at 200 MHz
 else()
   target_sources(LibBareMetal PRIVATE ${CMAKE_CURRENT_LIST_DIR}/trace.c)
   set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/STM32F767ZITx_FLASH.ld)

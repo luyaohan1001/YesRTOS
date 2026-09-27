@@ -19,6 +19,10 @@ cmake --build --preset qemu --target qemu-gdb    # halt at reset, attach arm-non
 ```
 
 To stress preemption, use the `qemu-stress` preset (10 kHz timeslice) instead of `qemu`.
+
+The `qemu-ast1030` preset targets QEMU's `ast1030-evb` instead (Aspeed AST1030, Cortex-M4F at 200 MHz, 768 KB SRAM at
+0x0, `qemu_ast1030.ld`), whose I2C controllers come with a TMP105 sensor and an EEPROM attached. Traces go to its
+16550 UART5 (`trace_ast1030_uart.c`).
 QEMU is not cycle accurate, so use it for functional checks, not timing.
 
 ## ARM Cortex M7

@@ -42,6 +42,14 @@
       }
     },
     {
+      "name": "qemu-ast1030",
+      "displayName": "QEMU ast1030-evb (Aspeed AST1030, Cortex-M4F)",
+      "inherits": "armv7m",
+      "cacheVariables": {
+        "BOARD": "ast1030"
+      }
+    },
+    {
       "name": "qemu-stress",
       "displayName": "QEMU netduinoplus2, 10 kHz timeslice to stress preemption",
       "inherits": "qemu",
@@ -53,10 +61,12 @@
   "buildPresets": [
     { "name": "stm32f767",   "configurePreset": "stm32f767" },
     { "name": "qemu",        "configurePreset": "qemu" },
-    { "name": "qemu-stress", "configurePreset": "qemu-stress" }
+    { "name": "qemu-stress", "configurePreset": "qemu-stress" },
+    { "name": "qemu-ast1030", "configurePreset": "qemu-ast1030" }
   ],
   "testPresets": [
     { "name": "qemu",        "configurePreset": "qemu",        "output": { "outputOnFailure": true } },
-    { "name": "qemu-stress", "configurePreset": "qemu-stress", "output": { "outputOnFailure": true } }
+    { "name": "qemu-stress", "configurePreset": "qemu-stress", "output": { "outputOnFailure": true } },
+    { "name": "qemu-ast1030", "configurePreset": "qemu-ast1030", "output": { "outputOnFailure": true } }
   ]
 }

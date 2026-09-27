@@ -131,7 +131,7 @@ CooperativeMultitaskingDemo.mp4
 
   The build is driven by CMake presets (`CMakePresets.json`); each preset builds into `build/<preset>`.
   ```bash
-  cmake --preset stm32f767          # or: qemu, qemu-stress
+  cmake --preset stm32f767          # or: qemu, qemu-stress, qemu-ast1030
   cmake --build --preset stm32f767
   ```
 
@@ -140,6 +140,7 @@ CooperativeMultitaskingDemo.mp4
   | `stm32f767`   | STM32F767 hardware (Cortex-M7)                          |
   | `qemu`        | QEMU `netduinoplus2` (Cortex-M4F), no hardware needed   |
   | `qemu-stress` | Same as `qemu` with a 10 kHz timeslice to stress preemption |
+  | `qemu-ast1030` | QEMU `ast1030-evb` (Aspeed AST1030, Cortex-M4F), which has I2C devices attached |
 
   To flash to platform using OpenOCD, use the following command:
   ```bash

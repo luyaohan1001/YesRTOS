@@ -44,7 +44,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 if (NOT BOARD OR BOARD STREQUAL "stm32f767")
   set(TARGET_FLAGS "-mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard")      # STM32F767: Cortex-M7, FPv5 double precision
 else()
-  set(TARGET_FLAGS "-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard")   # QEMU netduinoplus2: Cortex-M4F
+  set(TARGET_FLAGS "-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard")   # QEMU netduinoplus2 and ast1030: Cortex-M4F
 endif()
 
 # The *_INIT variables only seed the defaults, so flags given on the command line (e.g. -DCMAKE_CXX_FLAGS=...) are appended rather than replacing these.

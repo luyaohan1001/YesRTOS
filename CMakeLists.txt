@@ -16,12 +16,14 @@ set_property(CACHE ARCH_DEFINED PROPERTY STRINGS ARMV7M)
 
 # Board, normally set by the preset. A board fixes the CPU (toolchain file), its core clock, memory layout and trace
 # output (kernel/arch/armv7m/CMakeLists.txt), and for a QEMU board the machine the images run on.
-set(BOARD "stm32f767" CACHE STRING "Target board: stm32f767 (hardware) or netduinoplus2 (QEMU)")
-set_property(CACHE BOARD PROPERTY STRINGS stm32f767 netduinoplus2)
+set(BOARD "stm32f767" CACHE STRING "Target board: stm32f767 (hardware), netduinoplus2 or ast1030 (QEMU)")
+set_property(CACHE BOARD PROPERTY STRINGS stm32f767 netduinoplus2 ast1030)
 if (BOARD STREQUAL "stm32f767")
   set(YESRTOS_QEMU_MACHINE "")
 elseif (BOARD STREQUAL "netduinoplus2")
   set(YESRTOS_QEMU_MACHINE "netduinoplus2")
+elseif (BOARD STREQUAL "ast1030")
+  set(YESRTOS_QEMU_MACHINE "ast1030-evb")
 else()
   message(FATAL_ERROR "'BOARD' is not recognized: '${BOARD}'. Configure with a preset, e.g. 'cmake --preset stm32f767'.")
 endif()
