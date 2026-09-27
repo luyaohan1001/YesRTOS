@@ -133,8 +133,14 @@ void PreemptFIFOScheduler::start() {
  *        priority one resumes before the other threads of its priority. Equal priority threads are not rotated here:
  *        they only take turns when the running thread blocks, yields or exits. A SysTick therefore changes nothing
  *        unless a higher priority thread became ready.
+ * @note  Runs from PendSV, the lowest priority exception, so any interrupt can preempt it, and interrupt handlers do
+ *        change the scheduler state (e.g. Semaphore::release() makes a thread ready). Exceptions are disabled while the
+ *        next thread is chosen so it is picked from one consistent snapshot of prio_bitmap, the ready lists and the
+ *        thread states, as every other access to them is (atomic_section in thread context and in handlers).
  */
 void PreemptFIFOScheduler::schedule_next() {
+  atomic_section a;
+
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
   Thread* p_next_ready = ready_list_heads[prio];
 
