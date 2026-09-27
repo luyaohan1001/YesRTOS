@@ -20,6 +20,7 @@ set(YESRTOS_QEMU_TESTS
   external_interrupt
   semaphore
   semaphore_isr
+  tick_hook
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})

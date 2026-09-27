@@ -68,8 +68,16 @@ extern "C" {
   }
 }
 
+/**
+ * @brief Called from the SysTick interrupt on every tick. Weak default does nothing; an application may define it,
+ *        e.g. to release a semaphore periodically. Runs in interrupt context: it must not block.
+ */
+extern "C" __attribute__((weak)) void yesrtos_tick_hook(void) {
+}
+
 extern "C" {
   void SysTick_Handler() {
+    yesrtos_tick_hook();
     request_context_switch();
   }
 }

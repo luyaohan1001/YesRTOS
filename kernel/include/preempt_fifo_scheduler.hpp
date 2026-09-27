@@ -20,6 +20,13 @@
  */
 extern "C" void yesrtos_idle_hook(void);
 
+/**
+ * @brief Called from the SysTick interrupt on every tick (TIMESLICE_FREQ_HZ).
+ * @note  Weak default does nothing; an application may define it, e.g. to release a semaphore periodically. It runs in
+ *        interrupt context, so it must not block: Semaphore::release() and try_acquire() are fine, acquire() is not.
+ */
+extern "C" void yesrtos_tick_hook(void);
+
 namespace YesRTOS {
 
 class PreemptFIFOScheduler final {
