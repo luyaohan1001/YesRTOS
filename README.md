@@ -103,7 +103,7 @@ Open problems in the kernel, build and tests. Fixed issues are removed from this
 become case studies above.
 
 <details>
-<summary><b>10 open issues</b> - click to expand</summary>
+<summary><b>9 open issues</b> - click to expand</summary>
 
 | ID | Issue | Area | Details | Status |
 |----|-------|------|---------|--------|
@@ -115,8 +115,7 @@ become case studies above.
 | KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
 | KI-012 | Blocked lists wake the longest waiting thread, not the highest priority one: a high priority thread can queue behind lower priority waiters on a mutex | Mutex / scheduler |  | Open |
 | KI-013 | Appending to a ready list walks it (O(n) in the number of threads at that priority); scheduling paths should take constant time | Scheduler |  | Open |
-| KI-015 | I2C and I3C transfers have no timeout: if a controller never raises its interrupt, the thread blocks forever in `AspeedI2cBus` / `DwI3cBus` (the tick counter exists now; needs timed `Semaphore::acquire` / `Mutex::lock`) | Drivers | [drivers/README.md](drivers/README.md) | Open |
-| KI-016 | I3C in-band interrupts (IBI) and hot-join are not supported by `I3cBus` / `DwI3cBus` | Drivers | [drivers/README.md](drivers/README.md) | Open |
+| KI-015 | I2C transfers have no timeout: if the controller never raises its interrupt, the thread blocks forever in `AspeedI2cBus` (the tick counter exists now; needs timed `Semaphore::acquire` / `Mutex::lock`) | Drivers | [drivers/README.md](drivers/README.md) | Open |
 
 </details>
 
@@ -146,7 +145,7 @@ CooperativeMultitaskingDemo.mp4
   | `stm32f767`   | STM32F767 hardware (Cortex-M7)                          |
   | `qemu`        | QEMU `netduinoplus2` (Cortex-M4F), no hardware needed   |
   | `qemu-stress` | Same as `qemu` with a 10 kHz timeslice to stress preemption |
-  | `qemu-ast1030` | QEMU `ast1030-evb` (Aspeed AST1030, Cortex-M4F), with the I2C and I3C drivers and their tests (see [drivers/README.md](drivers/README.md)) |
+  | `qemu-ast1030` | QEMU `ast1030-evb` (Aspeed AST1030, Cortex-M4F), with the I2C driver and its EEPROM / TMP105 tests (see [drivers/README.md](drivers/README.md)) |
 
   To flash to platform using OpenOCD, use the following command:
   ```bash
