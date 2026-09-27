@@ -4,15 +4,6 @@
 
 using namespace YesRTOS;
 
-/**
- * @brief Whether the caller runs in an exception handler (IPSR holds the active exception number, 0 in Thread mode).
- */
-static bool in_exception_handler() {
-  uint32_t ipsr;
-  __asm volatile("mrs %0, ipsr" : "=r"(ipsr));
-  return ipsr != 0;
-}
-
 Semaphore::Semaphore(uint32_t initial, uint32_t max) {
   this->max_count = max;
   this->available = initial < max ? initial : max;

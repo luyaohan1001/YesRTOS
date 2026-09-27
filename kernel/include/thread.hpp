@@ -44,6 +44,7 @@ typedef struct thread_info {
   Thread* p_prev;
   uint32_t id;
   uint8_t priority;
+  uint64_t wake_tick;  // tick count at which a SLEEP thread becomes ready again
 } thread_info_t;
 
 class Thread {

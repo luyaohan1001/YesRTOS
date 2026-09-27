@@ -21,7 +21,15 @@ set(YESRTOS_QEMU_TESTS
   semaphore
   semaphore_isr
   tick_hook
+  sleep
+  sleep_until_periodic
 )
+
+# Tests that check tick counts against the work done run with -icount: QEMU's virtual clock then follows the number of
+# instructions executed instead of host time, so a loaded host (e.g. ctest -j8) cannot make ticks pass while the guest
+# is not running.
+set(QEMU_ARGS_sleep -icount shift=4)
+set(QEMU_ARGS_sleep_until_periodic -icount shift=4)
 
 # Boards whose QEMU machine has I2C devices attached.
 if (BOARD STREQUAL "ast1030")

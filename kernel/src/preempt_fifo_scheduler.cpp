@@ -34,6 +34,10 @@ uint32_t PreemptFIFOScheduler::prio_bitmap;
 
 Thread* PreemptFIFOScheduler::completed_list = nullptr;
 
+Thread* PreemptFIFOScheduler::sleep_list = nullptr;
+
+static volatile uint64_t ticks = 0;
+
 extern "C" __attribute__((weak)) void yesrtos_idle_hook(void) {
 }
 
@@ -226,6 +230,74 @@ void PreemptFIFOScheduler::block_running_thread(Thread** pp_blocked_list_head) {
 
   if (ready_list_heads[p_thread->thread_info.priority] == nullptr) {
     clr_bitpos<uint32_t>(prio_bitmap, p_thread->thread_info.priority);
+  }
+}
+
+uint64_t PreemptFIFOScheduler::tick_count() {
+  atomic_section a;  // 64-bit read: two loads the SysTick interrupt could split
+  return ticks;
+}
+
+void PreemptFIFOScheduler::sleep_until(uint64_t wake_tick) {
+  atomic_section a;
+  if (wake_tick <= ticks) {
+    return;
+  }
+  if (a.nested() || in_exception_handler()) {
+    // Sleeping is impossible here: the context switch could not be taken before returning.
+    while (1) {
+    }
+  }
+
+  Thread* p_thread = p_active_thread;
+  uint8_t prio_level = p_thread->thread_info.priority;
+  PreemptFIFOScheduler::unlink_node(&ready_list_heads[prio_level], p_thread);
+  if (ready_list_heads[prio_level] == nullptr) {
+    clr_bitpos<uint32_t>(prio_bitmap, prio_level);
+  }
+  p_thread->thread_info.state = SLEEP;
+  p_thread->thread_info.wake_tick = wake_tick;
+
+  // Insert after every sleeper due at the same tick or earlier: deadline order, FIFO among equal deadlines.
+  Thread* p_prev = nullptr;
+  Thread* p_curr = sleep_list;
+  while (p_curr && p_curr->thread_info.wake_tick <= wake_tick) {
+    p_prev = p_curr;
+    p_curr = p_curr->thread_info.p_next;
+  }
+  p_thread->thread_info.p_prev = p_prev;
+  p_thread->thread_info.p_next = p_curr;
+  if (p_curr) p_curr->thread_info.p_prev = p_thread;
+  if (p_prev) {
+    p_prev->thread_info.p_next = p_thread;
+  } else {
+    sleep_list = p_thread;
+  }
+
+  request_context_switch();  // taken when the atomic section ends; resumes here once tick() woke the thread
+}
+
+void PreemptFIFOScheduler::sleep_for_ticks(uint32_t ticks_to_sleep) {
+  if (ticks_to_sleep == 0) {
+    return;
+  }
+  PreemptFIFOScheduler::sleep_until(PreemptFIFOScheduler::tick_count() + ticks_to_sleep);
+}
+
+void PreemptFIFOScheduler::sleep_for_ms(uint32_t ms) {
+  uint64_t whole_ticks = (static_cast<uint64_t>(ms) * TIMESLICE_FREQ_HZ + 999) / 1000;  // round up
+  PreemptFIFOScheduler::sleep_until(PreemptFIFOScheduler::tick_count() + whole_ticks + 1);
+}
+
+void PreemptFIFOScheduler::tick() {
+  atomic_section a;
+  ticks = ticks + 1;
+  while (sleep_list && sleep_list->thread_info.wake_tick <= ticks) {
+    Thread* p_thread = sleep_list;
+    PreemptFIFOScheduler::unlink_node(&sleep_list, p_thread);
+    p_thread->thread_info.state = READY;
+    PreemptFIFOScheduler::insert_ready(p_thread);  // behind the ready threads of its priority
+    PreemptFIFOScheduler::preempt_if_higher(p_thread);
   }
 }
 

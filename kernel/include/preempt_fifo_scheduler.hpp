@@ -50,6 +50,42 @@ class PreemptFIFOScheduler final {
   static void yield();
 
   /**
+   * @brief Ticks since start() (SysTick at TIMESLICE_FREQ_HZ). 64 bits: it does not wrap in practice.
+   */
+  static uint64_t tick_count();
+
+  /**
+   * @brief Block the running thread until the tick count reaches `wake_tick`; the CPU goes to other threads meanwhile.
+   *        Returns at once if `wake_tick` has already passed. For periodic work, advance an absolute deadline by the
+   *        period each time: unlike sleep_for_ticks(), the wake-ups do not drift with the time spent working.
+   * @note  Threads only, not inside a critical section (stops in an infinite loop otherwise, like Semaphore::acquire()).
+   */
+  static void sleep_until(uint64_t wake_tick);
+
+  /**
+   * @brief Sleep until `ticks` ticks from now. The first of them may be only partly elapsed, so the actual time is
+   *        between (ticks - 1) and ticks tick periods. 0 returns at once.
+   */
+  static void sleep_for_ticks(uint32_t ticks);
+
+  /**
+   * @brief Sleep at least `ms` milliseconds: rounded up to whole ticks, plus one tick for the partly elapsed first one.
+   *        The resolution is one tick (1000 / TIMESLICE_FREQ_HZ ms).
+   */
+  static void sleep_for_ms(uint32_t ms);
+
+  /**
+   * @brief Called from the SysTick interrupt: counts the tick and makes due sleepers ready, requesting a context switch
+   *        only when one of them outranks the running thread.
+   */
+  static void tick();
+
+  /**
+   * @brief Sleeping threads ordered by wake_tick; equal wake ticks keep the order they went to sleep in.
+   */
+  static Thread* sleep_list;
+
+  /**
    * @brief Add running thread to a blocked list and marked as BLOCKED.
    * @param pp_blocked_list_head Double pointer to the head of a blocked list maintain by other entity such as a YesRTOS::Mutex.
    */

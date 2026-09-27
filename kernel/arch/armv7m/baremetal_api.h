@@ -30,6 +30,7 @@ extern "C" {
   void disable_exception();
   void enable_exception();
   uint32_t save_and_disable_exception();
+  bool in_exception_handler();
   void restore_exception(uint32_t primask);
 #if defined(__cplusplus)
 }

@@ -77,8 +77,9 @@ extern "C" __attribute__((weak)) void yesrtos_tick_hook(void) {
 
 extern "C" {
   void SysTick_Handler() {
+    // Counts the tick and wakes due sleepers; requests a context switch only if one outranks the running thread.
+    YesRTOS::PreemptFIFOScheduler::tick();
     yesrtos_tick_hook();
-    request_context_switch();
   }
 }
 
