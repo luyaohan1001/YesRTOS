@@ -100,7 +100,7 @@ Open problems in the kernel, build and tests. Fixed issues are removed from this
 become case studies above.
 
 <details>
-<summary><b>8 open issues</b> - click to expand</summary>
+<summary><b>7 open issues</b> - click to expand</summary>
 
 | ID | Issue | Area | Details | Status |
 |----|-------|------|---------|--------|
@@ -111,7 +111,6 @@ become case studies above.
 | KI-007 | Semaphore not implemented (`kernel/src/semaphore.cpp` is empty and not built) | Kernel API |  | Open |
 | KI-008 | Host unit test `unit_tests/linkedlist_unit_tests` does not build: `thread.hpp` requires an architecture | Tests |  | Open |
 | KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
-| KI-011 | `CPU_CLK_FREQ_HZ` is 16 MHz for every board, but QEMU runs netduinoplus2 at 168 MHz (and ast1030 at 200 MHz), so the tick is 10.5x the configured rate there | Board config |  | Open |
 
 </details>
 

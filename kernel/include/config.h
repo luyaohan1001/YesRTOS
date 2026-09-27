@@ -16,7 +16,9 @@ FREQ = 1 / PERIOD
 10ms = 0.01s = 0.01s / (1/16000000)s/cycle = 160,000 cycles (to load to register).
 TIMESLIDE_FREQ_HZ to program = 1 / 0.01s = 100Hz
 */
-#define CPU_CLK_FREQ_HZ         (16000000UL)            // Core frequency.
+#ifndef CPU_CLK_FREQ_HZ                                 // Core clock SysTick counts, set per board by the build.
+#define CPU_CLK_FREQ_HZ         (16000000UL)            // STM32F767 on its 16 MHz HSI (no PLL configured).
+#endif
 #ifndef TIMESLICE_FREQ_HZ                               // Overridable, e.g. -DTIMESLICE_FREQ_HZ=10000UL to stress preemption.
 #define TIMESLICE_FREQ_HZ       (100UL)                 // Timeslice frequency.
 #endif

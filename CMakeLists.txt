@@ -15,6 +15,11 @@ set(ARCH_DEFINED "" CACHE STRING "Target architecture: ARMV7M")
 set_property(CACHE ARCH_DEFINED PROPERTY STRINGS ARMV7M)
 option(QEMU "Build for QEMU netduinoplus2 (Cortex-M4F) instead of STM32F767 (Cortex-M7)" OFF)
 
+# Core clock of the board, which SysTick counts: QEMU runs netduinoplus2 (STM32F405) at 168 MHz.
+if (QEMU)
+  add_compile_definitions(CPU_CLK_FREQ_HZ=168000000UL)
+endif()
+
 if (NOT ARCH_DEFINED STREQUAL "ARMV7M")
   message(FATAL_ERROR "'ARCH_DEFINED' is not recognized: '${ARCH_DEFINED}'. Configure with a preset, e.g. 'cmake --preset stm32f767'.")
 endif()
