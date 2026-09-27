@@ -100,7 +100,7 @@ Open problems in the kernel, build and tests. Fixed issues are removed from this
 become case studies above.
 
 <details>
-<summary><b>7 open issues</b> - click to expand</summary>
+<summary><b>10 open issues</b> - click to expand</summary>
 
 | ID | Issue | Area | Details | Status |
 |----|-------|------|---------|--------|
@@ -111,6 +111,9 @@ become case studies above.
 | KI-007 | Semaphore not implemented (`kernel/src/semaphore.cpp` is empty and not built) | Kernel API |  | Open |
 | KI-008 | Host unit test `unit_tests/linkedlist_unit_tests` does not build: `thread.hpp` requires an architecture | Tests |  | Open |
 | KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
+| KI-012 | Blocked lists wake the longest waiting thread, not the highest priority one: a high priority thread can queue behind lower priority waiters on a mutex | Mutex / scheduler |  | Open |
+| KI-013 | Appending to a ready list walks it (O(n) in the number of threads at that priority); scheduling paths should take constant time | Scheduler |  | Open |
+| KI-014 | SysTick pends PendSV on every tick although SCHED_FIFO needs no time slicing: each tick saves and restores the running thread for nothing | Scheduler |  | Open |
 
 </details>
 
