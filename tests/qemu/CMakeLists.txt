@@ -29,7 +29,18 @@ if (BOARD STREQUAL "ast1030")
     i2c_eeprom
     i2c_tmp105
     i2c_concurrent
+    i3c_daa
+    i3c_transfer
+    i3c_concurrent
   )
+  # Extra QEMU arguments per test: mock I3C targets. QEMU does not arbitrate between several unaddressed targets
+  # during dynamic address assignment, so each controller carries at most one.
+  set(QEMU_ARGS_i3c_daa
+    -device mock-i3c-target,bus=dw.i3c.0,pid=0x04a100001001,bcr=0x06,dcr=0x55
+    -device mock-i3c-target,bus=dw.i3c.1,pid=0x04a100002002,bcr=0x07,dcr=0x66)
+  set(QEMU_ARGS_i3c_transfer
+    -device mock-i3c-target,bus=dw.i3c.0,pid=0x04a100001001,bcr=0x06,dcr=0x55)
+  set(QEMU_ARGS_i3c_concurrent ${QEMU_ARGS_i3c_transfer})
 endif()
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
@@ -49,6 +60,7 @@ foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
       -nographic
       -monitor none
       -semihosting-config enable=on,target=native
+      ${QEMU_ARGS_${TEST_NAME}}
       -kernel $<TARGET_FILE:${TEST_TARGET}>
   )
   # A faulting test spins in Default_Handler; the timeout turns that into a failure.
