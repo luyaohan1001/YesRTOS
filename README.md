@@ -72,7 +72,7 @@ Real bugs found while building YesRTOS, kept as reminders of RTOS design rules. 
 example, the fix and how it was found.
 
 <details>
-<summary><b>17 case studies</b> (race conditions, atomicity, memory ordering, interrupt priority, undefined behaviour, stack usage) - click to expand</summary>
+<summary><b>18 case studies</b> (race conditions, atomicity, memory ordering, interrupt priority, undefined behaviour, stack usage) - click to expand</summary>
 
 | ID | Issue | Category | Design rule | Status |
 |----|-------|----------|-------------|--------|
@@ -93,6 +93,7 @@ example, the fix and how it was found.
 | [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Thread objects on the main stack, no stack reserve | Stack overflow | Size and reserve every stack explicitly, including the exception stack; do not put thread stacks on it. | **Open** |
 | [CS-016](docs/case_studies/CS-016-context-switch-before-first-thread.md) | Context switch requested before the first thread runs | Race condition | Until the first thread runs there is no context to switch from: the context switch handler must be a no-op before start. | Fixed `487f805` |
 | [CS-017](docs/case_studies/CS-017-empty-interrupt-vector-table.md) | Interrupt vector table without external interrupts | Undefined behaviour (interrupt handling) | Every interrupt the hardware can raise needs a vector entry, even if it only points at a default handler; size the table from the device, and verify with an interrupt test before relying on interrupts. | Fixed `b983f0e` |
+| [CS-018](docs/case_studies/CS-018-scheduler-state-read-from-pendsv.md) | Scheduler state read from PendSV without masking interrupts | Race condition | Every access to state shared with interrupt handlers needs the same protection, including reads from the lowest priority exception; do not rely on the order in which handlers happen to modify it. | Fixed `edc16e5` |
 
 </details>
 
