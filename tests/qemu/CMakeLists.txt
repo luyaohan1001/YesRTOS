@@ -17,6 +17,7 @@ set(YESRTOS_QEMU_TESTS
   linkedlist
   scheduler_fifo
   startup_pending_switch
+  external_interrupt
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
