@@ -44,11 +44,11 @@ COMMAND openocd
 DEPENDS ${PROJECT_NAME}
 )
 
-if (ARCH_DEFINED STREQUAL "ARMV7M" AND QEMU)
+if (YESRTOS_QEMU_MACHINE)
   # Run in QEMU (exit with Ctrl-A X).
   add_custom_target(qemu
   COMMAND qemu-system-arm
-              -M netduinoplus2
+              -M ${YESRTOS_QEMU_MACHINE}
               -nographic
               -kernel $<TARGET_FILE:${PROJECT_NAME}>
   DEPENDS ${PROJECT_NAME}
@@ -58,7 +58,7 @@ if (ARCH_DEFINED STREQUAL "ARMV7M" AND QEMU)
   # Run in QEMU halted at reset, waiting for gdb on localhost:1234.
   add_custom_target(qemu-gdb
   COMMAND qemu-system-arm
-              -M netduinoplus2
+              -M ${YESRTOS_QEMU_MACHINE}
               -nographic
               -kernel $<TARGET_FILE:${PROJECT_NAME}>
               -s -S

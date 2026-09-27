@@ -13,11 +13,17 @@ project(YesRTOS
 # Target selection, normally set by the preset.
 set(ARCH_DEFINED "" CACHE STRING "Target architecture: ARMV7M")
 set_property(CACHE ARCH_DEFINED PROPERTY STRINGS ARMV7M)
-option(QEMU "Build for QEMU netduinoplus2 (Cortex-M4F) instead of STM32F767 (Cortex-M7)" OFF)
 
-# Core clock of the board, which SysTick counts: QEMU runs netduinoplus2 (STM32F405) at 168 MHz.
-if (QEMU)
-  add_compile_definitions(CPU_CLK_FREQ_HZ=168000000UL)
+# Board, normally set by the preset. A board fixes the CPU (toolchain file), its core clock, memory layout and trace
+# output (kernel/arch/armv7m/CMakeLists.txt), and for a QEMU board the machine the images run on.
+set(BOARD "stm32f767" CACHE STRING "Target board: stm32f767 (hardware) or netduinoplus2 (QEMU)")
+set_property(CACHE BOARD PROPERTY STRINGS stm32f767 netduinoplus2)
+if (BOARD STREQUAL "stm32f767")
+  set(YESRTOS_QEMU_MACHINE "")
+elseif (BOARD STREQUAL "netduinoplus2")
+  set(YESRTOS_QEMU_MACHINE "netduinoplus2")
+else()
+  message(FATAL_ERROR "'BOARD' is not recognized: '${BOARD}'. Configure with a preset, e.g. 'cmake --preset stm32f767'.")
 endif()
 
 if (NOT ARCH_DEFINED STREQUAL "ARMV7M")
@@ -39,7 +45,7 @@ add_subdirectory(kernel)
 add_subdirectory(app/multi_thread)
 
 # QEMU regression tests: ctest --preset qemu
-if (QEMU)
+if (YESRTOS_QEMU_MACHINE)
   enable_testing()
   add_subdirectory(tests/qemu)
 endif()

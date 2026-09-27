@@ -30,7 +30,7 @@
       "displayName": "STM32F767 (Cortex-M7, hardware)",
       "inherits": "armv7m",
       "cacheVariables": {
-        "QEMU": "OFF"
+        "BOARD": "stm32f767"
       }
     },
     {
@@ -38,7 +38,7 @@
       "displayName": "QEMU netduinoplus2 (Cortex-M4F)",
       "inherits": "armv7m",
       "cacheVariables": {
-        "QEMU": "ON"
+        "BOARD": "netduinoplus2"
       }
     },
     {

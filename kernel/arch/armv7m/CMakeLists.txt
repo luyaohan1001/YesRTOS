@@ -7,10 +7,12 @@ add_library(LibBareMetal
     ${CMAKE_CURRENT_LIST_DIR}/timeslice.cpp
 )
 
-# QEMU does not emulate the ITM; route traces to USART1 instead.
-if (QEMU)
+# Per board: trace output, memory layout and the core clock SysTick counts (CPU_CLK_FREQ_HZ, default in config.h).
+if (BOARD STREQUAL "netduinoplus2")
+  # QEMU does not emulate the ITM; route traces to USART1 instead.
   target_sources(LibBareMetal PRIVATE ${CMAKE_CURRENT_LIST_DIR}/trace_qemu_usart.c)
   set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/qemu_netduinoplus2.ld)
+  target_compile_definitions(LibBareMetal PUBLIC CPU_CLK_FREQ_HZ=168000000UL)   # QEMU runs the STM32F405 at 168 MHz
 else()
   target_sources(LibBareMetal PRIVATE ${CMAKE_CURRENT_LIST_DIR}/trace.c)
   set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/STM32F767ZITx_FLASH.ld)

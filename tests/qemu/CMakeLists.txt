@@ -1,4 +1,4 @@
-# QEMU regression tests. Each test is a firmware image run on the netduinoplus2 machine; it reports its result
+# QEMU regression tests. Each test is a firmware image run on the board's QEMU machine; it reports its result
 # through semihosting SYS_EXIT, which becomes QEMU's exit status (see test_support.hpp).
 #
 #   cmake --preset qemu && cmake --build --preset qemu && ctest --preset qemu
@@ -32,7 +32,7 @@ foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
 
   add_test(NAME ${TEST_NAME}
     COMMAND qemu-system-arm
-      -M netduinoplus2
+      -M ${YESRTOS_QEMU_MACHINE}
       -nographic
       -monitor none
       -semihosting-config enable=on,target=native
