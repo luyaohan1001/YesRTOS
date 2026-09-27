@@ -44,6 +44,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 add_subdirectory(kernel)
+add_subdirectory(drivers)
 add_subdirectory(app/multi_thread)
 
 # QEMU regression tests: ctest --preset qemu

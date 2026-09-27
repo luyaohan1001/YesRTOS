@@ -23,6 +23,15 @@ set(YESRTOS_QEMU_TESTS
   tick_hook
 )
 
+# Boards whose QEMU machine has I2C devices attached.
+if (BOARD STREQUAL "ast1030")
+  list(APPEND YESRTOS_QEMU_TESTS
+    i2c_eeprom
+    i2c_tmp105
+    i2c_concurrent
+  )
+endif()
+
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
   set(TEST_TARGET test_${TEST_NAME})
   add_executable(${TEST_TARGET} ${CMAKE_CURRENT_LIST_DIR}/${TEST_NAME}.cpp)
@@ -32,7 +41,7 @@ foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
     ${CMAKE_SOURCE_DIR}/kernel/include
     ${CMAKE_SOURCE_DIR}/kernel/arch/armv7m
   )
-  target_link_libraries(${TEST_TARGET} PRIVATE LibYesRTOSKernel LibBareMetal)
+  target_link_libraries(${TEST_TARGET} PRIVATE LibYesRTOSKernel LibBareMetal LibYesRTOSDrivers)
 
   add_test(NAME ${TEST_NAME}
     COMMAND qemu-system-arm

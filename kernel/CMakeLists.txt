@@ -32,6 +32,8 @@ set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/../third_party/o1heap/o1he
 
 if (ARCH_DEFINED STREQUAL "ARMV7M")
   add_compile_definitions(ARMV7M)
+  # Also for everything linking the kernel (its headers need the architecture), e.g. drivers/.
+  target_compile_definitions(${LIBRARY_NAME} PUBLIC ARMV7M)
 
   target_include_directories(${LIBRARY_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/arch/armv7m/
