@@ -100,7 +100,7 @@ Open problems in the kernel, build and tests. Fixed issues are removed from this
 become case studies above.
 
 <details>
-<summary><b>10 open issues</b> - click to expand</summary>
+<summary><b>9 open issues</b> - click to expand</summary>
 
 | ID | Issue | Area | Details | Status |
 |----|-------|------|---------|--------|
@@ -108,7 +108,6 @@ become case studies above.
 | KI-002 | Demo thread stacks live on MSP; linker scripts reserve no MSP space (`_alloc_stack_size = 0x0`); no overflow detection | Memory layout | [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Open |
 | KI-003 | Mutex has no priority inheritance: a low priority owner can be starved by medium priority threads while a high priority thread waits (the `owner` comment promises it) | Mutex |  | Open |
 | KI-004 | `RoundRobinScheduler` cannot run: PendSV/SVC only use `PreemptFIFOScheduler::p_active_thread`, and its `add_thread()` does not bound `TASK_QUEUE_DEPTH` | Scheduler |  | Open |
-| KI-007 | Semaphore not implemented (`kernel/src/semaphore.cpp` is empty and not built) | Kernel API |  | Open |
 | KI-008 | Host unit test `unit_tests/linkedlist_unit_tests` does not build: `thread.hpp` requires an architecture | Tests |  | Open |
 | KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
 | KI-012 | Blocked lists wake the longest waiting thread, not the highest priority one: a high priority thread can queue behind lower priority waiters on a mutex | Mutex / scheduler |  | Open |

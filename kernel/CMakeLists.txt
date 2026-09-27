@@ -20,6 +20,7 @@ add_library(${LIBRARY_NAME} STATIC
   ${CMAKE_CURRENT_LIST_DIR}/src/linkedlist.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/spinlock.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/semaphore.cpp
   ${CMAKE_CURRENT_LIST_DIR}/src/heap.cpp
   ${CMAKE_CURRENT_LIST_DIR}/../third_party/o1heap/o1heap.c
 )

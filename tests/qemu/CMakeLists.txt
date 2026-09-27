@@ -18,6 +18,8 @@ set(YESRTOS_QEMU_TESTS
   scheduler_fifo
   startup_pending_switch
   external_interrupt
+  semaphore
+  semaphore_isr
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})
