@@ -72,7 +72,7 @@ Real bugs found while building YesRTOS, kept as reminders of RTOS design rules. 
 example, the fix and how it was found.
 
 <details>
-<summary><b>15 case studies</b> (race conditions, atomicity, memory ordering, interrupt priority, undefined behaviour, stack usage) - click to expand</summary>
+<summary><b>17 case studies</b> (race conditions, atomicity, memory ordering, interrupt priority, undefined behaviour, stack usage) - click to expand</summary>
 
 | ID | Issue | Category | Design rule | Status |
 |----|-------|----------|-------------|--------|
@@ -91,6 +91,8 @@ example, the fix and how it was found.
 | [CS-013](docs/case_studies/CS-013-linkedlist-unconstructed-nodes.md) | Linked list nodes used without construction | Undefined behaviour | Memory from an allocator is not an object until it is constructed; an allocation failure is a return value, not an assert. | Fixed `e5b77ee` |
 | [CS-014](docs/case_studies/CS-014-fpu-context-not-saved.md) | FPU context not saved on context switch | Data integrity | If threads may use the FPU, the FPU registers are part of the thread context. | **Open** |
 | [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Thread objects on the main stack, no stack reserve | Stack overflow | Size and reserve every stack explicitly, including the exception stack; do not put thread stacks on it. | **Open** |
+| [CS-016](docs/case_studies/CS-016-context-switch-before-first-thread.md) | Context switch requested before the first thread runs | Race condition | Until the first thread runs there is no context to switch from: the context switch handler must be a no-op before start. | Fixed `487f805` |
+| [CS-017](docs/case_studies/CS-017-empty-interrupt-vector-table.md) | Interrupt vector table without external interrupts | Undefined behaviour (interrupt handling) | Every interrupt the hardware can raise needs a vector entry, even if it only points at a default handler; size the table from the device, and verify with an interrupt test before relying on interrupts. | Fixed `b983f0e` |
 
 </details>
 
