@@ -36,6 +36,13 @@ class PreemptFIFOScheduler final {
   static bool add_thread(Thread* thread);
 
   /**
+   * @brief Let the other ready threads of the running thread's priority run first (moves it to the tail of its list).
+   * @note  PreemptFIFOScheduler is SCHED_FIFO: equal priority threads are not time-sliced, so a thread that neither
+   *        blocks nor exits keeps the CPU until it calls yield(). Higher priority threads preempt at any time.
+   */
+  static void yield();
+
+  /**
    * @brief Add running thread to a blocked list and marked as BLOCKED.
    * @param pp_blocked_list_head Double pointer to the head of a blocked list maintain by other entity such as a YesRTOS::Mutex.
    */
@@ -93,6 +100,9 @@ class PreemptFIFOScheduler final {
   static void move_node(Thread** src_list, Thread** dest_list, Thread* node);
 
   static void insert_ready(Thread* p_new);
+  static void preempt_if_higher(Thread* p_ready);
+  static void unlink_node(Thread** pp_list, Thread* node);
+  static void append_node(Thread** pp_list, Thread* node);
 
   PreemptFIFOScheduler() = delete;
   ~PreemptFIFOScheduler() = delete;

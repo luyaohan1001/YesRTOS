@@ -32,7 +32,7 @@ static void first_thread() {
   // Adding a thread after start(), from a thread.
   static Thread late(12, late_thread, 0);
   yesrtos_test::check(PreemptFIFOScheduler::add_thread(&late), "rejected a valid thread");
-  for (int i = 0; i < 20 && !late_thread_ran; i++) request_context_switch();
+  for (int i = 0; i < 20 && !late_thread_ran; i++) PreemptFIFOScheduler::yield();
   yesrtos_test::check(late_thread_ran, "thread added at run time never ran");
   yesrtos_test::pass();
 }

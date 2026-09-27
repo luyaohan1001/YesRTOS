@@ -32,9 +32,7 @@ extern "C" void check_entry_sp(uint32_t sp) {
     yesrtos_test::check(misaligned == 0, "thread started with an SP that is not 8-byte aligned");
     yesrtos_test::pass();
   }
-  while (1) {
-  }
-}
+}  // returns to the thread's initial LR (yesrtos_thread_exit): aligned_entry branched here without linking
 
 // One padding word between the threads shifts every other Thread object by 4 bytes.
 struct PaddedThread {

@@ -35,6 +35,8 @@ void(thread0_routine)() {
       //atomic_section a;
       itm_trace("thread 0\n");
       tracer_lock.unlock();
+      // Equal priority threads are not time-sliced (SCHED_FIFO): hand the CPU to the next one.
+      PreemptFIFOScheduler::yield();
       }
     }
   }
@@ -51,6 +53,7 @@ void(thread1_routine)() {
       tracer_lock.lock();
       itm_trace("thread 1\n");
       tracer_lock.unlock();
+      PreemptFIFOScheduler::yield();
       }
     }
   }
@@ -66,6 +69,7 @@ void(thread2_routine)() {
       // atomic_section a;
       itm_trace("thread 2\n");
       tracer_lock.unlock();
+      PreemptFIFOScheduler::yield();
     }
   }
 }
@@ -80,6 +84,7 @@ void(thread3_routine)() {
       tracer_lock.lock();
       itm_trace("thread 3\n");
       tracer_lock.unlock();
+      PreemptFIFOScheduler::yield();
     }
   }
 }

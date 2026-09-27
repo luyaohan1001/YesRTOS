@@ -108,11 +108,11 @@ become case studies above.
 | KI-002 | Demo thread stacks live on MSP; linker scripts reserve no MSP space (`_alloc_stack_size = 0x0`); no overflow detection | Memory layout | [CS-015](docs/case_studies/CS-015-thread-objects-on-main-stack.md) | Open |
 | KI-003 | Mutex has no priority inheritance: a low priority owner can be starved by medium priority threads while a high priority thread waits (the `owner` comment promises it) | Mutex |  | Open |
 | KI-004 | `RoundRobinScheduler` cannot run: PendSV/SVC only use `PreemptFIFOScheduler::p_active_thread`, and its `add_thread()` does not bound `TASK_QUEUE_DEPTH` | Scheduler |  | Open |
-| KI-005 | `PreemptFIFOScheduler` time-slices equal priorities every tick (SCHED_RR behaviour, not FIFO) | Scheduler |  | Open |
-| KI-006 | Ready lists insert at the head, so the last thread added runs first (demo starts with thread 3) | Scheduler |  | Open |
 | KI-007 | Semaphore not implemented (`kernel/src/semaphore.cpp` is empty and not built) | Kernel API |  | Open |
 | KI-008 | Host unit test `unit_tests/linkedlist_unit_tests` does not build: `thread.hpp` requires an architecture | Tests |  | Open |
 | KI-009 | Demo passes id 1 to threads 1, 2 and 3 | Demo |  | Open |
+| KI-010 | Startup race: `start()` enables SysTick before `svc 0`; a tick in between runs PendSV before PSP is set up and HardFaults (seen under host load with a fast tick) | Scheduler |  | Open |
+| KI-011 | `CPU_CLK_FREQ_HZ` is 16 MHz for every board, but QEMU runs netduinoplus2 at 168 MHz (and ast1030 at 200 MHz), so the tick is 10.5x the configured rate there | Board config |  | Open |
 
 </details>
 

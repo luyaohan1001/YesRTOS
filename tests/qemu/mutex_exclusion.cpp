@@ -2,8 +2,8 @@
  * @file mutex_exclusion.cpp
  * @brief Four threads increment a shared counter with a non-atomic read-modify-write under a YesRTOS::Mutex.
  * @note  The owner yields inside the critical section, so every iteration forces the other threads to contend for a
- *        taken mutex and to be woken by unlock(). This does not depend on where SysTick happens to land: without the
- *        yield, threads mostly take turns and the test blocks only a handful of times per run.
+ *        taken mutex and to be woken by unlock(). Equal priority threads are not time-sliced (SCHED_FIFO), so without
+ *        the yield they would simply run one after another.
  */
 #include "mutex.hpp"
 #include "preempt_fifo_scheduler.hpp"
@@ -24,7 +24,7 @@ static void worker() {
     lock.lock();
     yesrtos_test::check(++inside == 1, "two threads inside the critical section");
     uint32_t tmp = counter;
-    request_context_switch();  // let the other threads run into the taken mutex
+    PreemptFIFOScheduler::yield();  // let the other threads run into the taken mutex
     yesrtos_test::check(inside == 1, "another thread entered the critical section");
     counter = tmp + 1;
     inside = inside - 1;
@@ -40,8 +40,6 @@ static void worker() {
     yesrtos_test::print("\n");
     yesrtos_test::check(counter == THREADS * ITERATIONS, "lost update");
     yesrtos_test::pass();
-  }
-  while (1) {
   }
 }
 

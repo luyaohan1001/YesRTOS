@@ -1,7 +1,10 @@
 /**
  * @file cas_spinlock.cpp
  * @brief Four equal priority threads increment one counter with atomic_compare_and_swap() and another with a
- *        non-atomic read-modify-write under a spinlock, while SysTick preempts them.
+ *        non-atomic read-modify-write under a spinlock.
+ * @note  Each CAS increment yields between reading the counter and the CAS, so the other threads change the value in
+ *        between and the mismatch path of the CAS is exercised on every iteration. Nothing yields while holding the
+ *        spinlock: under SCHED_FIFO an equal priority spinner would never let the holder run again (CS-006).
  */
 #include "preempt_fifo_scheduler.hpp"
 #include "spinlock.hpp"
@@ -21,6 +24,7 @@ static void cas_increment(volatile uint32_t* p) {
   uint32_t v;
   do {
     v = *p;
+    PreemptFIFOScheduler::yield();  // let the others update *p before this CAS
   } while (!atomic_compare_and_swap(p, v, v + 1));
 }
 
@@ -47,8 +51,6 @@ static void worker() {
     yesrtos_test::check(lock_counter == THREADS * ITERATIONS, "spinlock counter lost an update");
     yesrtos_test::check(!atomic_compare_and_swap(&cas_counter, 0, 1), "CAS succeeded on a mismatching value");
     yesrtos_test::pass();
-  }
-  while (1) {
   }
 }
 

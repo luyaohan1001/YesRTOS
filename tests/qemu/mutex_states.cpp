@@ -30,10 +30,9 @@ static void first() {
   m.lock();
   yesrtos_test::check(m.locked == Mutex::LOCKED, "uncontended lock did not mark LOCKED");
   PreemptFIFOScheduler::add_thread(&waiter_thread);
-  while (!waiter_started || waiter_thread.get_state() != BLOCKED) request_context_switch();
+  while (!waiter_started || waiter_thread.get_state() != BLOCKED) PreemptFIFOScheduler::yield();
   yesrtos_test::check(m.locked == Mutex::LOCKED_CONTENDED, "waiter blocked, but mutex not marked contended");
-  m.unlock();  // hands over to the waiter, which finishes the test
-  while (1) request_context_switch();
+  m.unlock();  // hands over to the waiter; returning lets it run and finish the test
 }
 
 int main() {

@@ -69,7 +69,7 @@ static void worker() {
     void* p = Heap::allocate(size);
     if (!p) continue;  // the other threads may hold the rest of the heap
     fill(p, size, tag);
-    request_context_switch();  // let the others allocate and free around this block
+    PreemptFIFOScheduler::yield();  // let the others allocate and free around this block
     yesrtos_test::check(holds(p, size, tag), "block modified by another thread");
     Heap::free(p);
   }

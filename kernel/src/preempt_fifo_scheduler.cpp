@@ -66,32 +66,42 @@ bool PreemptFIFOScheduler::add_thread(Thread* p_new) {
   // Once the scheduler runs, PendSV walks the same lists: keep it out while they are being linked.
   atomic_section a;
   if (!init_complete) PreemptFIFOScheduler::init();
+  p_new->thread_info.state = READY;
   PreemptFIFOScheduler::insert_ready(p_new);
+  PreemptFIFOScheduler::preempt_if_higher(p_new);
   return true;
 }
 
 /**
- * @brief Insert a thread at the head of the ready list of its priority.
+ * @brief Append a thread to the tail of the ready list of its priority (FIFO order).
  */
 void PreemptFIFOScheduler::insert_ready(Thread* p_new) {
   uint8_t prio_level = p_new->thread_info.priority;
+  PreemptFIFOScheduler::append_node(&ready_list_heads[prio_level], p_new);
+  set_bitpos<uint32_t>(prio_bitmap, prio_level);
+}
 
-  Thread** pp_head = &ready_list_heads[prio_level];
-
-  if (!(*pp_head)) {
-    // create new list
-    *pp_head = p_new;
-    p_new->thread_info.p_next = nullptr;
-    p_new->thread_info.p_prev = nullptr;
-
-    set_bitpos<uint32_t>(prio_bitmap, prio_level);
-  } else {
-    // insert to head
-    (*pp_head)->thread_info.p_prev = p_new;
-    p_new->thread_info.p_next = *pp_head;
-    p_new->thread_info.p_prev = nullptr;
-    *pp_head = p_new;
+/**
+ * @brief Request a context switch if a thread just made ready outranks the running one.
+ * @note  Before start() there is no running thread; start() picks the highest priority itself.
+ */
+void PreemptFIFOScheduler::preempt_if_higher(Thread* p_ready) {
+  if (p_active_thread && p_ready->thread_info.priority < p_active_thread->thread_info.priority) {
+    request_context_switch();
   }
+}
+
+/**
+ * @brief Move the running thread behind the other ready threads of its priority and let the first of them run.
+ * @note  Under SCHED_FIFO this is the only way for equal priority threads to share the CPU without blocking.
+ */
+void PreemptFIFOScheduler::yield() {
+  atomic_section a;
+  Thread* p_thread = p_active_thread;
+  Thread** pp_list = &ready_list_heads[p_thread->thread_info.priority];
+  PreemptFIFOScheduler::unlink_node(pp_list, p_thread);
+  PreemptFIFOScheduler::append_node(pp_list, p_thread);
+  request_context_switch();
 }
 
 /**
@@ -117,37 +127,54 @@ void PreemptFIFOScheduler::start() {
 #endif
 }
 
-static Thread* get_next_thread_circular(Thread *p_thread, Thread *p_head) {
-  Thread *p_next = p_thread->thread_info.p_next;
-  // Circular wrap around.
-  if (!p_next) {
-    p_next = p_head;
-  }
-  return p_next;
-}
-
 /**
- * @brief Return the next thread to run.
+ * @brief Pick the thread to run: the head of the highest priority non-empty ready list (SCHED_FIFO).
+ * @note  The running thread stays at the head of its ready list while it runs, so a thread preempted by a higher
+ *        priority one resumes before the other threads of its priority. Equal priority threads are not rotated here:
+ *        they only take turns when the running thread blocks, yields or exits. A SysTick therefore changes nothing
+ *        unless a higher priority thread became ready.
  */
 void PreemptFIFOScheduler::schedule_next() {
-  // Find highest priority ready task.
-  Thread *p_next_ready;
   uint32_t prio = count_trailing_zero<uint32_t>(prio_bitmap);
-  // Only rotate from the active thread while it is still in a ready list: once it blocked or completed, its links
-  // point into a blocked list or the completed list.
-  thread_state_t active_state = p_active_thread->thread_info.state;
-  bool active_in_ready_list = (active_state == RUNNING || active_state == READY);
-  if (prio == p_active_thread->thread_info.priority && active_in_ready_list) {
-    p_next_ready = get_next_thread_circular(p_active_thread, ready_list_heads[prio]);
-  } else {
-    p_next_ready = ready_list_heads[prio];
-  }
+  Thread* p_next_ready = ready_list_heads[prio];
 
-  if (active_state == RUNNING) {
+  if (p_active_thread->thread_info.state == RUNNING) {
     p_active_thread->thread_info.state = READY;
   }
   p_next_ready->thread_info.state = RUNNING;
   PreemptFIFOScheduler::p_active_thread = p_next_ready;
+}
+
+/**
+ * @brief Unlink a node from a doubly linked list.
+ */
+void PreemptFIFOScheduler::unlink_node(Thread** pp_list, Thread* node) {
+  Thread* p_prev = node->thread_info.p_prev;
+  Thread* p_next = node->thread_info.p_next;
+  if (p_prev) {
+    p_prev->thread_info.p_next = p_next;
+  } else {
+    *pp_list = p_next;
+  }
+  if (p_next) p_next->thread_info.p_prev = p_prev;
+  node->thread_info.p_next = nullptr;
+  node->thread_info.p_prev = nullptr;
+}
+
+/**
+ * @brief Append a node at the tail of a doubly linked list.
+ */
+void PreemptFIFOScheduler::append_node(Thread** pp_list, Thread* node) {
+  node->thread_info.p_next = nullptr;
+  if (!*pp_list) {
+    node->thread_info.p_prev = nullptr;
+    *pp_list = node;
+    return;
+  }
+  Thread* p_tail = *pp_list;
+  while (p_tail->thread_info.p_next) p_tail = p_tail->thread_info.p_next;
+  p_tail->thread_info.p_next = node;
+  node->thread_info.p_prev = p_tail;
 }
 
 void PreemptFIFOScheduler::move_node(Thread** src_list, Thread** dest_list, Thread* node) {
@@ -231,10 +258,10 @@ Thread* PreemptFIFOScheduler::unblock_one_thread(Thread** pp_blocked_list_head) 
     p_thread = p_thread->thread_info.p_next;
   }
 
-  uint8_t prio_level = p_thread->thread_info.priority;
-  PreemptFIFOScheduler::move_node(pp_blocked_list_head, &ready_list_heads[prio_level], p_thread);
+  PreemptFIFOScheduler::unlink_node(pp_blocked_list_head, p_thread);
   p_thread->thread_info.state = READY;
-  set_bitpos<uint32_t>(prio_bitmap, prio_level);
+  PreemptFIFOScheduler::insert_ready(p_thread);  // behind the ready threads of its priority
+  PreemptFIFOScheduler::preempt_if_higher(p_thread);
   return p_thread;
 }
 

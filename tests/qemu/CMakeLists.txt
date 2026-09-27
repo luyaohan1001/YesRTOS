@@ -15,6 +15,7 @@ set(YESRTOS_QEMU_TESTS
   mutex_states
   heap
   linkedlist
+  scheduler_fifo
 )
 
 foreach(TEST_NAME ${YESRTOS_QEMU_TESTS})

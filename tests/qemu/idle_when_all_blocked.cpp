@@ -22,11 +22,11 @@ extern "C" void yesrtos_idle_hook(void) {
 }
 
 // Each thread takes its first mutex, then waits until the other one holds its own before asking for the second, so
-// the deadlock does not depend on where SysTick preempts them.
+// the deadlock does not depend on the order they start in.
 static void thread_a() {
   m1.lock();
   a_holds_m1 = true;
-  while (!b_holds_m2) request_context_switch();
+  while (!b_holds_m2) PreemptFIFOScheduler::yield();
   blocked_threads = blocked_threads + 1;
   m2.lock();  // blocks forever
   yesrtos_test::fail("thread_a got both mutexes");
@@ -35,7 +35,7 @@ static void thread_a() {
 static void thread_b() {
   m2.lock();
   b_holds_m2 = true;
-  while (!a_holds_m1) request_context_switch();
+  while (!a_holds_m1) PreemptFIFOScheduler::yield();
   blocked_threads = blocked_threads + 1;
   m1.lock();  // blocks forever
   yesrtos_test::fail("thread_b got both mutexes");
