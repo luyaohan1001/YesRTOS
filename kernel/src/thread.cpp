@@ -22,8 +22,9 @@ namespace YesRTOS {
 
 Thread* Thread::registry_head = nullptr;
 
-Thread::Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority) {
+Thread::Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority, const char* name) {
   this->thread_info.id = id;
+  this->thread_info.name = name;
   this->thread_info.state = READY;
   this->thread_info.priority = priority;
   this->set_routine(routine_ptr);

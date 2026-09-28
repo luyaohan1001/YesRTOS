@@ -52,7 +52,7 @@ static void idle_routine() {
   }
 }
 
-static Thread idle_thread(UINT32_MAX, idle_routine, PreemptFIFOScheduler::IDLE_PRIO);
+static Thread idle_thread(UINT32_MAX, idle_routine, PreemptFIFOScheduler::IDLE_PRIO, "idle");
 
 void PreemptFIFOScheduler::init() {
   PreemptFIFOScheduler::init_complete = true;

@@ -31,6 +31,7 @@ const char* const CELL_FREE = "\xc2\xb7";      // U+00B7 middle dot: never used
 
 struct ThreadStack {
   uint32_t id;
+  const char* name;
   uint8_t priority;
   thread_state_t state;
   uint32_t used;
@@ -57,6 +58,21 @@ void put_u32(uint32_t value, uint32_t width) {
   put(&buf[i]);
 }
 
+/**
+ * @brief Print `str` left aligned in `width` characters, cut if longer.
+ */
+void put_padded(const char* str, uint32_t width) {
+  char buf[16];
+  uint32_t n = 0;
+  while (n < width && n < sizeof(buf) - 1 && str[n] != '\0') {
+    buf[n] = str[n];
+    n++;
+  }
+  while (n < width && n < sizeof(buf) - 1) buf[n++] = ' ';
+  buf[n] = '\0';
+  put(buf);
+}
+
 const char* state_name(thread_state_t state) {
   switch (state) {
     case READY: return "READY  ";
@@ -77,12 +93,17 @@ uint32_t cells(uint32_t bytes, uint32_t size) {
 
 void draw_row(const ThreadStack& t) {
   put("  ");
-  if (t.id == UINT32_MAX) {
-    put("  idle");
+  if (t.name) {
+    put_padded(t.name, 10);
   } else {
-    put_u32(t.id, 6);
+    // Unnamed: show the id instead, e.g. "#7".
+    uint32_t width = 2;
+    for (uint32_t id = t.id; id >= 10; id /= 10) width++;
+    put("#");
+    put_u32(t.id, 1);
+    for (; width < 10; width++) put(" ");
   }
-  put_u32(t.priority, 6);
+  put_u32(t.priority, 4);
   put("  ");
   put(state_name(t.state));
   put("  ");
@@ -132,7 +153,7 @@ void StackMonitor::draw() {
     for (Thread* p = Thread::registry_head; p; p = p->p_registry_next) {
       total++;
       if (count == MAX_THREADS) continue;
-      threads[count++] = ThreadStack{p->thread_info.id, p->thread_info.priority, p->thread_info.state,
+      threads[count++] = ThreadStack{p->thread_info.id, p->thread_info.name, p->thread_info.priority, p->thread_info.state,
                                      p->stack_used_bytes(), p->stack_peak_bytes(), p->stack_size_bytes()};
     }
   }
@@ -162,7 +183,7 @@ void StackMonitor::draw() {
   put("\n");
 
   // Same columns as draw_row(): the legend spans the 42 characters of "[" bar "]".
-  put("  THREAD  PRIO  STATE    ");
+  put("  THREAD    PRIO  STATE    ");
   put(CELL_NOW);
   put(" now  ");
   put(CELL_PEAK);

@@ -45,6 +45,7 @@ typedef struct thread_info {
   uint32_t id;
   uint8_t priority;
   uint64_t wake_tick;  // tick count at which a SLEEP thread becomes ready again
+  const char* name;    // optional, for monitors and debugging; nullptr if not given
 } thread_info_t;
 
 class Thread {
@@ -54,8 +55,9 @@ class Thread {
    * @param id Unique ID for the thread, defined by the user.
    * @param routine_ptr Function pointer to the execution routine.
    * @param priority Thread priority, by default 0 (highest priority)
+   * @param name Optional name shown by monitors such as StackMonitor; the string must outlive the thread.
    */
-  Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority = 0);
+  Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority = 0, const char* name = nullptr);
   ~Thread();
 
   public:
@@ -97,7 +99,6 @@ class Thread {
    *        including blocked ones whose lists belong to a Mutex or Semaphore.
    */
   static Thread* registry_head;
-  Thread* p_registry_next;
 
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
@@ -109,6 +110,9 @@ class Thread {
   // Stack pointer pointing to top of the stack.
   volatile uint32_t* stkptr;
   thread_info_t thread_info;
+  // Next thread in registry_head. Declared after allocated_stack, like the other control fields: a member in front of
+  // it would sit right below the stack and be the first thing an overflow overwrites.
+  Thread* p_registry_next;
 
   public:
 #if defined(HOST_PLATFORM)
