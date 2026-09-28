@@ -68,6 +68,37 @@ class Thread {
   void run();
   bool operator==(const Thread& other) const;
 
+  /**
+   * @brief Size of the thread stack in bytes.
+   */
+  uint32_t stack_size_bytes() const;
+
+  /**
+   * @brief Bytes of the stack in use right now: up to the saved stack pointer for a thread that is switched out, up to
+   *        PSP for the running thread. Includes the saved context (r0-r3, r12, lr, pc, xpsr, r4-r11).
+   */
+  uint32_t stack_used_bytes() const;
+
+  /**
+   * @brief High-water mark: the most stack bytes ever used, found by scanning from the far end for words that still
+   *        hold STACK_PAINT, and never less than stack_used_bytes(). Equal to stack_size_bytes() when the stack has
+   *        overflowed (or used every word).
+   * @note  Takes time linear in the unused part of the stack; meant for monitoring, not for hot paths.
+   */
+  uint32_t stack_peak_bytes() const;
+
+  /**
+   * @brief Pattern every stack word is filled with at construction; a word that still holds it was never written.
+   */
+  static constexpr uint32_t STACK_PAINT = 0xA5A5A5A5UL;
+
+  /**
+   * @brief Every constructed Thread, newest first (linked through p_registry_next), so monitors can find all threads,
+   *        including blocked ones whose lists belong to a Mutex or Semaphore.
+   */
+  static Thread* registry_head;
+  Thread* p_registry_next;
+
   public:
   // Allocate stack for execution of thread routine, and for saving runtime context when scheduling switching tasks.
   // AAPCS requires SP to be 8-byte aligned at every public function entry, and the thread starts with SP at the end of

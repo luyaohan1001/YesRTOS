@@ -11,8 +11,16 @@
 #endif
 
 #include <thread.hpp>
+#include <atomic_section.hpp>
+#include <preempt_fifo_scheduler.hpp>
+
+#if defined(ARMV7M)
+extern "C" volatile uint32_t yesrtos_scheduler_started;  // timeslice.cpp: non-zero once the first thread runs.
+#endif
 
 namespace YesRTOS {
+
+Thread* Thread::registry_head = nullptr;
 
 Thread::Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority) {
   this->thread_info.id = id;
@@ -20,16 +28,34 @@ Thread::Thread(uint32_t id, void (*routine_ptr)(void), uint8_t priority) {
   this->thread_info.priority = priority;
   this->set_routine(routine_ptr);
 
+  // Paint the stack, so stack_peak_bytes() can tell which words were ever written.
+  for (uint32_t i = 0; i < STACK_ALLOCATION_SIZE; i++) {
+    this->allocated_stack[i] = STACK_PAINT;
+  }
+
   // Initialize thread routine stack (PSP).
   uint32_t* contxt_stk_bottom = (uint32_t*)(&this->allocated_stack[0] + STACK_ALLOCATION_SIZE);
   this->stkptr = contxt_stk_bottom;
   this->init_stack();
+
+  atomic_section a;
+  this->p_registry_next = registry_head;
+  registry_head = this;
 }
 
 /**
  * @brief Destroy the Thread:: Thread object
  */
 Thread::~Thread() {
+  {
+    atomic_section a;
+    for (Thread** pp = &registry_head; *pp; pp = &(*pp)->p_registry_next) {
+      if (*pp == this) {
+        *pp = this->p_registry_next;
+        break;
+      }
+    }
+  }
   this->thread_info.routine_ptr = nullptr;
   this->thread_info.state = COMPLETE;
 }
@@ -87,6 +113,40 @@ void Thread::wake_up() {
  */
 void Thread::to_sleep() {
   this->thread_info.state = SLEEP;
+}
+
+uint32_t Thread::stack_size_bytes() const {
+  return STACK_ALLOCATION_SIZE * sizeof(uint32_t);
+}
+
+uint32_t Thread::stack_used_bytes() const {
+  uintptr_t sp = (uintptr_t)this->stkptr;
+#if defined(ARMV7M)
+  // The running thread's stkptr is only updated when it is switched out; its live stack pointer is PSP.
+  if (yesrtos_scheduler_started && this == PreemptFIFOScheduler::p_active_thread) {
+    uint32_t psp;
+    __asm volatile("mrs %0, psp" : "=r"(psp));
+    sp = psp;
+  }
+#endif
+  uintptr_t top = (uintptr_t)&this->allocated_stack[STACK_ALLOCATION_SIZE];
+  uintptr_t bottom = (uintptr_t)&this->allocated_stack[0];
+  if (sp >= top) return 0;
+  if (sp < bottom) return this->stack_size_bytes();  // stack pointer below the stack: overflowed.
+  return (uint32_t)(top - sp);
+}
+
+uint32_t Thread::stack_peak_bytes() const {
+  // The stack grows down from the end of allocated_stack: untouched words are left at the start.
+  uint32_t untouched = 0;
+  while (untouched < STACK_ALLOCATION_SIZE && this->allocated_stack[untouched] == STACK_PAINT) {
+    untouched++;
+  }
+  uint32_t peak = (STACK_ALLOCATION_SIZE - untouched) * sizeof(uint32_t);
+  // Stack reserved but not written (e.g. the initial r0-r3, r12, r4-r11 slots) still holds the paint: the current use
+  // is a lower bound too.
+  uint32_t used = this->stack_used_bytes();
+  return peak > used ? peak : used;
 }
 
 bool Thread::operator==(const Thread& other) const {

@@ -46,6 +46,7 @@ endif()
 add_subdirectory(kernel)
 add_subdirectory(drivers)
 add_subdirectory(app/multi_thread)
+add_subdirectory(app/stack_monitor)
 
 # QEMU regression tests: ctest --preset qemu
 if (YESRTOS_QEMU_MACHINE)

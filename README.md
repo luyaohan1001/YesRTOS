@@ -26,6 +26,9 @@
 
 ## Tracing
 * ARM ITM/SWO
+* Stack monitor: `YesRTOS::StackMonitor` (`kernel/include/stack_monitor.hpp`) draws every thread's stack as a live bar
+  (current use, high-water mark, never used) on the trace output, redrawn in place with ANSI escape codes. Thread
+  stacks are painted with `0xA5A5A5A5` at creation, so `Thread::stack_peak_bytes()` finds the high-water mark.
 
 ## YesRTOS Architecture
 * The kernel follows modular pattern with various *static* libraries:
@@ -157,6 +160,11 @@ CooperativeMultitaskingDemo.mp4
   cmake --preset qemu
   cmake --build --preset qemu --target qemu
   cmake --build --preset qemu --target qemu-gdb
+  ```
+
+  To watch the thread stacks live in the terminal (`app/stack_monitor`, exit with `Ctrl-A X`):
+  ```bash
+  cmake --build --preset qemu --target qemu-stack-monitor
   ```
 
   To run the QEMU regression tests (`tests/qemu`), each a firmware image that reports PASS/FAIL through semihosting:

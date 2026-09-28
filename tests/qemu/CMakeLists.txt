@@ -23,6 +23,7 @@ set(YESRTOS_QEMU_TESTS
   tick_hook
   sleep
   sleep_until_periodic
+  stack_usage
 )
 
 # Tests that check tick counts against the work done run with -icount: QEMU's virtual clock then follows the number of
